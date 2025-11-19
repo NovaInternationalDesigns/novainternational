@@ -1,0 +1,68 @@
+.Carousel {
+  background-image: url("./backgound-img.jpg"); 
+  background-repeat: no-repeat;
+  background-size: cover; 
+  text-align: center;
+  color: white;
+  height: 550px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+
+.carousel {
+  width: 100%;
+  max-width: 900px; /* max width for desktop */
+  margin: 0 auto;   /* center horizontally */
+  overflow: hidden;
+  border-radius: 12px; /* optional rounded edges */
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2); /* optional shadow */
+}
+
+/* Slides wrapper */
+.slides {
+  display: flex;
+  width: calc(900px * 5); /* total width = number of images * max-width */
+  animation: slide 25s infinite; /* adjust speed if needed */
+}
+
+/* Each slide image */
+.slides img {
+  width: 875px;     /* max width desktop */
+  height: 400px;    /* billboard height */
+  object-fit: cover; /* maintain aspect ratio & crop excess */
+  flex-shrink: 0;   /* prevents shrinking */
+  transition: transform 0.5s;
+}
+
+/* Keyframes for sliding */
+@keyframes slide {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(0); }
+  
+  25%  { transform: translateX(-900px); }
+  45%  { transform: translateX(-900px); }
+  
+  50%  { transform: translateX(-1800px); }
+  70%  { transform: translateX(-1800px); }
+  
+  75%  { transform: translateX(-2700px); }
+  95%  { transform: translateX(-2700px); }
+  
+  100% { transform: translateX(-3600px); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .slides img {
+    width: 100%;
+    height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .slides img {
+    height: 200px;
+  }
+}

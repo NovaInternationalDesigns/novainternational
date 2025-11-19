@@ -1,0 +1,16 @@
+*{
+    margin: 10px;
+}
+
+.logo{
+    width: 200px;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+section {
+  padding: 40px;
+}
