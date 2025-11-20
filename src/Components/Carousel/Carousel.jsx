@@ -4,11 +4,11 @@ import "./Carousel.css";
 const Carousel = () => {
 
     const images = [
-    "/vaccum-sealing-machine.png",
-    "/light.png",
-    "/vaccum-sealing-machine.png",
-    "/light.png",
-    "/vaccum-sealing-machine.png",
+    "./robot.png",
+    "./light.png",
+    "./vaccum-sealing-machine.png",
+    "./digital-photoframe.png",
+    "./light.png",
   ];
 
     return (

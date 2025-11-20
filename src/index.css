@@ -1,9 +1,9 @@
 *{
-    margin: 10px;
+    box-sizing: border-box;
 }
 
 .logo{
-    width: 200px;
+    width: 250px;
 }
 
 body {
@@ -11,6 +11,3 @@ body {
   font-family: Arial, sans-serif;
 }
 
-section {
-  padding: 40px;
-}
