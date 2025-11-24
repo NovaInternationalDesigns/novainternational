@@ -7,6 +7,12 @@
   align-items: center;
 }
 
+.social-icons img {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+}
+
 /******************* Mobile Responsiveness *******************/ 
 
 @media (max-width: 600px) {
