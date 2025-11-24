@@ -5,8 +5,8 @@
   max-width: 1200px;
   margin: 15px auto;
   overflow: hidden;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  /* border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2); */
 }
 
 /* SLIDES WRAPPER (5 slides × 1200px) */
@@ -42,46 +42,44 @@
   100% { transform: translateX(-4800px); }
 }
 
-/* TABLET VIEW */
-@media (max-width: 1024px) {
-  .carousel {
-    height: 350px;
-  }
-
-  .slides img {
-    width: 100%;       /* auto-scale */
-    height: 350px;
-  }
-
-  .slides {
-    width: calc(100% * 5);
-  }
-
-  @keyframes slide {
-    0%   { transform: translateX(0); }
-    20%  { transform: translateX(0); }
-
-    25%  { transform: translateX(-100%); }
-    40%  { transform: translateX(-100%); }
-
-    45%  { transform: translateX(-200%); }
-    60%  { transform: translateX(-200%); }
-
-    65%  { transform: translateX(-300%); }
-    80%  { transform: translateX(-300%); }
-
-    85%  { transform: translateX(-400%); }
-    100% { transform: translateX(-400%); }
-  }
-}
-
 /* MOBILE VIEW */
 @media (max-width: 768px) {
   .carousel {
-    height: 250px;
+    height: 250px;           /* smaller carousel height */
   }
 
   .slides img {
-    height: 250px;
+    height: 250px;           /* match carousel */
+    object-fit: cover;       /* still fills container */
+    object-position: top;    /* show top part of image on mobile */
   }
+}
+
+/* SMALL MOBILE VIEW */
+@media (max-width: 480px) {
+  .carousel {
+    height: 290px;           /* even smaller carousel */
+  }
+
+  .slides img {
+    width: 350px;
+    height: 300px; 
+  }
+
+  @keyframes slide {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(0); }
+
+  25%  { transform: translateX(-350px); }
+  40%  { transform: translateX(-350px); }
+
+  45%  { transform: translateX(-650px); }
+  60%  { transform: translateX(-650px); }
+
+  65%  { transform: translateX(-1000px); }
+  80%  { transform: translateX(-1000px); }
+
+  85%  { transform: translateX(-1400px); }
+  100% { transform: translateX(-1400px); }
+}
 }

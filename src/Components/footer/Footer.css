@@ -1,8 +1,18 @@
-.footer{
-    background-color: black;
-    color: white;
-    height: 100px;
-    justify-content: center;
-    align-items: center;
-    display: flex;
+.footer {
+  background: #111;
+  color: #fff;
+  padding: 20px;
+  display: flex;             /* enables left/right alignment */
+  justify-content: space-between;
+  align-items: center;
+}
+
+/******************* Mobile Responsiveness *******************/ 
+
+@media (max-width: 600px) {
+  .footer {
+    flex-direction: column;   /* stack items vertically */
+    text-align: center;
+    gap: 15px;                /* space between elements */
+  }
 }

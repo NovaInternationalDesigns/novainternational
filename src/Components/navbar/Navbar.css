@@ -31,3 +31,25 @@
 .nav-links li a:hover {
   color: goldenrod;
 }
+
+/******************* Mobile Responsiveness *******************/ 
+
+@media (max-width: 600px) {
+  .navbar {
+    height: auto;                /* remove fixed height */
+    flex-direction: column;      /* stack logo + links vertically */
+    padding: 10px 0;
+  }
+
+  .nav-links {
+    flex-direction: column;      /* vertical menu */
+    gap: 12px;                   /* smaller gap for mobile */
+    margin-right: 0;             /* reset */
+    margin-top: 10px;            /* spacing below logo */
+    align-items: flex-start;     /* left items */
+  }
+
+  .nav-links li a {
+    font-size: 16px;             /* bigger tap-friendly text */
+  }
+}
