@@ -1,23 +1,19 @@
 import React from "react";
 import "./Navbar.css";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="logo-container">
-        <a href="#">
+        <Link to="/">
           <img src="./images/logo.png" alt="logo" className="logo" />
-        </a>
-      </div>
-
-      <div className="search">
-        <input type="text" placeholder="Search" />
-        <button>Go</button>
+        </Link>
       </div>
 
       <ul className="nav-links">
 
-        <li><a href="#about-us">About Us</a></li>
+        <li><Link to="/about">About Us</Link></li>
 
         {/* HOLIDAY OFFERS */}
         <li className="has-dropdown">
@@ -70,7 +66,7 @@ const Navbar = () => {
 
 
         <li><a href="#add-to-purchase-order">Add to Purchase Order</a></li>
-        <li><a href="#contact-us">Contact Us</a></li>
+        <li><Link to="/contact">Contact Us</Link></li>
 
       </ul>
     </nav>

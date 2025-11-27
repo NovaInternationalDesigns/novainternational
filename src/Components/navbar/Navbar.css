@@ -4,7 +4,7 @@
   align-items: center;
   background-color: #1a4f35;
   height: 115px;
-  padding: 0 20px;
+  padding: 0 20px 0px 0px;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -28,7 +28,8 @@
 }
 
 .nav-links a:hover {
-  color: goldenrod;
+  /* color: goldenrod; */
+  text-decoration: underline;
 }
 
 /* ---------- MAIN DROPDOWN ---------- */

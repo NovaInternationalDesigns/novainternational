@@ -7,6 +7,8 @@ import Categories from './Components/Categories';
 import Carousel from './Components/Carousel/Carousel';
 import Footer from './Components/footer/Footer';
 import Product from './pages/Product';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 
 function App() {
@@ -24,8 +26,12 @@ function App() {
           } 
         />
 
+        {/* About Page */}
+        <Route path="/about" element={<About />} />
+
         {/* Product Page */}
         <Route path="/product" element={<Product />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
 
       <Footer />   {/* always visible */}
