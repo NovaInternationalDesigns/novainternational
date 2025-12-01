@@ -1,0 +1,37 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} ^(www\.)?novainternationaldesigns\.com [NC]
+RewriteRule ^(.*)$ https://novainternationaldesigns.com/$1 [L,R=301]
+</IfModule>
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^(www\.)?novainternationaldesigns\.com [NC]
+RewriteRule .* - [E=UPGRADE]
+    <IfModule mod_headers.c>
+        Header always set Content-Security-Policy "upgrade-insecure-requests;" env=UPGRADE
+    </IfModule>
+</IfModule>
+
+# ⚠️ REMOVE this — it breaks client-side routing
+# RewriteEngine on
+# RewriteOptions inherit
+# RewriteCond %{HTTP_HOST} ^.*$
+# RewriteRule ^public_html\/?(.*)$ "https\:\/\/www\.novainternationaldesigns\.com\/index\.html$1" [R=301,L]
+
+# ✅ React Router fallback (THIS FIXES THE 404 ON REFRESH)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # If the file or directory exists, serve it
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Otherwise rewrite everything to index.html
+  RewriteRule ^ index.html [L]
+</IfModule>

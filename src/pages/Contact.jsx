@@ -1,10 +1,11 @@
 import React from 'react';
+import "./Contact.css";
 
 const Contact = () => {
   return (
-    <div>
-      <h1>Contact Us</h1>
-      <p>Fill out the form below to get in touch with us.</p>
+    <div className="contact-page">     
+      <p>You can contact us at</p>
+      <p><a href="mailto:ritika@novainternationaldesigns.com">Email: ritika@novainternationaldesigns.com</a></p>
       {/* You can add a form here */}
     </div>
   );

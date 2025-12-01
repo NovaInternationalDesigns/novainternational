@@ -26,8 +26,8 @@ const Navbar = () => {
               <ul className="submenu">
                 <li><a href="#">Electronics</a></li>
                 <li><a href="#">Fashion</a></li>
-                <li><a href="#">Evening Bags</a></li> 
-                <li><a href="#">Hand Bags</a></li>
+                <li><a href="#">Accessories</a></li> 
+                <li><a href="#">Phone Models</a></li>
               </ul>
 
             </li>
@@ -48,8 +48,8 @@ const Navbar = () => {
               <ul className="submenu">
                 <li><a href="#">Electronics</a></li>
                 <li><a href="#">Fashion</a></li>
-                <li><a href="#">Evening Bags</a></li>
-                <li><a href="#">Hand Bags</a></li>
+                <li><a href="#">Accessories</a></li>
+                <li><a href="#">Phone Models</a></li>
                 <li><a href="#">Wholesale Order</a></li>
                 <li><a href="#">Retail Order</a></li>
                 <li><a href="#">Minimum Quantity Order (MOQ)</a></li>
