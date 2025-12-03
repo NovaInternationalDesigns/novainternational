@@ -12,7 +12,6 @@ const Navbar = () => {
       </div>
 
       <ul className="nav-links">
-
         <li><Link to="/about">About Us</Link></li>
 
         {/* HOLIDAY OFFERS */}
@@ -21,15 +20,14 @@ const Navbar = () => {
 
           <ul className="dropdown">
             <li className="has-submenu">
-              <a href="#">Catagories ▸</a>
+              <a href="#">Categories ▸</a>
 
               <ul className="submenu">
-                <li><a href="#">Electronics</a></li>
+                <li><Link to="/electronics">Electronics</Link></li>
                 <li><a href="#">Fashion</a></li>
                 <li><a href="#">Accessories</a></li> 
                 <li><a href="#">Phone Models</a></li>
               </ul>
-
             </li>
           </ul>
         </li>
@@ -38,15 +36,14 @@ const Navbar = () => {
 
         {/* B2B */}
         <li className="has-dropdown">
-        <a href="#business-to-business">Business to Business ▾</a>
+          <a href="#business-to-business">Business to Business ▾</a>
 
           <ul className="dropdown">
-
             <li className="has-submenu">
               <a href="#">Digital Purchase Order ▸</a>
 
               <ul className="submenu">
-                <li><a href="#">Electronics</a></li>
+                <li><Link to="/electronics">Electronics</Link></li>
                 <li><a href="#">Fashion</a></li>
                 <li><a href="#">Accessories</a></li>
                 <li><a href="#">Phone Models</a></li>
@@ -60,14 +57,12 @@ const Navbar = () => {
               </ul>
             </li>
 
-    <li><a href="#">Digital Letter Head</a></li>
-  </ul>
-</li>
-
+            <li><a href="#">Digital Letter Head</a></li>
+          </ul>
+        </li>
 
         <li><a href="#add-to-purchase-order">Add to Purchase Order</a></li>
         <li><Link to="/contact">Contact Us</Link></li>
-
       </ul>
     </nav>
   );

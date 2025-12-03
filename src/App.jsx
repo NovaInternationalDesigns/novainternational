@@ -9,6 +9,7 @@ import Footer from './Components/footer/Footer';
 import Product from './pages/Product';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Electronics from './pages/Electronics';
 
 
 function App() {
@@ -32,6 +33,8 @@ function App() {
         {/* Product Page */}
         <Route path="/product" element={<Product />} />
         <Route path="/contact" element={<Contact />} />
+
+        <Route path="/electronics" element={<Electronics />} />
       </Routes>
 
       <Footer />   {/* always visible */}
