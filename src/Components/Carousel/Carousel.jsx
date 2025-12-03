@@ -3,7 +3,7 @@ import "./Carousel.css";
 
 const Carousel = () => {
   const slides = [
-    { type: "video", src: "./videos/SeasonsGreeting-2.mp4" },
+    { type: "video", src: "./videos/SeasonsGreeting3.mp4" },
     { type: "image", src: "./images/robot.png" },
     { type: "video", src: "./videos/campfire-speaker-black-logo.mp4" },
     { type: "image", src: "./images/light.png" },
