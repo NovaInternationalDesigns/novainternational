@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-function Electronics() {
+function Accessories() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL;
@@ -9,8 +9,8 @@ function Electronics() {
     fetch(`${API_URL}/api/products/all`)
       .then((res) => res.json())
       .then((data) => {
-        const electronics = data.filter((p) => p.category === "Electronics");
-        setProducts(electronics);
+        const accessories = data.filter((p) => p.category === "Accessories");
+        setProducts(accessories);
         setLoading(false);
       })
       .catch((err) => {
@@ -23,7 +23,7 @@ function Electronics() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Electronics</h1>
+      <h1>Accessories</h1>
       {products.length === 0 ? (
         <p>No products found.</p>
       ) : (
@@ -48,4 +48,4 @@ function Electronics() {
   );
 }
 
-export default Electronics;
+export default Accessories;
