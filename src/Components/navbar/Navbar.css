@@ -96,6 +96,11 @@
   background-color: #3b8a63;
 }
 
+.category-label {
+  color: white;       /* white text */
+
+}
+
 /* Remove bullets */
 .nav-links ul,
 .dropdown,

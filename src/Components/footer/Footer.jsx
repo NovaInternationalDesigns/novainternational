@@ -1,9 +1,10 @@
 import React from "react";
 import "./Footer.css";
 
+
 const Footer = () => {
   return (
-    <footer className="footer">
+    <div className="footer">
       <p>© Nova International Designs Corporation. All rights reserved.</p>
 
       <div className="social-icons">
@@ -12,7 +13,7 @@ const Footer = () => {
         <a href="#" target="_blank"><img src="/images/linkedIn-logo.png" alt="LinkedIn" /></a>
         <a href="#" target="_blank"><img src="/images/x_logo.png" alt="X" /></a>
       </div>
-    </footer>
+    </div>
   );
 };
 

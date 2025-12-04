@@ -1,45 +1,53 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import React from 'react'
-import './App.css'
-import Navbar from "./Components/navbar/Navbar";
-import Home from './pages/Home'
-import Categories from './Components/Categories';
-import Carousel from './Components/Carousel/Carousel';
-import Footer from './Components/footer/Footer';
-import Product from './pages/Product';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import Electronics from './pages/Electronics';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React from "react";
+import "./App.css";
+
+/* Components */
+import Navbar from "./Components/Navbar/Navbar";
+import Carousel from "./Components/Carousel/Carousel";
+import Footer from "./Components/Footer/Footer";
+
+/* Pages */
+import Home from "./pages/Home/Home.jsx";
+import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
+import Category from "./pages/Category.jsx";
+
 
 
 function App() {
-
   return (
-     <BrowserRouter>
-      <Navbar />   {/* always visible */}
+    <BrowserRouter>
+      <Navbar />
+
       <Routes>
+
         {/* Home Page */}
-        <Route path="/" element={
+        <Route
+          path="/"
+          element={
             <>
               <Carousel />
-              <Categories />
             </>
-          } 
+          }
         />
 
         {/* About Page */}
         <Route path="/about" element={<About />} />
 
-        {/* Product Page */}
-        <Route path="/product" element={<Product />} />
+        {/* Contact Page */}
         <Route path="/contact" element={<Contact />} />
 
-        <Route path="/electronics" element={<Electronics />} />
+        {/* Category Page */}
+        <Route path="/category/:category" element={<Category />} />
+
+ 
+
       </Routes>
 
-      <Footer />   {/* always visible */}
+      <Footer />
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -17,16 +17,14 @@ const Navbar = () => {
         {/* HOLIDAY OFFERS */}
         <li className="has-dropdown">
           <a href="#holiday-offers">Holiday Offers ▾</a>
-
           <ul className="dropdown">
             <li className="has-submenu">
-              <a href="#">Categories ▸</a>
-
+              <span className="category-label">Categories ▸</span>
               <ul className="submenu">
-                <li><Link to="/electronics">Electronics</Link></li>
-                <li><a href="#">Fashion</a></li>
-                <li><a href="#">Accessories</a></li> 
-                <li><a href="#">Phone Models</a></li>
+                <li><Link to="/category/electronics">Electronics</Link></li>
+                <li><Link to="/category/fashion">Fashion</Link></li>
+                <li><Link to="/category/accessories">Accessories</Link></li>
+                <li><Link to="/category/phone-models">Phone Models</Link></li>
               </ul>
             </li>
           </ul>
@@ -37,16 +35,14 @@ const Navbar = () => {
         {/* B2B */}
         <li className="has-dropdown">
           <a href="#business-to-business">Business to Business ▾</a>
-
           <ul className="dropdown">
             <li className="has-submenu">
               <a href="#">Digital Purchase Order ▸</a>
-
               <ul className="submenu">
-                <li><Link to="/electronics">Electronics</Link></li>
-                <li><a href="#">Fashion</a></li>
-                <li><a href="#">Accessories</a></li>
-                <li><a href="#">Phone Models</a></li>
+                <li><Link to="/category/electronics">Electronics</Link></li>
+                <li><Link to="/category/fashion">Fashion</Link></li>
+                <li><Link to="/category/accessories">Accessories</Link></li>
+                <li><Link to="/category/phone-models">Phone Models</Link></li>
                 <li><a href="#">Wholesale Order</a></li>
                 <li><a href="#">Retail Order</a></li>
                 <li><a href="#">Minimum Quantity Order (MOQ)</a></li>
@@ -56,7 +52,6 @@ const Navbar = () => {
                 <li><a href="#">Inventory</a></li>
               </ul>
             </li>
-
             <li><a href="#">Digital Letter Head</a></li>
           </ul>
         </li>
