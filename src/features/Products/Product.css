@@ -1,0 +1,99 @@
+/* ---- PAGE CONTAINER ---- */
+.product-page {
+  padding: 40px 5%;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+.product-page h1 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2.2rem;
+  color: #222;
+}
+
+/* ---- GRID LAYOUT ---- */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  justify-items: center; /* center all cards in the grid */
+}
+
+/* ---- PRODUCT CARD ---- */
+.product-card {
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0; /* visible border */
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column; /* vertical layout */
+  align-items: center;    /* center image and text */
+  text-align: center;     /* center text */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ---- PRODUCT IMAGE ---- */
+.product-card img {
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover img {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ---- PRODUCT NAME ---- */
+.product-card h3 {
+  font-size: 1.1rem;
+  color: #222;
+  margin-bottom: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* ---- PRODUCT PRICE ---- */
+.product-card .price {
+  font-weight: bold;
+  color: #e63946; /* red color for price */
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+/* ---- PRODUCT CATEGORY ---- */
+.product-card .category {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* ---- ADD SOME SPACING ---- */
+.product-card p,
+.product-card h3 {
+  margin: 5px 0;
+}
+
+/* ---- OPTIONAL: PRODUCT BADGE ---- */
+.product-card .badge {
+  background-color: #ffd700;
+  color: #222;
+  font-size: 0.75rem;
+  padding: 3px 7px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}

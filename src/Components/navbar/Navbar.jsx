@@ -31,6 +31,7 @@ const Navbar = () => {
         </li>
 
         <li><a href="#gift-card">Gift Card</a></li>
+        <li><Link to="/product">Products</Link></li>
 
         {/* B2B */}
         <li className="has-dropdown">
