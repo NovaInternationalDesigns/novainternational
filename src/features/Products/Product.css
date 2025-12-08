@@ -43,9 +43,10 @@
 
 /* ---- PRODUCT IMAGE ---- */
 .product-card img {
-  width: 160px;
-  height: 160px;
-  object-fit: cover;
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+ 
   border-radius: 12px;
   margin-bottom: 15px;
   border: 1px solid #ddd;
@@ -89,7 +90,6 @@
 
 /* ---- OPTIONAL: PRODUCT BADGE ---- */
 .product-card .badge {
-  background-color: #ffd700;
   color: #222;
   font-size: 0.75rem;
   padding: 3px 7px;
