@@ -4,40 +4,61 @@ import "./Carousel.css";
 const Carousel = () => {
   const slides = [
     { type: "video", src: "./videos/SeasonsGreeting3.mp4" },
+    { type: "image", src: "./images/vaccum-sealing-machine-by-Nova-International-Designs-Corporation.png" },
+    { type: "video", src: "./videos/Robot-final.mp4" },
+    { type: "image", src: "./images/red-clutch.png" },
     { type: "image", src: "./images/robot.png" },
     { type: "video", src: "./videos/campfire-speaker-black-logo.mp4" },
+    { type: "image", src: "./images/black-clutch.png" },
     { type: "image", src: "./images/light.png" },
-    { type: "video", src: "./videos/Robot-final.mp4" },
+    { type: "image", src: "./images/golden-clutch.png" },
+    { type: "image", src: "./images/magenta-clutch2.png" },
     { type: "image", src: "./images/digital-photoframe.png" },
+    { type: "image", src: "./images/gittery-gold-clutch.png" },
+    { type: "image", src: "./images/silver-clutch.png" },
   ];
 
   // Clone first and last slide for seamless loop
-  const extendedSlides = [
-    slides[slides.length - 1],
-    ...slides,
-    slides[0],
-  ];
+  const extendedSlides = [slides[slides.length - 1], ...slides, slides[0]];
 
-  const [index, setIndex] = useState(1); // start at first real slide
+  const [index, setIndex] = useState(1); // Start at first real slide
   const [transition, setTransition] = useState(true);
   const timeoutRef = useRef(null);
+  const videoRefs = useRef([]);
 
   const delay = 3000;
-
-  const goNext = () => setIndex((prev) => prev + 1);
-  const goPrev = () => setIndex((prev) => prev - 1);
 
   const resetTimeout = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
   };
 
-  // Auto-slide for images only
+  const goNext = () => setIndex((prev) => prev + 1);
+  const goPrev = () => setIndex((prev) => prev - 1);
+
+  // Pause all videos
+  const pauseAllVideos = () => {
+    videoRefs.current.forEach((video) => {
+      if (video && !video.paused) {
+        video.pause();
+        video.currentTime = 0; // optional: reset to start
+      }
+    });
+  };
+
+  // Auto-slide for images only & play video when it becomes active
   useEffect(() => {
-    resetTimeout();
+    pauseAllVideos(); // Stop any previous video
+
     const currentSlide = extendedSlides[index];
 
     if (currentSlide.type === "image") {
       timeoutRef.current = setTimeout(goNext, delay);
+    } else if (currentSlide.type === "video") {
+      const video = videoRefs.current[index];
+      if (video) {
+        video.currentTime = 0;
+        video.play();
+      }
     }
 
     return () => resetTimeout();
@@ -45,13 +66,10 @@ const Carousel = () => {
 
   // Handle seamless loop
   const handleTransitionEnd = () => {
-    // If moved to cloned last slide (index 0), jump to real last slide
     if (index === 0) {
       setTransition(false);
       setIndex(slides.length);
-    }
-    // If moved to cloned first slide (index = extendedSlides.length - 1), jump to real first slide
-    if (index === extendedSlides.length - 1) {
+    } else if (index === extendedSlides.length - 1) {
       setTransition(false);
       setIndex(1);
     }
@@ -81,46 +99,49 @@ const Carousel = () => {
               <img src={slide.src} alt={`Slide ${i}`} />
             ) : (
               <video
+                ref={(el) => (videoRefs.current[i] = el)}
                 src={slide.src}
-                muted
-                autoPlay
-                playsInline
+                controls
                 onEnded={goNext}
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
-
-            // For video with sonund controls.
-            //   <video
-            //   src={slide.src}
-            //   autoPlay
-            //   controls   // optional, shows play/pause + volume
-            //   playsInline
-            //   onEnded={goNext}
-            //   style={{ width: "100%", height: "100%", objectFit: "contain" }}
-            // />
             )}
           </div>
         ))}
       </div>
 
       {/* BUTTONS */}
-      <button className="arrow left" onClick={goPrev}>
+      <button
+        className="arrow left"
+        onClick={() => {
+          pauseAllVideos();
+          goPrev();
+        }}
+      >
         ❮
       </button>
-      <button className="arrow right" onClick={goNext}>
+      <button
+        className="arrow right"
+        onClick={() => {
+          pauseAllVideos();
+          goNext();
+        }}
+      >
         ❯
       </button>
 
       {/* DOTS */}
       <div className="dots">
         {slides.map((_, i) => {
-          // Adjust dot index because we have a cloned slide at start
-          const dotIndex = i + 1;
+          const dotIndex = i + 1; // Adjust for cloned slide
           return (
             <div
               key={i}
               className={`dot ${index === dotIndex ? "active" : ""}`}
-              onClick={() => setIndex(dotIndex)}
+              onClick={() => {
+                pauseAllVideos();
+                setIndex(dotIndex);
+              }}
             ></div>
           );
         })}
