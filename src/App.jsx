@@ -13,6 +13,7 @@ import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Category from "./pages/Category.jsx";
 import Product from "./features/products/Product.jsx";
+import PurchaseOrderForm from "./pages/PurchaseOrderForm.jsx";
 
 
 
@@ -41,6 +42,7 @@ function App() {
         
         {/* Product Page */}
         <Route path="/product" element={<Product />} />
+        <Route path="/purchase-order" element={<PurchaseOrderForm />} />
 
         {/* Category Page */}
         <Route path="/category/:category" element={<Category />} />

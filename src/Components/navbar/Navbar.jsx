@@ -37,20 +37,24 @@ const Navbar = () => {
         <li className="has-dropdown">
           <a href="#business-to-business">Business to Business ▾</a>
           <ul className="dropdown">
+
+            {/* Digital Purchase Order section */}
             <li className="has-submenu">
-              <a href="#">Digital Purchase Order ▸</a>
+              <Link to="/purchase-order">Digital Purchase Order ▸</Link>
+
               <ul className="submenu">
                 <li><Link to="/category/electronics">Electronics</Link></li>
                 <li><Link to="/category/fashion">Fashion</Link></li>
                 <li><Link to="/category/accessories">Accessories</Link></li>
                 <li><Link to="/category/phone-models">Phone Models</Link></li>
-                <li><a href="#">Wholesale Order</a></li>
-                <li><a href="#">Retail Order</a></li>
-                <li><a href="#">Minimum Quantity Order (MOQ)</a></li>
-                <li><a href="#">Repeating Purchase Order</a></li>
-                <li><a href="#">Delivery Terms</a></li>
-                <li><a href="#">Payment Terms</a></li>
-                <li><a href="#">Inventory</a></li>
+
+                <li><Link to="/b2b/wholesale-order">Wholesale Order</Link></li>
+                <li><Link to="/b2b/retail-order">Retail Order</Link></li>
+                <li><Link to="/b2b/mqo">Minimum Quantity Order (MQO)</Link></li>
+                <li><Link to="/b2b/repeat-order">Repeating Purchase Order</Link></li>
+                <li><Link to="/b2b/delivery-terms">Delivery Terms</Link></li>
+                <li><Link to="/b2b/payment-terms">Payment Terms</Link></li>
+                <li><Link to="/b2b/inventory">Inventory</Link></li>
               </ul>
             </li>
             <li><a href="#">Digital Letter Head</a></li>
