@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import React from "react";
 import "./App.css";
 
@@ -14,6 +14,7 @@ import Contact from "./pages/Contact.jsx";
 import Category from "./pages/Category.jsx";
 import Product from "./features/products/Product.jsx";
 import PurchaseOrderForm from "./pages/PurchaseOrderForm.jsx";
+import ProductDetails from "./features/products/ProductDetails.jsx";
 
 
 
@@ -42,6 +43,7 @@ function App() {
         
         {/* Product Page */}
         <Route path="/product" element={<Product />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/purchase-order" element={<PurchaseOrderForm />} />
 
         {/* Category Page */}

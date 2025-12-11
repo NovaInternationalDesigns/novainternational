@@ -41,6 +41,11 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
+.product-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 /* ---- PRODUCT IMAGE ---- */
 .product-card img {
   width: 150px;

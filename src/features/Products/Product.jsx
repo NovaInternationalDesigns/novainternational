@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom"; 
 import "./Product.css";
 
 function Product() {
@@ -33,12 +34,19 @@ function Product() {
 
       <div className="product-grid">
         {products.map(product => (
-         <div className="product-card" key={product._id}>
-            <img src={product.images?.[0] || "/images/no-image.png"}alt={product.name} />
-            <h3>{product.name}</h3>
-            <p className="price">${product.price}</p>
-            <p className="category">{product.category}</p>
-        </div>
+          <Link 
+            to={`/product/${product._id}`}  // ✅ Clicking goes to details page
+            className="product-card-link" 
+            key={product._id}
+          >
+      <div className="product-card" key={product._id}>
+        <img src={product.images?.[0] || "/images/no-image.png"} alt={product.name} />
+        <h3>{product.name}</h3>
+        <p className="price">${product.price}</p>
+        <p className="category">{product.category}</p>
+      </div>
+
+          </Link>
         ))}
       </div>
     </div>

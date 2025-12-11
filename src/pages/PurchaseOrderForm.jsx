@@ -63,7 +63,7 @@ export default function PurchaseOrderForm() {
         return;
         }
         if (item.qty <= 0 || item.price < 0) {
-        alert(`Please enter valid quantity and price for Order Items ${i + 1}.`);
+        alert(`Please enter valid quantity and price for Order item ${i + 1}.`);
         return;
         }
     }
