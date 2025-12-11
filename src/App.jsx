@@ -26,14 +26,7 @@ function App() {
       <Routes>
 
         {/* Home Page */}
-        <Route
-          path="/"
-          element={
-            <>
-              <Carousel />
-            </>
-          }
-        />
+        <Route path="/" element={<Carousel />} />
 
         {/* About Page */}
         <Route path="/about" element={<About />} />
@@ -48,8 +41,6 @@ function App() {
 
         {/* Category Page */}
         <Route path="/category/:category" element={<Category />} />
-
- 
 
       </Routes>
 
