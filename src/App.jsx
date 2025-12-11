@@ -15,6 +15,7 @@ import Category from "./pages/Category.jsx";
 import Product from "./features/products/Product.jsx";
 import PurchaseOrderForm from "./pages/PurchaseOrderForm.jsx";
 import ProductDetails from "./features/products/ProductDetails.jsx";
+import DigitalLetterHead from './pages/DigitalLetterhead.jsx';
 
 
 
@@ -41,6 +42,8 @@ function App() {
 
         {/* Category Page */}
         <Route path="/category/:category" element={<Category />} />
+
+        <Route path="/digital-letter-head/:orderId" element={<DigitalLetterHead />} />
 
       </Routes>
 

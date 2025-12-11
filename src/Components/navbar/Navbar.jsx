@@ -7,7 +7,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="logo-container">
         <Link to="/">
-          <img src="./images/logo.png" alt="logo" className="logo" />
+          <img src="/images/logo.png" alt="logo" className="logo" />
         </Link>
       </div>
 
@@ -43,10 +43,10 @@ const Navbar = () => {
               <Link to="/purchase-order">Digital Purchase Order ▸</Link>
 
               <ul className="submenu">
-                <li><Link to="/category/electronics">Electronics</Link></li>
+                {/* <li><Link to="/category/electronics">Electronics</Link></li>
                 <li><Link to="/category/fashion">Fashion</Link></li>
                 <li><Link to="/category/accessories">Accessories</Link></li>
-                <li><Link to="/category/phone-models">Phone Models</Link></li>
+                <li><Link to="/category/phone-models">Phone Models</Link></li> */}
 
                 <li><Link to="/b2b/wholesale-order">Wholesale Order</Link></li>
                 <li><Link to="/b2b/retail-order">Retail Order</Link></li>
@@ -57,7 +57,7 @@ const Navbar = () => {
                 <li><Link to="/b2b/inventory">Inventory</Link></li>
               </ul>
             </li>
-            <li><a href="#">Digital Letter Head</a></li>
+            {/* <Link to="/digital-letter-head">Digital Letter Head</Link> */}
           </ul>
         </li>
 
