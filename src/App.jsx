@@ -3,9 +3,9 @@ import React from "react";
 import "./App.css";
 
 /* Components */
-import Navbar from "./Components/navbar/Navbar";
-import Carousel from "./Components/Carousel/Carousel";
-import Footer from "./Components/Footer/Footer";
+import Navbar from "./Components/navbar/Navbar.jsx";
+import Carousel from "./Components/Carousel/Carousel.jsx";
+import Footer from "./Components/Footer/Footer.jsx";
 
 /* Pages */
 import Home from "./pages/Home/Home.jsx";
