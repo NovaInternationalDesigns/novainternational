@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import "./DigitalLetterHead.css";
+import "./digitalLetterHead.css";
 
 function DigitalLetterHead() {
   const { orderId } = useParams();

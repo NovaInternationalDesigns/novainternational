@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import "./PurchaseOrderForm.css";
+import "./purchaseOrderForm.css";
 
 export default function PurchaseOrderForm() {
   const navigate = useNavigate(); // Hook for redirecting
