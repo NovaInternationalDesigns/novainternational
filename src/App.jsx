@@ -3,18 +3,18 @@ import React from "react";
 import "./App.css";
 
 /* Components */
-import Navbar from "./Components/navbar/Navbar.jsx";
-import Carousel from "./Components/Carousel/Carousel.jsx";
-import Footer from "./Components/Footer/Footer.jsx";
+import Navbar from "./components/navbar/Navbar.jsx";
+import Carousel from "./components/carousel/Carousel.jsx";
+import Footer from "./components/footer/Footer.jsx";
 
 /* Pages */
 import Home from "./pages/Home/Home.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Category from "./pages/Category.jsx";
-import Product from "./features/Products/Product.jsx";
+import Product from "./features/products/Product.jsx";
 import PurchaseOrderForm from "./pages/PurchaseOrderForm.jsx";
-import ProductDetails from "./features/Products/ProductDetails.jsx";
+import ProductDetails from "./features/products/ProductDetails.jsx";
 import DigitalLetterHead from './pages/DigitalLetterhead.jsx';
 
 
