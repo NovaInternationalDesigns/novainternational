@@ -9,7 +9,10 @@ function AddProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("https://novainternational-backend.onrender.com/api/products/add", {
+    //const res = await fetch("https://novainternational-backend.onrender.com/api/products/add", {
+    
+    const res = await fetch( `${import.meta.env.VITE_API_URL}/api/products/add`, // fetch("https://novainternational-backend.onrender.com/api/products/add",
+    { 
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, description, price, images })

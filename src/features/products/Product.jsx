@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom"; 
+import ProductCard from "./ProductCard";
 import "./Product.css";
 
 function Product() {
@@ -8,9 +8,10 @@ function Product() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log("API URL:", import.meta.env.VITE_API_URL);
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`); //fetch("http://localhost:5000/api/products");
         if (!res.ok) throw new Error("Failed to load products");
 
         const data = await res.json();
@@ -34,19 +35,7 @@ function Product() {
 
       <div className="product-grid">
         {products.map(product => (
-          <Link 
-            to={`/product/${product._id}`}  // ✅ Clicking goes to details page
-            className="product-card-link" 
-            key={product._id}
-          >
-      <div className="product-card" key={product._id}>
-        <img src={product.images?.[0] || "/images/no-image.png"} alt={product.name} />
-        <h3>{product.name}</h3>
-        <p className="price">${product.price}</p>
-        <p className="category">{product.category}</p>
-      </div>
-
-          </Link>
+          <ProductCard key={product._id} product={product} />
         ))}
       </div>
     </div>

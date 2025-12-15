@@ -14,7 +14,7 @@ import Contact from "./pages/Contact.jsx";
 import Category from "./pages/Category.jsx";
 import Product from "./features/products/Product.jsx";
 import PurchaseOrderForm from "./pages/PurchaseOrderForm.jsx";
-import ProductDetails from "./features/products/ProductDetails.jsx";
+import ProductDetails from "./pages/ProductDetails.jsx";
 import DigitalLetterHead from './pages/DigitalLetterhead.jsx';
 
 

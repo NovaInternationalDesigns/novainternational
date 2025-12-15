@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import ProductCard from "../features/products/ProductCard";
 
 function Category() {
   const { category } = useParams();
@@ -7,20 +8,16 @@ function Category() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
+    fetch(`${import.meta.env.VITE_API_URL}/api/products`) //fetch("http://localhost:5000/api/products")
       .then(res => res.json())
       .then(data => {
         const filtered = data.filter(
           item => item.category.toLowerCase() === category.toLowerCase()
         );
-
         setProducts(filtered);
         setLoading(false);
       })
-      .catch(err => {
-        console.log(err);
-        setLoading(false);
-      });
+      .catch(() => setLoading(false));
   }, [category]);
 
   if (loading) return <p>Loading...</p>;
@@ -34,15 +31,7 @@ function Category() {
           <p>No products found in this category.</p>
         ) : (
           products.map(product => (
-            <div className="product-card" key={product._id}>
-              <img 
-                src={product.images?.[0] || "/images/no-image.png"}
-                alt={product.name}
-              />
-              <h3>{product.name}</h3>
-              <p className="price">${product.price}</p>
-              <p className="category">{product.category}</p>
-            </div>
+            <ProductCard key={product._id} product={product} />
           ))
         )}
       </div>
