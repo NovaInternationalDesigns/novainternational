@@ -1,70 +1,78 @@
 import React from "react";
-import "./navbar.css";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/ContextProvider.jsx";
+import "./navbar.css";
 
 const Navbar = () => {
+  const { user, logout, isAuthenticated } = useAuth();
+
   return (
-    <nav className="navbar">
-      <div className="logo-container">
-        <Link to="/">
-          <img src="/images/logo.png" alt="logo" className="logo" />
-        </Link>
+<nav className="navbar">
+  <div className="navbar-container">
+    <div className="logo-container">
+      <Link to="/"><img src="/images/logo.png" alt="logo" className="logo" /></Link>
+    </div>
+
+    {/* Top-level menu */}
+    <ul className="top-menu right-align">
+      <li><Link to="/about">About Us</Link></li>
+      <li><Link to="#">Holiday Offers</Link></li>
+      {/* <li><Link to="/product">Products</Link></li> */}
+      <li><Link to="#">Gift Card</Link></li>
+      <li><Link to="#">Business to Business</Link></li>
+      <Link to="/purchase-order">Purchase Order</Link>
+      <li><Link to="/contact">Contact Us</Link></li>
+      {/* <li><Link to="/signin">Sign In</Link></li> */}
+    </ul>
+  </div>
+ 
+  {/* Second-level menu row */}
+  <ul className="second-level-row right-align">
+    <li className="has-dropdown">
+      <li><Link to="/category/electronics">Electronics</Link></li>
+      <div className="mega-menu">
+        <div className="mega-column">
+          <Link to="/product/693c3e068d8ccb03a032c1ae">Vacuum Sealing Machine</Link>
+          <Link to="/product/693c3e068d8ccb03a032c1b1">Campfire Light</Link>
+          <Link to="/product/6942f1628d8ccb03a032c1d6">Bladeless Fan</Link>
+          <Link to="/product/693c3e068d8ccb03a032c1af">Digital Photoframe</Link>
+        </div>
       </div>
+    </li>
 
-      <ul className="nav-links">
-        <li><Link to="/about">About Us</Link></li>
+    <li className="has-dropdown">
+      <li><Link to="/category/fashion">Fashion</Link></li>
+      <div className="mega-menu">
+        <div className="mega-column">
+          <Link to="/category/men">Men</Link>
+          <Link to="/category/women">Women</Link>
+          <Link to="/category/kids">Kids</Link>
+        </div>
+      </div>
+    </li>
 
-        {/* HOLIDAY OFFERS */}
-        <li className="has-dropdown">
-          <a href="#holiday-offers">Holiday Offers ▾</a>
-          <ul className="dropdown">
-            <li className="has-submenu">
-              <span className="category-label">Categories ▸</span>
-              <ul className="submenu">
-                <li><Link to="/category/electronics">Electronics</Link></li>
-                <li><Link to="/category/fashion">Fashion</Link></li>
-                <li><Link to="/category/accessories">Accessories</Link></li>
-                <li><Link to="/category/phone-models">Phone Models</Link></li>
-              </ul>
-            </li>
-          </ul>
-        </li>
+    <li className="has-dropdown">
+      <li><Link to="/category/accessories">Evening Clutches</Link></li>
+      <div className="mega-menu">
+        <div className="mega-column">
+          <Link to="/category/accessories">All Clutches</Link>
+          <Link to="/product/693c3e068d8ccb03a032c1b8">Jute Bags</Link>
+        </div>
+      </div>
+    </li>
 
-        <li><a href="#gift-card">Gift Card</a></li>
-        <li><Link to="/product">Products</Link></li>
+    <li className="has-dropdown">
+      <Link to="/product/693c3e068d8ccb03a032c1ad">Robots</Link>
+      <div className="mega-menu">
+        <div className="mega-column">
+          <Link to="/product/693c3e068d8ccb03a032c1ad">Educational Robots</Link>
+        </div>
+      </div>
+    </li>
+  </ul>
+</nav>
 
-        {/* B2B */}
-        <li className="has-dropdown">
-          <a href="#business-to-business">Business to Business ▾</a>
-          <ul className="dropdown">
 
-            {/* Digital Purchase Order section */}
-            <li className="has-submenu">
-              <Link to="/purchase-order">Digital Purchase Order ▸</Link>
-
-              <ul className="submenu">
-                {/* <li><Link to="/category/electronics">Electronics</Link></li>
-                <li><Link to="/category/fashion">Fashion</Link></li>
-                <li><Link to="/category/accessories">Accessories</Link></li>
-                <li><Link to="/category/phone-models">Phone Models</Link></li> */}
-
-                <li><Link to="/b2b/wholesale-order">Wholesale Order</Link></li>
-                <li><Link to="/b2b/retail-order">Retail Order</Link></li>
-                <li><Link to="/b2b/mqo">Minimum Quantity Order (MQO)</Link></li>
-                <li><Link to="/b2b/repeat-order">Repeating Purchase Order</Link></li>
-                <li><Link to="/b2b/delivery-terms">Delivery Terms</Link></li>
-                <li><Link to="/b2b/payment-terms">Payment Terms</Link></li>
-                <li><Link to="/b2b/inventory">Inventory</Link></li>
-              </ul>
-            </li>
-            {/* <Link to="/digital-letter-head">Digital Letter Head</Link> */}
-          </ul>
-        </li>
-
-        <li><a href="#add-to-purchase-order">Add to Purchase Order</a></li>
-        <li><Link to="/contact">Contact Us</Link></li>
-      </ul>
-    </nav>
   );
 };
 

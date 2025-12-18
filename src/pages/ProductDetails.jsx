@@ -1,31 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "./ProductDetails.css";
+import PurchaseOrderForm from "./PurchaseOrderForm";
 
 function ProductDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
+  const MIN_QTY = 500;
 
   const [product, setProduct] = useState(null);
   const [selectedColor, setSelectedColor] = useState("");
-  const [qty, setQty] = useState(1);
+  const [qty, setQty] = useState(MIN_QTY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/id/${id}`); //fetch(`http://localhost:5000/api/products/id/${id}` );
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/products/id/${id}`
+        );
 
-        if (!res.ok) {
-          throw new Error("Product not found");
-        }
+        if (!res.ok) throw new Error("Product not found");
 
         const data = await res.json();
         setProduct(data);
 
-        if (data?.colors?.length > 0) {
-          setSelectedColor(data.colors[0]);
-        }
+        if (data?.colors?.length > 0) setSelectedColor(data.colors[0]);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -41,11 +43,24 @@ function ProductDetails() {
   if (!product) return null;
 
   const handleQtyChange = (value) => {
-    if (value < 1) return;
+    if (value < MIN_QTY) {
+      setQty(MIN_QTY);
+      return;
+    }
     setQty(value);
   };
 
+  const validateQty = () => {
+    if (qty < MIN_QTY) {
+      alert(`Minimum order quantity is ${MIN_QTY}`);
+      return false;
+    }
+    return true;
+  };
+
   const handleAddToPO = () => {
+    if (!validateQty()) return;
+
     const poItem = {
       productId: product._id,
       name: product.name,
@@ -55,10 +70,28 @@ function ProductDetails() {
     };
 
     console.log("Add to Purchase Order:", poItem);
-    // later → send to context / redux / API
+    // TODO: send to context / redux / API
   };
 
-  return (
+  const handleBuyNow = () => {
+    if (!validateQty()) return;
+
+    const order = {
+      productId: product._id,
+      name: product.name,
+      price: product.price,
+      color: selectedColor,
+      quantity: qty,
+    };
+
+    console.log("Buy Now:", order);
+    navigate("/checkout", { state: order });
+  };
+  
+
+return (
+  <>
+    {/* PRODUCT DETAILS */}
     <div className="product-details">
       {/* LEFT IMAGE */}
       <div className="images-section">
@@ -73,7 +106,6 @@ function ProductDetails() {
         <h1>{product.name}</h1>
         <h2 className="price">${product.price}</h2>
         <p className="category">{product.category}</p>
-
         <p className="description">{product.description}</p>
 
         {/* COLORS */}
@@ -81,7 +113,7 @@ function ProductDetails() {
           <div className="colors-group">
             <h4>Select Color:</h4>
             <div className="color-options">
-              {product.colors.map(color => (
+              {product.colors.map((color) => (
                 <button
                   key={color}
                   className={`color-btn ${
@@ -101,19 +133,35 @@ function ProductDetails() {
           <h4>Quantity:</h4>
           <input
             type="number"
-            min="1"
+            min={MIN_QTY}
             value={qty}
             onChange={(e) => handleQtyChange(Number(e.target.value))}
           />
+          <p className="min-qty-note">
+            Minimum order quantity: <strong>{MIN_QTY}</strong>
+          </p>
         </div>
 
-        {/* ADD TO PO */}
-        <button className="add-po-btn" onClick={handleAddToPO}>
-          Add to Purchase Order
-        </button>
+        {/* ACTION BUTTONS */}
+        <div className="action-buttons">
+          <button className="buy-now-btn" onClick={handleBuyNow}>
+            Buy Now
+          </button>
+          <button className="add-po-btn" onClick={handleAddToPO}>
+            Add to Purchase Order
+          </button>
+        </div>
       </div>
     </div>
-  );
+
+    {/* PURCHASE ORDER FORM BELOW PRODUCT DETAILS */}
+    <PurchaseOrderForm
+      product={product}
+      qty={qty}
+      color={selectedColor}
+    />
+  </>
+);
 }
 
 export default ProductDetails;

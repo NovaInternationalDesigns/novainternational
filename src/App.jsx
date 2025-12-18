@@ -16,7 +16,9 @@ import Product from "./features/products/Product.jsx";
 import PurchaseOrderForm from "./pages/PurchaseOrderForm.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
 import DigitalLetterHead from './pages/DigitalLetterhead.jsx';
-
+import Checkout from './pages/Checkout.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import SignIn from './pages/SignIn.jsx';
 
 
 function App() {
@@ -42,9 +44,16 @@ function App() {
 
         {/* Category Page */}
         <Route path="/category/:category" element={<Category />} />
+        <Route path="/category/:category/:subcategory" element={<Category />} />
 
         <Route path="/digital-letter-head/:orderId" element={<DigitalLetterHead />} />
+        <Route path="/signin" element={<SignIn />} />
 
+        {/* Checkout Page - Protected Route */} 
+        <Route path="/checkout" element={
+        <ProtectedRoute><Checkout /></ProtectedRoute>
+  }
+/>
       </Routes>
 
       <Footer />

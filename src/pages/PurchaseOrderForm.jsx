@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import "./PurchaseOrderForm.css";
 
-export default function PurchaseOrderForm() {
-  const navigate = useNavigate(); // Hook for redirecting
+export default function PurchaseOrderForm({ product, qty, color }) {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     bankName: "",
     accountNo: "",
@@ -17,7 +18,23 @@ export default function PurchaseOrderForm() {
     notes: ""
   });
 
-  const [items, setItems] = useState([{ styleNo: "", description: "", color: "", qty: 1, price: 0, total: 0 }]);
+  const [items, setItems] = useState([]);
+
+  // ✅ Pre-fill first row with product data
+  useEffect(() => {
+    if (product) {
+      setItems([
+        {
+          styleNo: product._id,
+          description: product.name,
+          color: color || "",
+          qty: qty,
+          price: product.price,
+          total: qty * product.price
+        }
+      ]);
+    }
+  }, [product, qty, color]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,74 +43,35 @@ export default function PurchaseOrderForm() {
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...items];
     updatedItems[index][field] = value;
+
     if (field === "qty" || field === "price") {
-      updatedItems[index].total = (updatedItems[index].qty || 0) * (updatedItems[index].price || 0);
+      updatedItems[index].total =
+        (updatedItems[index].qty || 0) * (updatedItems[index].price || 0);
     }
+
     setItems(updatedItems);
   };
 
-  const addRow = () => setItems([...items, { styleNo: "", description: "", color: "", qty: 1, price: 0, total: 0 }]);
-  const removeRow = (index) => setItems(items.filter((_, i) => i !== index));
+  const addRow = () =>
+    setItems([
+      ...items,
+      { styleNo: "", description: "", color: "", qty: 1, price: 0, total: 0 }
+    ]);
+
+  const removeRow = (index) =>
+    setItems(items.filter((_, i) => i !== index));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
-    if (
-      !formData.bankName ||
-      !formData.accountNo ||
-      !formData.routingNo ||
-      !formData.customerName ||
-      !formData.attn ||
-      !formData.address ||
-      !formData.tel
-    ) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
-    // Validate telephone (simple regex for digits)
-    const phoneRegex = /^[0-9]{10,15}$/;
-    if (!phoneRegex.test(formData.tel.replace(/\D/g, ""))) {
-      alert("Please enter a valid telephone number.");
-      return;
-    }
-
-    // Validate order items
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (!item.styleNo || !item.description || !item.color) {
-        alert(`Please fill in all details for Order Items ${i + 1}.`);
-        return;
-      }
-      if (item.qty <= 0 || item.price < 0) {
-        alert(`Please enter valid quantity and price for Order item ${i + 1}.`);
-        return;
-      }
-    }
-
     try {
-      // Submit form
-      const res = await axios.post("http://localhost:5000/api/purchase-order", { ...formData, items });
-      
+      const res = await axios.post(
+        "http://localhost:5000/api/purchase-order",
+        { ...formData, items }
+      );
+
       alert("Purchase order submitted successfully!");
-
-      // Redirect to Digital Letter Head page with order ID
       navigate(`/digital-letter-head/${res.data.order._id}`);
-
-      // Optional: reset form
-      setFormData({
-        bankName: "",
-        accountNo: "",
-        routingNo: "",
-        customerName: "",
-        attn: "",
-        address: "",
-        tel: "",
-        fax: "",
-        notes: ""
-      });
-      setItems([{ styleNo: "", description: "", color: "", qty: 1, price: 0, total: 0 }]);
     } catch (error) {
       console.error(error);
       alert("Error submitting purchase order");
@@ -102,66 +80,85 @@ export default function PurchaseOrderForm() {
 
   return (
     <div className="purchase-order-form">
-      <h2>Digital Purchase Order</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="po-header">
-          <h3>1755 Park St, Second Floor, Naperville, IL 60565</h3>
-          <h3>Tel: 224-454-1513</h3>
-          <h3>Email: ritika@novainternationaldesigns.com</h3>
-        </div>
+      <h2>Purchase Order</h2>
 
-        {/* Bank Info */}
+      <form onSubmit={handleSubmit}>
         <h3>BANK DETAILS</h3>
         <div className="input-row">
-          <input type="text" name="bankName" placeholder="Bank Name" value={formData.bankName} onChange={handleChange} required />
-          <input type="text" name="accountNo" placeholder="A/C Number" value={formData.accountNo} onChange={handleChange} required />
-          <input type="text" name="routingNo" placeholder="Routing Number" value={formData.routingNo} onChange={handleChange} required />
+          <input name="bankName" placeholder="Bank Name" onChange={handleChange} required />
+          <input name="accountNo" placeholder="A/C Number" onChange={handleChange} required />
+          <input name="routingNo" placeholder="Routing Number" onChange={handleChange} required />
         </div>
 
-        {/* Customer Info */}
-        <h3>CUSTOMER DETAILS</h3>
+        <h3>BUSINESS DETAILS</h3>
         <div className="input-row">
-          <input type="text" name="customerName" placeholder="Customer Name" value={formData.customerName} onChange={handleChange} required />
-          <input type="text" name="attn" placeholder="ATTN" value={formData.attn} onChange={handleChange} required />
-          <input type="tel" name="tel" placeholder="Telephone Number" value={formData.tel} onChange={handleChange} required />
-          <input type="text" name="fax" placeholder="Fax Number" value={formData.fax} onChange={handleChange} />
+          <input name="customerName" placeholder="Customer Name" onChange={handleChange} required />
+          <input name="attn" placeholder="ATTN" onChange={handleChange} required />
+          <input name="tel" placeholder="Telephone" onChange={handleChange} required />
+          <input name="fax" placeholder="Fax" onChange={handleChange} />
         </div>
-        <textarea name="address" placeholder="Address" value={formData.address} onChange={handleChange} required></textarea>
 
-        {/* Order Items */}
+        <textarea
+          name="address"
+          placeholder="Address"
+          onChange={handleChange}
+          required
+        />
+
         <h3>ORDER ITEMS</h3>
         <table className="po-table">
           <thead>
             <tr>
-              <th>Style No.</th>
+              <th>Style</th>
               <th>Description</th>
               <th>Color</th>
               <th>Qty</th>
               <th>Price</th>
-              <th>Total Amount</th>
+              <th>Total</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, index) => (
               <tr key={index}>
-                <td><input type="text" placeholder="Style No" value={item.styleNo} onChange={(e) => handleItemChange(index, "styleNo", e.target.value)} /></td>
-                <td><input type="text" placeholder="Description" value={item.description} onChange={(e) => handleItemChange(index, "description", e.target.value)} /></td>
-                <td><input type="text" placeholder="Color" value={item.color} onChange={(e) => handleItemChange(index, "color", e.target.value)} /></td>
-                <td><input type="number" min="1" placeholder="Qty" value={item.qty} onChange={(e) => handleItemChange(index, "qty", Number(e.target.value))} /></td>
-                <td><input type="number" min="0" placeholder="Price" value={item.price} onChange={(e) => handleItemChange(index, "price", Number(e.target.value))} /></td>
-                <td><input type="number" value={item.total} readOnly /></td>
-                <td><button type="button" onClick={() => removeRow(index)}>X</button></td>
+                <td><input value={item.styleNo} /></td>
+                <td><input value={item.description} /></td>
+                <td>
+                  <input
+                    value={item.color}
+                    onChange={(e) =>
+                      handleItemChange(index, "color", e.target.value)
+                    }
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={item.qty}
+                    onChange={(e) =>
+                      handleItemChange(index, "qty", Number(e.target.value))
+                    }
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={item.price}
+                    onChange={(e) =>
+                      handleItemChange(index, "price", Number(e.target.value))
+                    }
+                  />
+                </td>
+                <td><input value={item.total} readOnly /></td>
+                <td>
+                  <button type="button" onClick={() => removeRow(index)}>X</button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <div className="add-row-container">
-          <button type="button" onClick={addRow}>+ Add Row</button>
-        </div>
 
-        <textarea name="notes" placeholder="Notes" value={formData.notes} onChange={handleChange}></textarea>
-
+        <button type="button" onClick={addRow}>+ Add Row</button>
         <button type="submit">Submit Purchase Order</button>
       </form>
     </div>

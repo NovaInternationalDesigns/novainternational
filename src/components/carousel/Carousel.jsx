@@ -3,6 +3,7 @@ import "./carousel.css";
 
 const Carousel = () => {
   const slides = [
+    { type: "video", src: "./videos/Bladeless-fan-final.mp4" },
     { type: "video", src: "./videos/SeasonsGreeting3.mp4" },
     { type: "image", src: "./images/vaccum-sealing-machine-by-Nova-International-Designs-Corporation.png" },
     { type: "video", src: "./videos/Robot-final.mp4" },
