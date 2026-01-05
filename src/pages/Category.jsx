@@ -7,18 +7,17 @@ function Category() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/products`) //fetch("http://localhost:5000/api/products")
-      .then(res => res.json())
-      .then(data => {
-        const filtered = data.filter(
-          item => item.category.toLowerCase() === category.toLowerCase()
-        );
-        setProducts(filtered);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [category]);
+useEffect(() => {
+  setLoading(true);
+
+  fetch(`${import.meta.env.VITE_API_URL}/api/products/category/${category}`)
+    .then(res => res.json())
+    .then(data => {
+      setProducts(data);
+      setLoading(false);
+    })
+    .catch(() => setLoading(false));
+}, [category]);
 
   if (loading) return <p>Loading...</p>;
 

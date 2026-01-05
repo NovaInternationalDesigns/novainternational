@@ -8,11 +8,10 @@ function Product() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log("API URL:", import.meta.env.VITE_API_URL);
     const fetchProducts = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/products`
-        );
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`); //fetch("http://localhost:5000/api/products");
         if (!res.ok) throw new Error("Failed to load products");
 
         const data = await res.json();
@@ -35,7 +34,7 @@ function Product() {
       <h1>All Products</h1>
 
       <div className="product-grid">
-        {products.map((product) => (
+        {products.map(product => (
           <ProductCard key={product._id} product={product} />
         ))}
       </div>

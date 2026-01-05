@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import React from "react";
 import "./App.css";
 
@@ -6,6 +6,7 @@ import "./App.css";
 import Navbar from "./components/navbar/Navbar.jsx";
 import Carousel from "./components/carousel/Carousel.jsx";
 import Footer from "./components/footer/Footer.jsx";
+import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 /* Pages */
 import Home from "./pages/Home/Home.jsx";
@@ -13,13 +14,12 @@ import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Category from "./pages/Category.jsx";
 import Product from "./features/products/Product.jsx";
-import PurchaseOrderForm from "./pages/PurchaseOrderForm.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
+import PurchaseOrderForm from "./pages/PurchaseOrderForm.jsx";
 import DigitalLetterHead from './pages/DigitalLetterhead.jsx';
 import Checkout from './pages/Checkout.jsx';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
 import SignIn from './pages/SignIn.jsx';
-
+import PurchaseOrderSummary from './pages/PurchaseOrderSummary.jsx';
 
 function App() {
   return (
@@ -27,33 +27,20 @@ function App() {
       <Navbar />
 
       <Routes>
-
-        {/* Home Page */}
+        {/* Public Routes */}
         <Route path="/" element={<Carousel />} />
-
-        {/* About Page */}
         <Route path="/about" element={<About />} />
-
-        {/* Contact Page */}
         <Route path="/contact" element={<Contact />} />
-        
-        {/* Product Page */}
-        <Route path="/product" element={<Product />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/purchase-order" element={<PurchaseOrderForm />} />
-
-        {/* Category Page */}
+        <Route path="/products" element={<Product />} />
+        <Route path="/product/:slug" element={<ProductDetails />} />
         <Route path="/category/:category" element={<Category />} />
-        <Route path="/category/:category/:subcategory" element={<Category />} />
-
         <Route path="/digital-letter-head/:orderId" element={<DigitalLetterHead />} />
         <Route path="/signin" element={<SignIn />} />
 
-        {/* Checkout Page - Protected Route */} 
-        <Route path="/checkout" element={
-        <ProtectedRoute><Checkout /></ProtectedRoute>
-  }
-/>
+        {/* Protected Routes */}
+        <Route path="/purchase-order" element={<ProtectedRoute><PurchaseOrderForm /></ProtectedRoute>} />
+        <Route path="/purchase-order-summary" element={<ProtectedRoute><PurchaseOrderSummary /></ProtectedRoute>} />
+        <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
       </Routes>
 
       <Footer />

@@ -3,8 +3,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./PurchaseOrderForm.css";
 
-export default function PurchaseOrderForm({ product, qty, color }) {
+export default function PurchaseOrderForm({ items }) {
   const navigate = useNavigate();
+
+  const [authChecked, setAuthChecked] = useState(false); // 🔐 auth state
 
   const [formData, setFormData] = useState({
     bankName: "",
@@ -18,65 +20,98 @@ export default function PurchaseOrderForm({ product, qty, color }) {
     notes: ""
   });
 
-  const [items, setItems] = useState([]);
+  const [orderItems, setOrderItems] = useState([]);
 
-  // ✅ Pre-fill first row with product data
+  // 🔐 CHECK LOGIN STATUS (REDIRECT IF NOT LOGGED IN)
   useEffect(() => {
-    if (product) {
-      setItems([
-        {
-          styleNo: product._id,
-          description: product.name,
-          color: color || "",
-          qty: qty,
-          price: product.price,
-          total: qty * product.price
-        }
-      ]);
+    const checkAuth = async () => {
+      try {
+        await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/auth/me`,
+          { withCredentials: true }
+        );
+        setAuthChecked(true); // ✅ logged in
+      } catch (error) {
+        navigate("/signin"); // ❌ not logged in → sign in
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  // ✅ LOAD ITEMS FROM SUMMARY PAGE
+  useEffect(() => {
+    if (items && items.length > 0) {
+      setOrderItems(
+        items.map(item => ({
+          styleNo: item.productId,
+          description: item.name,
+          color: item.color || "",
+          qty: item.quantity,
+          price: item.price,
+          total: item.quantity * item.price
+        }))
+      );
     }
-  }, [product, qty, color]);
+  }, [items]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleItemChange = (index, field, value) => {
-    const updatedItems = [...items];
-    updatedItems[index][field] = value;
+    const updated = [...orderItems];
+    updated[index][field] = value;
 
     if (field === "qty" || field === "price") {
-      updatedItems[index].total =
-        (updatedItems[index].qty || 0) * (updatedItems[index].price || 0);
+      updated[index].total =
+        (updated[index].qty || 0) * (updated[index].price || 0);
     }
 
-    setItems(updatedItems);
+    setOrderItems(updated);
   };
 
   const addRow = () =>
-    setItems([
-      ...items,
-      { styleNo: "", description: "", color: "", qty: 1, price: 0, total: 0 }
+    setOrderItems([
+      ...orderItems,
+      { styleNo: "", description: "", color: "", qty: 0, price: 0, total: 0 }
     ]);
 
   const removeRow = (index) =>
-    setItems(items.filter((_, i) => i !== index));
+    setOrderItems(orderItems.filter((_, i) => i !== index));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/purchase-order",
-        { ...formData, items }
+        `${import.meta.env.VITE_API_URL}/api/purchase-order`,
+        { ...formData, items: orderItems },
+        { withCredentials: true } // 🔐 send session cookie
       );
 
       alert("Purchase order submitted successfully!");
       navigate(`/digital-letter-head/${res.data.order._id}`);
     } catch (error) {
       console.error(error);
-      alert("Error submitting purchase order");
+
+      if (error.response?.status === 401) {
+        navigate("/signin"); // session expired
+      } else {
+        alert("Error submitting purchase order");
+      }
     }
   };
+
+  // ⛔ DO NOT RENDER UNTIL AUTH IS VERIFIED
+  if (!authChecked) {
+    return <p>Checking login status...</p>;
+  }
+
+  // ⛔ SAFETY CHECK
+  if (orderItems.length === 0) {
+    return <p>Loading order items...</p>;
+  }
 
   return (
     <div className="purchase-order-form">
@@ -118,38 +153,35 @@ export default function PurchaseOrderForm({ product, qty, color }) {
               <th></th>
             </tr>
           </thead>
+
           <tbody>
-            {items.map((item, index) => (
+            {orderItems.map((item, index) => (
               <tr key={index}>
-                <td><input value={item.styleNo} /></td>
-                <td><input value={item.description} /></td>
+                <td><input value={item.styleNo} readOnly /></td>
+                <td><input value={item.description} readOnly /></td>
                 <td>
                   <input
                     value={item.color}
-                    onChange={(e) =>
-                      handleItemChange(index, "color", e.target.value)
-                    }
+                    onChange={(e) => handleItemChange(index, "color", e.target.value)}
                   />
                 </td>
                 <td>
                   <input
                     type="number"
                     value={item.qty}
-                    onChange={(e) =>
-                      handleItemChange(index, "qty", Number(e.target.value))
-                    }
+                    onChange={(e) => handleItemChange(index, "qty", Number(e.target.value))}
                   />
                 </td>
                 <td>
                   <input
                     type="number"
                     value={item.price}
-                    onChange={(e) =>
-                      handleItemChange(index, "price", Number(e.target.value))
-                    }
+                    onChange={(e) => handleItemChange(index, "price", Number(e.target.value))}
                   />
                 </td>
-                <td><input value={item.total} readOnly /></td>
+                <td>
+                  <input value={item.total} readOnly />
+                </td>
                 <td>
                   <button type="button" onClick={() => removeRow(index)}>X</button>
                 </td>

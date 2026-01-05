@@ -115,3 +115,93 @@
 .mega-column a:hover {
   color: #0073e6;
 }
+
+@media (max-width: 768px) {
+
+  /* Navbar container */
+  .navbar-container {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  /* Logo container */
+  .logo-container {
+    height: auto;
+    margin-bottom: 8px;
+  }
+
+  /* Logo image */
+  .logo {
+    height: 36px;        /* smaller logo */
+    width: auto;         /* keep aspect ratio */
+    max-width: 160px;    /* prevent overflow */
+  }
+
+  /* Top-level menu */
+  .top-menu {
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+  }
+
+  .top-menu li {
+    width: 100%;
+  }
+
+  .top-menu a {
+    padding: 12px 15px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* Second-level row */
+  .second-level-row {
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    padding: 0;
+  }
+
+  .second-level-row.right-align {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .second-level-row li {
+    width: 100%;
+  }
+
+  .second-level-row a {
+    padding: 12px 15px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+  }
+
+  /* Disable hover dropdowns on mobile */
+  .second-level-row li.has-dropdown:hover .mega-menu {
+    display: none;
+  }
+
+  /* Mega menu mobile layout */
+  .mega-menu {
+    position: static;
+    display: none;
+    width: 100%;
+    padding: 10px 15px;
+    box-shadow: none;
+    background: #f9f9f9;
+  }
+
+  /* Optional: show mega menu when parent has .open class */
+  .second-level-row li.has-dropdown.open .mega-menu {
+    display: block;
+  }
+
+  .mega-column {
+    min-width: 100%;
+  }
+
+  .mega-column a {
+    padding: 8px 0;
+    color: #333;
+  }
+}

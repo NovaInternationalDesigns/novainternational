@@ -105,14 +105,14 @@ function ProductCard({ product }) {
       </div>
 
       {/* ACTION BUTTONS */}
-      <div className="action-buttons">
+      {/* <div className="action-buttons">
         <button className="buy-now-btn" onClick={handleBuyNow}>
           Buy Now
         </button>
         <button className="add-po-btn" onClick={handleAddToPO}>
           Add to Purchase Order
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }
