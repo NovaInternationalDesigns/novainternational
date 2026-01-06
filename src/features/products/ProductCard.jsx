@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./ProductCard.css";
+import "./productcard.css";
 
 function ProductCard({ product }) {
   const navigate = useNavigate();
