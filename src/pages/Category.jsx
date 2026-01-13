@@ -1,33 +1,51 @@
-import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import ProductCard from "../features/products/ProductCard";
+import "./category.css"; // We'll create this CSS file
 
 function Category() {
-  const { category } = useParams();
+  const { category, subcategory } = useParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  setLoading(true);
+  // Helper to format strings: replace hyphens with spaces and uppercase
+  const formatTitle = (str) => {
+    if (!str) return "";
+    return str.replace(/-/g, " ").toUpperCase();
+  };
 
-  fetch(`${import.meta.env.VITE_API_URL}/api/products/category/${category}`)
-    .then(res => res.json())
-    .then(data => {
-      setProducts(data);
-      setLoading(false);
-    })
-    .catch(() => setLoading(false));
-}, [category]);
+  useEffect(() => {
+    setLoading(true);
+
+    let url = `${import.meta.env.VITE_API_URL}/api/products?category=${category}`;
+    if (subcategory) url += `&subcategory=${subcategory}`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [category, subcategory]);
 
   if (loading) return <p>Loading...</p>;
 
   return (
     <div className="product-page">
-      <h1>{category.toUpperCase()}</h1>
+      <h1 className="category-title">
+        <span className="main-category">{formatTitle(category)}</span>
+        {subcategory && (
+          <>
+            <span className="separator"> : </span>
+            <span className="sub-category">{formatTitle(subcategory)}</span>
+          </>
+        )}
+      </h1>
 
       <div className="product-grid">
         {products.length === 0 ? (
-          <p>No products found in this category.</p>
+          <p>No products found</p>
         ) : (
           products.map(product => (
             <ProductCard key={product._id} product={product} />

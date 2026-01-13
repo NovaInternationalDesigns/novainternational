@@ -33,8 +33,12 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/products" element={<Product />} />
         <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/product/:slug" element={<Product />} />
         {/* <Route path="/product/:slug" element={<ProductDetails />} /> */}
+
         <Route path="/category/:category" element={<Category />} />
+        <Route path="/category/:category/:subcategory" element={<Category />} />
+
         <Route path="/digital-letter-head/:orderId" element={<DigitalLetterHead />} />
         <Route path="/signin" element={<SignIn />} />
 

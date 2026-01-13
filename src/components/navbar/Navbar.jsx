@@ -38,10 +38,10 @@ const Navbar = () => {
           <Link to="/category/electronics">Electronics</Link>
           <div className="mega-menu">
             <div className="mega-column">
-              <Link to="/product/693c3e068d8ccb03a032c1ae">Vacuum Sealing Machine</Link>
-              <Link to="/product/693c3e068d8ccb03a032c1b1">Campfire Light</Link>
-              <Link to="/product/6942f1628d8ccb03a032c1d6">Bladeless Fan</Link>
-              <Link to="/product/693c3e068d8ccb03a032c1af">Digital Photoframe</Link>
+              <Link to="/category/electronics/vacuum-sealing-machine">Vacuum Sealing Machines</Link>
+              <Link to="/category/electronics/campfire-light">Campfire Light</Link>
+              <Link to="/category/electronics/bladeless-fan">Bladeless Fans</Link>
+              <Link to="/category/electronics/digital-photo-frame">Digital Photoframe</Link>
             </div>
           </div>
         </li>
@@ -64,7 +64,7 @@ const Navbar = () => {
           <div className="mega-menu">
             <div className="mega-column">
               <Link to="/category/accessories">All Clutches</Link>
-              <Link to="/product/693c3e068d8ccb03a032c1b8">Jute Bags</Link>
+              <Link to="/category/jute-bag">Jute Bags</Link>
             </div>
           </div>
         </li>
@@ -74,7 +74,7 @@ const Navbar = () => {
           <Link to="/category/robots">Robots</Link>
           <div className="mega-menu">
             <div className="mega-column">
-              <Link to="/product/6944408b8d8ccb03a032c1f8">Educational Robots</Link>
+              <Link to="/category/robots">Educational Robots</Link>
             </div>
           </div>
         </li>

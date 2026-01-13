@@ -1,45 +1,37 @@
-import React, { useEffect, useState } from "react";
-import ProductCard from "./ProductCard";
-import "./Product.css";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import "./Product.css"
 
-function Product() {
-  const [products, setProducts] = useState([]);
+function ProductPage() {
+  const { slug } = useParams();
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log("API URL:", import.meta.env.VITE_API_URL);
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`); //fetch("http://localhost:5000/api/products");
-        if (!res.ok) throw new Error("Failed to load products");
-
-        const data = await res.json();
-        setProducts(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
+    fetch(`${import.meta.env.VITE_API_URL}/api/products/slug/${slug}`)
+      .then(res => res.json())
+      .then(data => {
+        setProduct(data);
         setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
+      })
+      .catch(() => setLoading(false));
+  }, [slug]);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (!product) return <p>Product not found.</p>;
 
   return (
-    <div className="product-page">
-      <h1>All Products</h1>
-
-      <div className="product-grid">
-        {products.map(product => (
-          <ProductCard key={product._id} product={product} />
-        ))}
-      </div>
+    <div className="product-detail">
+      <h1>{product.name}</h1>
+      <img src={product.images[0]} alt={product.name} />
+      <p>Price: ${product.price}</p>
+      <p>Category: {product.category}</p>
+      {product.subcategory && <p>Subcategory: {product.subcategory}</p>}
+      {product.colors && <p>Colors: {product.colors.join(", ")}</p>}
+      {product.sizes && <p>Sizes: {product.sizes.join(", ")}</p>}
+      <p>{product.description}</p>
     </div>
   );
 }
 
-export default Product;
+export default ProductPage;

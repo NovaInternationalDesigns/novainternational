@@ -1,0 +1,16 @@
+.category-title {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.category-title .main-category {
+  color: red; /* Main category color */
+}
+
+.category-title .sub-category {
+  color: green; /* Subcategory color */
+}
+
+.category-title .separator {
+  color: black; /* Color for the colon */
+}
