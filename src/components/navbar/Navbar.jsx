@@ -6,80 +6,191 @@ import "./navbar.css";
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
 
-  return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <div className="logo-container">
-          <Link to="/">
-            <img src="/images/logo.png" alt="logo" className="logo" />
-          </Link>
-        </div>
 
-        {/* Top-level menu */}
-        <ul className="top-menu right-align">
-          <li><Link to="/about">About Us</Link></li>
-          <li><Link to="#">Holiday Offers</Link></li>
-          <li><Link to="#">Gift Card</Link></li>
-          <li><Link to="#">Business to Business</Link></li>
-          <li><Link to="/purchase-order">Purchase Order</Link></li>
-          <li><Link to="/contact">Contact Us</Link></li>
-          {isAuthenticated ? (
-            <li><button onClick={logout}>Logout</button></li>
-          ) : (
-            <li><Link to="/signin">Sign In</Link></li>
-          )}
-        </ul>
+  const menuData = [
+  {
+    title: "Women",
+    path: "/category/fashion/women",
+    megaMenu: [
+      {
+        heading: "Womens >",
+        links: [
+          { title: "Womens Wear", path: "/category/fashion/women" },
+          { title: "Coats and Jackets", path: "#" },
+          { title: "Jackets", path: "#" },
+          { title: "Sweaters", path: "#" },
+          { title: "Tops", path: "#" },
+          { title: "Dresses", path: "/category/fashion/women" },
+        ],
+      },
+      {
+        heading: "More Sizes >",
+        links: [
+          { title: "Plus Sizes", path: "#" },
+          { title: "Petites", path: "#" },
+          { title: "Sneakers", path: "#" },
+        ],
+      },
+      {
+        heading: "New & Trending >",
+        links: [
+          { title: "New Arrivals In Women", path: "#" },
+          { title: "Contemporary Trending", path: "#" },
+          { title: "New Fashion Desings", path: "#" },
+          { title: "Trending Colors Desings", path: "#" },
+        ],
+      },
+    ],
+  },
+  {
+    title: "Electronics",
+    path: "/category/electronics",
+    megaMenu: [
+      {
+        heading: "Vacuum Sealers >",
+        links: [
+          { title: "Zip Lock Vacuum Sealers", path: "product/69667a55081e46fbb391cefe" },
+          { title: "Kitchenware Vacuum Sealers", path: "product/69667a55081e46fbb391cefe" },
+          { title: "Technologically Advance Vacuum Sealers", path: "product/69667a55081e46fbb391cefe" },
+        ],
+      },
+      {
+        heading: "Speakers & Audio >",
+        links: [
+          { title: "Bluetooth & Wireless Speakers", path: "/product/69667a55081e46fbb391cf01" },
+          { title: "Campfire Bluetooth Speakers", path: "/product/69667a55081e46fbb391cf01" },
+          { title: "Technologycally Advanced Bluetooth Speakers", path: "/product/69667a55081e46fbb391cf01" },
+        ],
+      },
+      {
+        heading: "Fans >",
+        links: [
+          { title: "Technologically Advanced Fans", path: "/product/69667e5c081e46fbb391cf42" },
+          { title: "Bladeless Fans", path: "/product/69667e5c081e46fbb391cf42" },
+          { title: "Musical Fans", path: "/product/69667e5c081e46fbb391cf42" },
+        ],
+      },
+      {
+        heading: "Digital Photo Frames >",
+        links: [
+          { title: "Digital Photo Frames", path: "/product/69667a55081e46fbb391cf00" },
+        ],
+      },
+      {
+        heading: "Kids Tech and Electronics >",
+        links: [
+          { title: "Kids Robot", path: "/product/69667a55081e46fbb391cefc" },
+          { title: "Technologically Advanced Robots", path: "/product/69667a55081e46fbb391cefc" },
+        ],
+      },
+      {
+        heading: "New & Trending >",
+        links: [
+          { title: "New Arrivals In Electronics", path: "#" },
+          { title: "Contemporary Trending", path: "#" },
+          { title: "New Electronics Designs", path: "#" },
+          { title: "Trending Colors Designs", path: "#" },
+        ],
+      },
+    ],
+  },
+   {
+    title: "Bags And Accessories",
+    path: "/category/accessories",
+    megaMenu: [
+      {
+        heading: "Bags And Accessories >",
+        links: [
+          { title: "Jute Bags", path: "/product/69667a55081e46fbb391cf08" },
+          { title: "Evening Clutches", path: "/category/accessories/clutch" },
+          { title: "Designer Bags", path: "/category/accessories" },
+        ],
+      },
+      {
+        heading: "New & Trending >",
+        links: [
+          { title: "New Arrivals In Clutches", path: "#" },
+          { title: "Contemporary Trending", path: "#" },
+          { title: "New Fashion Desings", path: "#" },
+          { title: "Trending Colors Desings", path: "#" },
+        ],
+      },
+    ],
+  },
+  {
+    title: "Business To Business",
+    path: "/business-to-business",
+    megaMenu: [
+      {
+        heading: "Business To Business >",
+        links: [
+          { title: "Invester Relations", path: "/women/clothing/womens-wear" },
+          { title: "Inventry Details", path: "#" },
+          { title: "Digital Purchase Order", path: "#" },
+          { title: "Latest Updates", path: "#" },
+        ],
+      },
+    ],
+  },
+];
+
+// Top utility links
+const topLinks = [
+  { title: "About Us", path: "/about" },
+  { title: "Add to Purchase Order", path: "/purchase-order-summary" },
+  { title: "Gift Cards", path: "#" },
+  { title: "Sign In", path: "/signin" },
+  { title: "Contact Us", path: "/contact" },
+];
+
+   return (
+    <header>
+      {/* Top Utility Navigation */}
+      <div className="top-nav">
+        <div className="container">
+          <ul>
+            {topLinks.map((link, i) => (
+              <li key={i}>
+                <Link to={link.path}>{link.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
-      {/* Second-level mega menu */}
-      <ul className="second-level-row right-align">
-        {/* Electronics */}
-        <li className="has-dropdown">
-          <Link to="/category/electronics">Electronics</Link>
-          <div className="mega-menu">
-            <div className="mega-column">
-              <Link to="/category/electronics/vacuum-sealing-machine">Vacuum Sealing Machines</Link>
-              <Link to="/category/electronics/campfire-light">Campfire Light</Link>
-              <Link to="/category/electronics/bladeless-fan">Bladeless Fans</Link>
-              <Link to="/category/electronics/digital-photo-frame">Digital Photoframe</Link>
-            </div>
-          </div>
-        </li>
+      {/* Main Navigation */}
+      <nav className="navbar">
+        <div className="logo">
+          <Link to="/"><img src="/images/logo.png" alt="logo" className="logo" /></Link>
+        </div>
 
-        {/* Fashion */}
-        <li className="has-dropdown">
-          <Link to="/category/fashion">Fashion</Link>
-          <div className="mega-menu">
-            <div className="mega-column">
-              <Link to="/category/fashion/men">Men</Link>
-              <Link to="/category/fashion/women">Women</Link>
-              <Link to="/category/fashion/kids">Kids</Link>
-            </div>
-          </div>
-        </li>
+        <ul className="menu">
+          {menuData.map((menu, i) => (
+            <li key={i} className="menu-item">
+              <Link to={menu.path} className="menu-title">
+                {menu.title}
+              </Link>
 
-        {/* Accessories */}
-        <li className="has-dropdown">
-          <Link to="/category/accessories">Evening Clutches</Link>
-          <div className="mega-menu">
-            <div className="mega-column">
-              <Link to="/category/accessories">All Clutches</Link>
-              <Link to="/category/jute-bag">Jute Bags</Link>
-            </div>
-          </div>
-        </li>
-
-        {/* Robots */}
-        <li className="has-dropdown">
-          <Link to="/category/robots">Robots</Link>
-          <div className="mega-menu">
-            <div className="mega-column">
-              <Link to="/category/robots">Educational Robots</Link>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </nav>
+              {/* Mega Menu */}
+              <div className="mega-menu">
+                {menu.megaMenu.map((section, idx) => (
+                  <div key={idx} className="mega-section">
+                    <h4>{section.heading}</h4>
+                    <ul>
+                      {section.links.map((link, k) => (
+                        <li key={k}>
+                          <Link to={link.path}>{link.title}</Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </header>
   );
 };
 

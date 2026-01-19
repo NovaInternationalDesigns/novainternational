@@ -86,7 +86,7 @@ function DigitalLetterHead() {
   <button onClick={() => window.print()}>Print / Save PDF</button>
 
   <div className="letterhead-footer">
-    <p>Phone: +1 234 567 890 | Email: info@company.com | Address: 123 Main Street, City, Country</p>
+    <p>Phone: +1 708 334 8942 | Email: ritika@novainternationaldesigns.com | Address: 1755 Park Street, Naperville, IL </p>
   </div>
 </div>
 

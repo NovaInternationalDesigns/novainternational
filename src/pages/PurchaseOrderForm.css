@@ -43,7 +43,7 @@
 
 .purchase-order-form input:focus,
 .purchase-order-form textarea:focus {
-  border-color: #007bff;
+  border-color: #000000;
   outline: none;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .po-table th {
-  background: #007bff;
+  background: #000000;
   color: #fff;
   padding: 12px;
   text-align: center;
@@ -140,7 +140,7 @@ button[type="submit"] {
   width: 100%;
   padding: 14px;
   margin-top: 25px;
-  background: #007bff;
+  background: #000000;
   color: white;
   border: none;
   font-size: 18px;
@@ -149,7 +149,7 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-  background: #0056b3;
+  background: #000000;
 }
 
 /* ---------- Notes Section ---------- */

@@ -1,14 +1,16 @@
 .category-title {
-  font-size: 1rem;
+  font-size: 16px;
   margin-bottom: 1rem;
 }
 
 .category-title .main-category {
-  color: red; /* Main category color */
+  color: rgb(0, 0, 0); /* Main category color */
+  font-size: 16px;
 }
 
 .category-title .sub-category {
   color: green; /* Subcategory color */
+  font-size: 16px;
 }
 
 .category-title .separator {

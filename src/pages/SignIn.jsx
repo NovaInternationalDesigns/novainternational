@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import "./signin.css";
 
 function SignIn() {
   const [email, setEmail] = useState("");
@@ -23,9 +24,7 @@ function SignIn() {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: {"Content-Type": "application/json", },
         body: JSON.stringify({ email, password }),
       });
 
@@ -74,7 +73,8 @@ function SignIn() {
           {loading ? "Signing in..." : "Sign In"}
         </button>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p className="signin-error">{error}</p>}
+
       </form>
 
       {userNotFound && (

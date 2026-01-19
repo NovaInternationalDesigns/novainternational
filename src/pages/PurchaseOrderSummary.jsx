@@ -15,7 +15,7 @@ export default function PurchaseOrderSummary() {
         <h2>No items found in Purchase Order</h2>
         <p>Please add products before submitting a PO.</p>
 
-        <button onClick={() => navigate("/")}>
+        <button className="add-po-btn" onClick={() => navigate("/")}>
           Go Back to Products
         </button>
       </div>
