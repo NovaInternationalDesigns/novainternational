@@ -19,6 +19,8 @@ import PurchaseOrderForm from "./pages/PurchaseOrderForm.jsx";
 import DigitalLetterHead from './pages/DigitalLetterhead.jsx';
 import Checkout from './pages/Checkout.jsx';
 import SignIn from './pages/SignIn.jsx';
+import Signup from './pages/Signup.jsx';
+import CheckoutGuest from './pages/CheckoutGuest.jsx';
 import PurchaseOrderSummary from './pages/PurchaseOrderSummary.jsx';
 
 function App() {
@@ -41,6 +43,8 @@ function App() {
 
         <Route path="/digital-letter-head/:orderId" element={<DigitalLetterHead />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/Signup" element={<Signup />} />
+        <Route path="/checkout-guest" element={<CheckoutGuest />} />  
 
         {/* Protected Routes */}
         <Route path="/purchase-order" element={<ProtectedRoute><PurchaseOrderForm /></ProtectedRoute>} />

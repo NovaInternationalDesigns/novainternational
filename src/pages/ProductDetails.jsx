@@ -139,7 +139,7 @@ function ProductDetails() {
 
         <div className="action-buttons">
           <button className="add-po-btn" onClick={handleAddToPO}>Add to Purchase Order</button>
-          <button className="buy-now-btn" onClick={handleBuyNow}>Buy Now</button>
+          {/* <button className="buy-now-btn" onClick={handleBuyNow}>Buy Now</button> */}
         </div>
       </div>
     </div>

@@ -3,20 +3,20 @@ import "./carousel.css";
 
 const Carousel = () => {
   const slides = [
-    { type: "video", src: "./videos/Bladeless-fan-final.mp4" },
-    { type: "video", src: "./videos/SeasonsGreeting3.mp4" },
-    { type: "image", src: "./images/vaccum-sealing-machine-by-Nova-International-Designs-Corporation.png" },
-    { type: "video", src: "./videos/Robot-final.mp4" },
-    { type: "image", src: "./images/red-clutch.png" },
-    { type: "image", src: "./images/robot.png" },
-    { type: "video", src: "./videos/campfire-speaker-black-logo.mp4" },
     { type: "image", src: "./images/black-clutch.png" },
-    { type: "image", src: "./images/light.png" },
+    { type: "image", src: "./images/red-clutch.png" },
     { type: "image", src: "./images/golden-clutch.png" },
     { type: "image", src: "./images/magenta-clutch2.png" },
     { type: "image", src: "./images/digital-photoframe.png" },
     { type: "image", src: "./images/gittery-gold-clutch.png" },
     { type: "image", src: "./images/silver-clutch.png" },
+    { type: "image", src: "./images/vaccum-sealing-machine-by-Nova-International-Designs-Corporation.png" },  
+    { type: "image", src: "./images/robot.png" },
+     { type: "image", src: "./images/light.png" },
+     { type: "video", src: "./videos/Robot-final.mp4" },
+    { type: "video", src: "./videos/campfire-speaker-black-logo.mp4" },
+    { type: "video", src: "./videos/Bladeless-fan-final.mp4" },
+    { type: "video", src: "./videos/SeasonsGreeting3.mp4" },
   ];
 
   // Clone first and last slide for seamless loop
@@ -36,19 +36,20 @@ const Carousel = () => {
   const goNext = () => setIndex((prev) => prev + 1);
   const goPrev = () => setIndex((prev) => prev - 1);
 
-  // Pause all videos
+  // Pause all videos safely
   const pauseAllVideos = () => {
     videoRefs.current.forEach((video) => {
       if (video && !video.paused) {
         video.pause();
-        video.currentTime = 0; // optional: reset to start
+        video.currentTime = 0;
       }
     });
   };
 
-  // Auto-slide for images only & play video when it becomes active
+  // Auto-slide & play videos safely
   useEffect(() => {
-    pauseAllVideos(); // Stop any previous video
+    resetTimeout();
+    pauseAllVideos();
 
     const currentSlide = extendedSlides[index];
 
@@ -58,7 +59,11 @@ const Carousel = () => {
       const video = videoRefs.current[index];
       if (video) {
         video.currentTime = 0;
-        video.play();
+        // ✅ Safely handle play promise
+        video.play().catch((err) => {
+          // Ignore AbortError (expected if paused immediately)
+          if (err.name !== "AbortError") console.error(err);
+        });
       }
     }
 
@@ -79,7 +84,8 @@ const Carousel = () => {
   // Re-enable transition after jump
   useEffect(() => {
     if (!transition) {
-      setTimeout(() => setTransition(true), 20);
+      const t = setTimeout(() => setTransition(true), 20);
+      return () => clearTimeout(t);
     }
   }, [transition]);
 

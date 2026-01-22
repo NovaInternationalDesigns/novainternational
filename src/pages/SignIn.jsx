@@ -1,94 +1,67 @@
-import React, { useState } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { UserContext } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 import "./signin.css";
 
-function SignIn() {
+const SignIn = () => {
+  const { signIn } = useContext(UserContext);  // Get the signIn function from context
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [userNotFound, setUserNotFound] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const redirectTo = location.state?.redirectTo || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-    setUserNotFound(false);
-
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
-        credentials: "include",
-        headers: {"Content-Type": "application/json", },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email, password }),
+        credentials: "include",  // Send cookies with the request
       });
 
-      if (!res.ok) {
+      if (res.ok) {
         const data = await res.json();
-        if (data.message === "User not found") {
-          setUserNotFound(true); // Show account creation option
-        } else {
-          setError(data.message || "Login failed");
-        }
-        setLoading(false);
-        return;
+        signIn(data.user);  // Update user context
+        navigate("/");  // Redirect to home page
+      } else {
+        const data = await res.json();
+        setError(data.message || "Login failed");
       }
-
-      // Success: redirect
-      setLoading(false);
-      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError("Network error");
-      setLoading(false);
     }
   };
 
   return (
     <div className="signin-container">
-      <h2>Sign In</h2>
-
-      <form onSubmit={handleSubmit}>
+      <h2 className="signin-heading">Sign In</h2>
+      <form className="signin-form" onSubmit={handleSubmit}>
         <input
+          className="signin-input"
           type="email"
-          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
           required
-          autoComplete="username"
         />
         <input
+          className="signin-input"
           type="password"
-          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
           required
-          autoComplete="current-password"
         />
-        <button type="submit" disabled={loading}>
-          {loading ? "Signing in..." : "Sign In"}
+        <button className="signin-button" type="submit">
+          Sign In
         </button>
-
         {error && <p className="signin-error">{error}</p>}
-
       </form>
-
-      {userNotFound && (
-        <div className="signin-options">
-          <p>No account yet?</p>
-          <Link to="/signup">
-            <button>Create an Account</button>
-          </Link>
-          <p>Or checkout as a guest:</p>
-          <button onClick={() => navigate("/checkout-guest")}>Checkout as Guest</button>
-        </div>
-      )}
     </div>
   );
-}
+};
 
 export default SignIn;

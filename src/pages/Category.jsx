@@ -33,16 +33,7 @@ function Category() {
 
   return (
     <div className="product-page">
-      <h1 className="category-title">
-        <span className="main-category">{formatTitle(category)}</span>
-        {subcategory && (
-          <>
-            <span className="separator"> : </span>
-            <span className="sub-category">{formatTitle(subcategory)}</span>
-          </>
-        )}
-      </h1>
-
+      
       <div className="product-grid">
         {products.length === 0 ? (
           <p>No products found</p>

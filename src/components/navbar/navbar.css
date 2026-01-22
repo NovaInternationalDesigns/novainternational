@@ -1,8 +1,7 @@
 /* ---------------- Top Navigation ---------------- */
 .top-nav {
-  font-size: 16px;
-  padding: 12px 0;
   width: 100%;
+  background: black;
 }
 
 .top-nav .container {
@@ -10,33 +9,36 @@
   margin: 0 auto;
   padding: 0 32px;
   display: flex;
+  color:red;
+  font-weight: bold;
 }
 
+/* Keep links on right */
 .top-nav ul {
   list-style: none;
+  margin-left: auto;
   display: flex;
+  align-items: center;
   gap: 20px;
-  margin: 0;
-  padding: 0;
-  margin-left: auto; /* pushes links to the right */
 }
-
 .top-nav li a {
   text-decoration: none;
-  color: #333;
-  font-size: 14px;
+  color: white;
+  font-weight: bold;
+  padding-right: 20px;
 }
 
 .top-nav li a:hover {
-  color: #000;
+  color: white;
   text-decoration: underline;
+  font-weight: bold;
 }
 
 /* ---------------- Main Navigation ---------------- */
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: left;
   background: #1a4f35;
   font-family: Arial, sans-serif;
   position: relative;
@@ -47,9 +49,9 @@
 .menu {
   display: flex;
   list-style: none;
-  margin: 0;
+  margin-left:100px;
   padding: 0;
-  gap: 28px;
+  gap: 100px;
 }
 
 .menu-item {
@@ -60,7 +62,6 @@
   text-decoration: none;
   color: #ffffff;
   font-size: 16px;
-  margin-right: 20px;
 }
 
 .menu-title:hover {
@@ -69,6 +70,30 @@
 
 .menu-title:hover {
   border-bottom: 2px solid #ffffff;
+}
+
+ /* Cart Icon */
+.cart-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.cart-icon {
+  font-size: 24px;
+  color: #333;
+}
+
+.cart-item-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px;
+  font-size: 12px;
 }
 
 /* ---------------- Mega Menu ---------------- */
