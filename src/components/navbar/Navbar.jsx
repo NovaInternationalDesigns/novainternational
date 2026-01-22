@@ -63,31 +63,31 @@ const Navbar = () => {
         {
           heading: "Vacuum Sealers >",
           links: [
-            { title: "Zip Lock Vacuum Sealers", path: "/product/69667a55081e46fbb391cefe" },
-            { title: "Kitchenware Vacuum Sealers", path: "/product/69667a55081e46fbb391cefe" },
-            { title: "Technologically Advance Vacuum Sealers", path: "/product/69667a55081e46fbb391cefe" },
+            { title: "Zip Lock Vacuum Sealers", path: "/product/6966a6999871802ec732ee69" },
+            { title: "Kitchenware Vacuum Sealers", path: "/product/6966a6999871802ec732ee69" },
+            { title: "Technologically Advance Vacuum Sealers", path: "/product/6966a6999871802ec732ee69" },
           ],
         },
         {
           heading: "Speakers & Audio >",
           links: [
-            { title: "Bluetooth & Wireless Speakers", path: "/product/69667a55081e46fbb391cf01" },
-            { title: "Campfire Bluetooth Speakers", path: "/product/69667a55081e46fbb391cf01" },
-            { title: "Technologically Advanced Bluetooth Speakers", path: "/product/69667a55081e46fbb391cf01" },
+            { title: "Bluetooth & Wireless Speakers", path: "/product/6966a6999871802ec732ee6c" },
+            { title: "Campfire Bluetooth Speakers", path: "/product/6966a6999871802ec732ee6c" },
+            { title: "Technologically Advanced Bluetooth Speakers", path: "product/6966a6999871802ec732ee6c" },
           ],
         },
         {
           heading: "Fans >",
           links: [
-            { title: "Technologically Advanced Fans", path: "/product/69667e5c081e46fbb391cf42" },
-            { title: "Bladeless Fans", path: "/product/69667e5c081e46fbb391cf42" },
-            { title: "Musical Fans", path: "/product/69667e5c081e46fbb391cf42" },
+            { title: "Technologically Advanced Fans", path: "/product/6966a6999871802ec732ee7d" },
+            { title: "Bladeless Fans", path: "/product/6966a6999871802ec732ee7d" },
+            { title: "Musical Fans", path: "/product/6966a6999871802ec732ee7d" },
           ],
         },
         {
           heading: "Digital Photo Frames >",
           links: [
-            { title: "Digital Photo Frames", path: "/product/69667a55081e46fbb391cf00" },
+            { title: "Digital Photo Frames", path: "/product/6966a6999871802ec732ee6a" },
           ],
         },
         {
