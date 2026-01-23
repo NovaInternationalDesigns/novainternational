@@ -80,7 +80,7 @@ const Navbar = () => {
           heading: "Fans >",
           links: [
             { title: "Technologically Advanced Fans", path: "/product/6973b8c221ef7c5ee004fbd8" },
-            { title: "Bladeless Fans", path: "/product/6966a6999871802ec732ee7d" },
+            { title: "Bladeless Fans", path: "/product/6973b8c221ef7c5ee004fbd7" },
             { title: "Musical Fans", path: "/product/6973b8c221ef7c5ee004fbd9" },
           ],
         },
