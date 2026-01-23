@@ -87,7 +87,7 @@ const Navbar = () => {
         {
           heading: "Digital Photo Frames >",
           links: [
-            { title: "Digital Photo Frames", path: "/product/6966a6999871802ec732ee6a" },
+            { title: "Digital Photo Frames", path: "/product/6973b8c221ef7c5ee004fbc2" },
           ],
         },
         {
@@ -115,7 +115,7 @@ const Navbar = () => {
         {
           heading: "Bags And Accessories >",
           links: [
-            { title: "Jute Bags", path: "/product/69667a55081e46fbb391cf08" },
+            { title: "Jute Bags", path: "/product/6973b8c221ef7c5ee004fbcd" },
             { title: "Evening Designer Bags", path: "/category/accessories/clutch" },
             { title: "Designer Bags", path: "/category/accessories" },
           ],
@@ -147,7 +147,6 @@ const Navbar = () => {
       ],
     },
   ];
-
 
   return (
     <header>
