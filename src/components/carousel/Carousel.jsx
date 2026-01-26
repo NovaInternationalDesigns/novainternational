@@ -12,11 +12,12 @@ const Carousel = () => {
     { type: "image", src: "./images/silver-clutch.png" },
     { type: "image", src: "./images/vaccum-sealing-machine-by-Nova-International-Designs-Corporation.png" },  
     { type: "image", src: "./images/robot.png" },
-     { type: "image", src: "./images/light.png" },
-     { type: "video", src: "./videos/Robot-final.mp4" },
+    { type: "image", src: "./images/light.png" },
+    { type: "video", src: "./videos/Robot-final.mp4" },
     { type: "video", src: "./videos/campfire-speaker-black-logo.mp4" },
     { type: "video", src: "./videos/Bladeless-fan-final.mp4" },
     { type: "video", src: "./videos/SeasonsGreeting3.mp4" },
+    { type: "image", src: "./images/black-clutch.png" },
   ];
 
   // Clone first and last slide for seamless loop
@@ -59,7 +60,7 @@ const Carousel = () => {
       const video = videoRefs.current[index];
       if (video) {
         video.currentTime = 0;
-        // ✅ Safely handle play promise
+        // Safely handle play promise
         video.play().catch((err) => {
           // Ignore AbortError (expected if paused immediately)
           if (err.name !== "AbortError") console.error(err);
