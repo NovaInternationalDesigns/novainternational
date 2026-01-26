@@ -115,7 +115,7 @@ const Navbar = () => {
         {
           heading: "Bags And Accessories >",
           links: [
-            { title: "Jute Bags", path: "/product/6973b8c221ef7c5ee004fbcd" },
+            { title: "Jute Bags", path: "/product/69667a55081e46fbb391cf08" },
             { title: "Evening Designer Bags", path: "/category/accessories/clutch" },
             { title: "Designer Bags", path: "/category/accessories" },
           ],
@@ -147,6 +147,7 @@ const Navbar = () => {
       ],
     },
   ];
+
 
   return (
     <header>

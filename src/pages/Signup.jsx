@@ -1,37 +1,52 @@
 import React, { useState, useContext } from "react";
 import { UserContext } from "../context/UserContext.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import "./signup.css";
 
 const SignUp = () => {
-  const { signUp } = useContext(UserContext);
+  const { signUp, signIn } = useContext(UserContext);
   const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
+      // 1️⃣ Create user
       await signUp(name, email, password);
-      navigate("/"); // redirect after signup
+
+      // 2️⃣ Fetch user context
+      await signIn();
+
+      // 3️⃣ Redirect
+      navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Signup failed");
+      setError(err.message || "Signup failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="signup-container">
-      <h2>Create Account</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
+      <h2 className="signup-heading">Create Account</h2>
+
+      <form className="signup-form" onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Name"
+          placeholder="Full Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
+
         <input
           type="email"
           placeholder="Email"
@@ -39,6 +54,7 @@ const SignUp = () => {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           placeholder="Password"
@@ -46,8 +62,17 @@ const SignUp = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Sign Up</button>
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Creating account..." : "Create Account"}
+        </button>
+
+        {error && <p className="signup-error">{error}</p>}
       </form>
+
+      <div className="signup-footer">
+        Already have an account? <Link to="/signin">Sign In</Link>
+      </div>
     </div>
   );
 };

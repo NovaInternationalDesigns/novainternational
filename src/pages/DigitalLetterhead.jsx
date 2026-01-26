@@ -10,7 +10,7 @@ function DigitalLetterHead() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/purchase-order/${orderId}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/purchase-order/${orderId}`);
         const data = await res.json();
         setOrder(data);
       } catch (error) {

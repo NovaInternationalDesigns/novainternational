@@ -1,68 +1,61 @@
-/* src/pages/Checkout.css */
-
-.checkout-page {
-  max-width: 600px;
-  margin: 60px auto;
-  padding: 0 20px;
-  font-family: Arial, sans-serif;
+.checkout {
+  width: 80%;
+  margin: 0 auto;
 }
 
-.checkout-title {
+.checkout h2 {
   text-align: center;
+}
+
+.order-summary {
   margin-bottom: 30px;
-  font-size: 28px;
-  font-weight: 600;
 }
 
-.checkout-card {
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+.order-summary h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
 }
 
-.checkout-row {
+.order-summary ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.order-summary li {
+  margin-bottom: 10px;
+}
+
+.order-summary .order-total {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.checkout-form {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-  font-size: 16px;
+  flex-direction: column;
 }
 
-.checkout-row span {
-  color: #555;
+.checkout-form .shipping-section,
+.checkout-form .payment-section {
+  margin-bottom: 20px;
 }
 
-.checkout-row strong {
-  color: #000;
+.checkout-form input {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-.checkout-total {
-  display: flex;
-  justify-content: space-between;
-  font-size: 18px;
-  font-weight: 600;
-  margin: 20px 0;
-}
-
-.checkout-btn {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  background-color: #0073e6;
-  color: #fff;
+.checkout-form button {
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
-.checkout-btn:hover {
-  background-color: #005bb5;
-}
-
-.checkout-empty {
-  text-align: center;
-  margin-top: 80px;
-  color: #777;
+.checkout-form button:hover {
+  background-color: #45a049;
 }

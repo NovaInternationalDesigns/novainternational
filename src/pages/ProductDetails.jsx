@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom"; // Ensure useNavigate and useParams are used
+import { UserContext } from "../context/UserContext";  // Import UserContext
 import "./ProductDetails.css";
 
 function ProductDetails() {
-  const { id } = useParams();
+  const { id } = useParams();  // Get product ID from URL params
   const navigate = useNavigate();
+  const { user } = useContext(UserContext);  // Get user from context
   const MIN_QTY = 500;
 
   const [product, setProduct] = useState(null);
@@ -15,11 +17,12 @@ function ProductDetails() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/id/${id}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/id/${id}`); // Fetch product by ID
         if (!res.ok) throw new Error("Product not found");
         const data = await res.json();
         setProduct(data);
 
+        // Set initial order item with default color, size, and minimum quantity
         setOrderItems([{
           color: data.colors?.[0] || "",
           size: data.sizes?.[0] || "",
@@ -35,10 +38,6 @@ function ProductDetails() {
   }, [id]);
 
   const hasVariations = product?.colors?.length > 0 && product?.sizes?.length > 0;
-
-  if (loading) return <p>Loading product...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (!product) return null;
 
   const updateOrderItem = (index, field, value) => {
     const newItems = [...orderItems];
@@ -74,6 +73,14 @@ function ProductDetails() {
 
   const handleAddToPO = () => {
     if (!validateTotalQty()) return;
+
+    if (!user) {
+      // If user is not logged in, navigate to SignIn page
+      navigate("/signin");
+      return;
+    }
+
+    // Prepare purchase order data
     const poData = orderItems.map(item => ({
       productId: product._id,
       name: product.name,
@@ -82,11 +89,14 @@ function ProductDetails() {
       size: hasVariations ? item.size : null,
       quantity: item.quantity
     }));
-    navigate("/purchase-order-summary", { state: { items: poData } });
+
+    // Navigate to purchase order summary page with the order data
+    navigate("/checkout", { state: { items: poData } });
   };
 
   const handleBuyNow = () => {
     if (!validateTotalQty()) return;
+
     const orderData = orderItems.map(item => ({
       productId: product._id,
       name: product.name,
@@ -95,13 +105,22 @@ function ProductDetails() {
       size: hasVariations ? item.size : null,
       quantity: item.quantity
     }));
+
+    // Navigate to checkout page with the order data
     navigate("/checkout", { state: { items: orderData } });
   };
+
+  if (loading) return <p>Loading product...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (!product) return null;
 
   return (
     <div className="product-details">
       <div className="images-section">
-        <img src={product.images?.[0] || "/images/no-image.png"} alt={product.name} />
+        {/* Product image is clickable and links to the details page */}
+        <Link to={`/product/${product._id}`}>
+          <img src={product.images?.[0] || "/images/no-image.png"} alt={product.name} />
+        </Link>
       </div>
 
       <div className="info-section">

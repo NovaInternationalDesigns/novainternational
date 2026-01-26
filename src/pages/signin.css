@@ -1,97 +1,80 @@
-/* ================= Sign In ================= */
-
 .signin-container {
-  max-width: 400px;
-  margin: 80px auto;
-  padding: 24px;
-  font-family: "Segoe UI", Arial, sans-serif;
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 30px;
+  border: 1px solid #ddd;
   background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 6px;
 }
 
-.signin-container h2 {
+.signin-heading {
   text-align: center;
-  margin-bottom: 24px;
-  color: #222;
-  font-weight: 600;
+  margin-bottom: 20px;
 }
 
-/* Form */
-.signin-container form {
+.signin-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
-.signin-container input {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.signin-container input:focus {
-  outline: none;
-  border-color: #000;
-}
-
-/* Primary Button */
-.signin-container button[type="submit"] {
-  margin-top: 10px;
+.signin-input {
   padding: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.signin-button {
   background: #000;
   color: #fff;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 12px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
 }
 
-.signin-container button[type="submit"]:hover {
+.signin-button:hover {
   background: #333;
 }
 
-.signin-container button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Error Message */
 .signin-error {
-  color: #d32f2f;
-  font-size: 13px;
-  margin-top: 6px;
+  color: red;
+  margin-top: 10px;
   text-align: center;
 }
 
-/* Extra Options */
-.signin-options {
-  margin-top: 24px;
+.signin-divider {
   text-align: center;
+  margin: 20px 0;
+  position: relative;
 }
 
-.signin-options p {
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.signin-options button {
-  padding: 8px 14px;
+.signin-divider span {
   background: #fff;
-  color: #000;
+  padding: 0 10px;
+  color: #666;
+}
+
+.signin-divider::before {
+  content: "";
+  height: 1px;
+  background: #ddd;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  z-index: -1;
+}
+
+.signin-secondary-btn,
+.signin-guest-btn {
+  display: block;
+  text-align: center;
+  padding: 12px;
+  margin-top: 10px;
   border: 1px solid #000;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.signin-options button:hover {
-  background: #f5f5f5;
-}
-
-.signin-options a {
   text-decoration: none;
+  color: #000;
+}
+
+.signin-secondary-btn:hover,
+.signin-guest-btn:hover {
+  background: #f5f5f5;
 }
