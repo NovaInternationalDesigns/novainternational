@@ -76,26 +76,21 @@ function PurchaseOrder() {
       <h2 className="po-total">Total: ${totalAmount.toFixed(2)}</h2>
 
       <div className="po-actions">
-        <button className="confirm-order-btn" onClick={() => navigate("/purchase-order/form")}>
-          Confirm Order & Checkout
-        </button>
-        <button
-          className="clear-po-btn"
-          onClick={async () => {
-            setError("");
-            try {
-              await clearPO();
-              navigate('/');
-            } catch (err) {
-              console.error(err);
-              setError(err.message || 'Failed to clear Purchase Order');
-            }
-          }}
-        >
-          Clear Purchase Order
-        </button>
+      <button
+        className="confirm-order-btn"
+        onClick={() => navigate("/purchase-order/form")}
+      >
+        Confirm Order & Checkout
+      </button>
+
+      <a
+        href="mailto:support@novainternationaldesigns.com?subject=Need%20Help%20with%20Purchase%20Order"
+        className="po-help-link"
+      >
+        Need Help?
+      </a>
       </div>
-    </div>
+      </div>
   );
 }
 
