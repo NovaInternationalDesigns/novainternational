@@ -1,63 +1,92 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import PurchaseOrderForm from "./PurchaseOrderForm";
-import "./PurchaseOrderSummary.css";
+import React, { useEffect, useState, useContext } from "react";
+import { UserContext } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
-export default function PurchaseOrderSummary() {
-  const location = useLocation();
+function PurchaseOrderSummary() {
+  const { user } = useContext(UserContext);
   const navigate = useNavigate();
+  const [po, setPO] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const items = location.state?.items || [];
+  useEffect(() => {
+    if (!user || !user._id) {
+      alert("Please log in first");
+      navigate("/signin");
+      return;
+    }
 
-  if (items.length === 0) {
+    const fetchPO = async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${user._id}`
+        );
+        if (!res.ok) throw new Error("Failed to fetch purchase order");
+
+        const data = await res.json();
+        setPO(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPO();
+  }, [user, navigate]);
+
+  if (loading) return <p>Loading Purchase Order...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+
+  if (!po || !po.items.length) {
     return (
-      <div style={{ padding: 40 }}>
-        <h2>No items found in Purchase Order</h2>
-        <p>Please add products before submitting a PO.</p>
-
-        <button className="add-po-btn" onClick={() => navigate("/")}>
-          Go Back to Products
-        </button>
+      <div>
+        <h2>Your Purchase Order is empty.</h2>
+        <button onClick={() => navigate("/")}>Continue Shopping</button>
       </div>
     );
   }
 
-  return (
-    <div className="po-summary">
-      <h1>Purchase Order Summary</h1>
+  const totalPrice = po.items.reduce(
+    (acc, item) => acc + (item.qty || item.quantity) * item.price,
+    0
+  );
 
-      <table border="1" cellPadding="10">
+  return (
+    <div className="purchase-order-summary">
+      <h1>Your Purchase Order</h1>
+      <table>
         <thead>
           <tr>
             <th>Product</th>
             <th>Color</th>
             <th>Size</th>
             <th>Qty</th>
-            <th>Price</th>
-            <th>Total</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
           </tr>
         </thead>
         <tbody>
-          {items.map((item, i) => (
-            <tr key={i}>
-              <td>{item.name}</td>
-              <td>{item.color || "-"}</td>
-              <td>{item.size || "-"}</td>
-              <td>{item.quantity}</td>
-              <td>${item.price}</td>
-              <td>${item.price * item.quantity}</td>
-            </tr>
-          ))}
+          {po.items.map((item, idx) => {
+            const qty = item.qty || item.quantity;
+            return (
+              <tr key={idx}>
+                <td>{item.name}</td>
+                <td>{item.color || "-"}</td>
+                <td>{item.size || "-"}</td>
+                <td>{qty}</td>
+                <td>${item.price.toFixed(2)}</td>
+                <td>${(qty * item.price).toFixed(2)}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-
-      <PurchaseOrderForm items={items} />
-
-      <div className="actions">
-        <button className="continue-btn" onClick={() => navigate("/")}>
-            Continue Shopping
-        </button>
-        </div>
+      <h3>Total: ${totalPrice.toFixed(2)}</h3>
+      <button onClick={() => navigate("/purchase-order")}>Confirm Order</button>
+      <button onClick={() => navigate("/")}>Continue Shopping</button>
     </div>
   );
 }
+
+export default PurchaseOrderSummary;

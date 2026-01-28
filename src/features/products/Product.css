@@ -47,10 +47,10 @@
 
 /* ---- PRODUCT IMAGE ---- */
 .product-card img {
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   object-fit: contain;
- 
+  padding: 20px;
   border-radius: 12px;
   margin-bottom: 15px;
   border: 1px solid #ddd;

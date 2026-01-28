@@ -14,7 +14,7 @@ const Navbar = () => {
   // Top utility links
   const topLinks = [
     { title: "About Us", path: "/about" },
-    { title: "Add to Purchase Order", path: "/purchase-order-summary" },
+    { title: "Add to Purchase Order", path: "/purchase-order" },
     { title: "Gift Cards", path: "#" },
     { title: "Sign In", path: "/signin" },
     { title: "Contact Us", path: "/contact" },

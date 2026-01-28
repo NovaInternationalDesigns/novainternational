@@ -58,6 +58,7 @@ function DigitalLetterHead() {
     <thead> 
       <tr>
         <th>Style No.</th>
+        <th>Size</th>
         <th>Description</th>
         <th>Color</th>
         <th>Qty</th>
@@ -69,6 +70,7 @@ function DigitalLetterHead() {
       {order.items?.map((item, index) => (
         <tr key={index}>
           <td>{item.styleNo}</td>
+          <td>{item.size || "-"}</td>
           <td>{item.description}</td>
           <td>{item.color}</td>
           <td>{item.qty}</td>

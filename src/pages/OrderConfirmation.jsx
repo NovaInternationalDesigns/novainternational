@@ -1,18 +1,10 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-
-export default function OrderConfirmation() {
-  const { orderId } = useParams();
-  const navigate = useNavigate();
-
+const OrderConfirmation = () => {
   return (
-    <div>
-      <h2>Thank You!</h2>
-      <p>Your order <strong>{orderId}</strong> has been submitted successfully.</p>
-      <p>We have sent email notifications to you and the owner. Your order is being processed.</p>
-
-      <button onClick={() => navigate("/")}>Continue Shopping</button>
-      <button onClick={() => navigate(`/purchase-order-summary`)}>View Order</button>
+    <div style={{ padding: "40px" }}>
+      <h1>Order Confirmed</h1>
+      <p>Thank you for your order!</p>
     </div>
   );
-}
+};
+
+export default OrderConfirmation;

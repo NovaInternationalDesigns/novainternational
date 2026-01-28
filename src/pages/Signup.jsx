@@ -19,13 +19,13 @@ const SignUp = () => {
     setLoading(true);
 
     try {
-      // 1️⃣ Create user
+      // 1️ Create user
       await signUp(name, email, password);
 
-      // 2️⃣ Fetch user context
+      // 2️ Fetch user context
       await signIn();
 
-      // 3️⃣ Redirect
+      // 3️ Redirect
       navigate("/");
     } catch (err) {
       setError(err.message || "Signup failed");

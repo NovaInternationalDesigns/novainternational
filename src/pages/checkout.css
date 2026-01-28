@@ -7,10 +7,6 @@
   text-align: center;
 }
 
-.order-summary {
-  margin-bottom: 30px;
-}
-
 .order-summary h3 {
   font-size: 1.5rem;
   margin-bottom: 10px;
@@ -35,25 +31,23 @@
   flex-direction: column;
 }
 
-.checkout-form .shipping-section,
-.checkout-form .payment-section {
-  margin-bottom: 20px;
-}
-
 .checkout-form input {
   padding: 10px;
-  margin-bottom: 10px;
+  margin-right: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
 .checkout-form button {
   padding: 10px;
+  width: 150px;
+  height: auto;
   background-color: #4CAF50;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-bottom:20px;
 }
 
 .checkout-form button:hover {

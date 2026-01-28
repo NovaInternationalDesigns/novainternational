@@ -16,12 +16,14 @@ import Category from "./pages/Category.jsx";
 import Product from "./features/products/Product.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
 import PurchaseOrderForm from "./pages/PurchaseOrderForm.jsx";
+import PurchaseOrder from "./pages/PurchaseOrder.jsx";
 import DigitalLetterHead from './pages/DigitalLetterhead.jsx';
 import Checkout from './pages/Checkout.jsx';
 import SignIn from './pages/SignIn.jsx';
 import Signup from './pages/Signup.jsx';
 import CheckoutGuest from './pages/CheckoutGuest.jsx';
 import PurchaseOrderSummary from './pages/PurchaseOrderSummary.jsx';
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 function App() {
   return (
@@ -45,10 +47,13 @@ function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/Signup" element={<Signup />} />
         <Route path="/checkout-guest" element={<CheckoutGuest />} />  
+        <Route path="/order-confirmation" element={<OrderConfirmation />} />
 
         {/* Protected Routes */}
-        <Route path="/purchase-order" element={<ProtectedRoute><PurchaseOrderForm /></ProtectedRoute>} />
-        <Route path="/purchase-order-summary" element={<ProtectedRoute><PurchaseOrderSummary /></ProtectedRoute>} />
+        <Route path="/purchase-order" element={<ProtectedRoute><PurchaseOrder /></ProtectedRoute>} />
+        <Route path="/purchase-order/form" element={<ProtectedRoute><PurchaseOrderForm /></ProtectedRoute>} />
+        <Route path="/purchaseordersummary" element={<ProtectedRoute><PurchaseOrderSummary /></ProtectedRoute>} />
+
         <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
       </Routes>
 

@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./PurchaseOrderForm.css";
+import { usePO } from "../context/PurchaseOrderContext.jsx";
 
 export default function PurchaseOrderForm({ items }) {
   const navigate = useNavigate();
+
+  const { poItems, clearPO } = usePO();
 
   const [authChecked, setAuthChecked] = useState(false); // 🔐 auth state
 
@@ -41,19 +44,22 @@ export default function PurchaseOrderForm({ items }) {
 
   // ✅ LOAD ITEMS FROM SUMMARY PAGE
   useEffect(() => {
-    if (items && items.length > 0) {
+    const source = items && items.length > 0 ? items : poItems;
+
+    if (source && source.length > 0) {
       setOrderItems(
-        items.map(item => ({
-          styleNo: item.productId,
-          description: item.name,
+        source.map((item) => ({
+          styleNo: item.productId || item.styleNo,
+          description: item.name || item.description,
           color: item.color || "",
-          qty: item.quantity,
-          price: item.price,
-          total: item.quantity * item.price
+          size: item.size || "",
+          qty: item.quantity ?? item.qty ?? 0,
+          price: item.price || 0,
+          total: (item.quantity ?? item.qty ?? 0) * (item.price || 0),
         }))
       );
     }
-  }, [items]);
+  }, [items, poItems]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -91,6 +97,8 @@ export default function PurchaseOrderForm({ items }) {
       );
 
       alert("Purchase order submitted successfully!");
+      // clear client-side PO after successful submit
+      if (clearPO) clearPO();
       navigate(`/digital-letter-head/${res.data.order._id}`);
     } catch (error) {
       console.error(error);
@@ -146,6 +154,7 @@ export default function PurchaseOrderForm({ items }) {
             <tr>
               <th>Style</th>
               <th>Description</th>
+              <th>Size</th>
               <th>Color</th>
               <th>Qty</th>
               <th>Price</th>
@@ -161,6 +170,12 @@ export default function PurchaseOrderForm({ items }) {
                 <td><input value={item.description} readOnly /></td>
                 <td>
                   <input
+                    value={item.size}
+                    onChange={(e) => handleItemChange(index, "size", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
                     value={item.color}
                     onChange={(e) => handleItemChange(index, "color", e.target.value)}
                   />
@@ -170,6 +185,7 @@ export default function PurchaseOrderForm({ items }) {
                     type="number"
                     value={item.qty}
                     onChange={(e) => handleItemChange(index, "qty", Number(e.target.value))}
+                    min={0}
                   />
                 </td>
                 <td>

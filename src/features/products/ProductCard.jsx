@@ -70,49 +70,6 @@ function ProductCard({ product }) {
       <h3 className="product-name" onClick={() => navigate(`/product/${product._id}`)}>{product.name}</h3>
       <p className="price">${product.price}</p>
 
-      {/* COLORS */}
-      {product.colors?.length > 0 && (
-        <div className="colors-group">
-          <h4>Select Color:</h4>
-          <div className="color-options">
-            {product.colors.map((color) => (
-              <button
-                key={color}
-                className={`color-btn ${
-                  selectedColor === color ? "selected" : ""
-                }`}
-                onClick={() => setSelectedColor(color)}
-              >
-                {color}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* QUANTITY */}
-      <div className="qty-group">
-        <h4>Quantity:</h4>
-        <input
-          type="number"
-          min={MIN_QTY}
-          value={qty}
-          onChange={(e) => handleQtyChange(Number(e.target.value))}
-        />
-        <p className="min-qty-note">
-          Minimum order quantity: <strong>{MIN_QTY}</strong>
-        </p>
-      </div>
-
-      {/* ACTION BUTTONS */}
-      {/* <div className="action-buttons">
-        <button className="buy-now-btn" onClick={handleBuyNow}>
-          Buy Now
-        </button>
-        <button className="add-po-btn" onClick={handleAddToPO}>
-          Add to Purchase Order
-        </button>
-      </div> */}
     </div>
   );
 }
