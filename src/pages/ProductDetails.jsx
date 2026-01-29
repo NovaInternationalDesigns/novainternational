@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { usePO } from "../context/PurchaseOrderContext.jsx";
-import "./ProductDetails.css";
+import "./CSS/ProductDetails.css";
 
 function ProductDetails() {
   const { id } = useParams();

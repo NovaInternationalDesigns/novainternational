@@ -36,7 +36,7 @@ export const UserProvider = ({ children }) => {
       const res = await fetch(`${API_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // 🔥 session cookie
+        credentials: "include", // session cookie
         body: JSON.stringify({ name, email, password }),
       });
 
@@ -50,7 +50,14 @@ export const UserProvider = ({ children }) => {
   };
 
   // Sign in: fetch user from /me
-  const signIn = async () => {
+  const signIn = async (userData) => {
+    // If caller provides user data from login response, use it immediately
+    if (userData) {
+      setUser(userData);
+      setLoading(false);
+      return;
+    }
+
     await fetchUser();
   };
 
@@ -62,6 +69,10 @@ export const UserProvider = ({ children }) => {
         credentials: "include",
       });
       setUser(null);
+      // Clear local purchase order cache to avoid leaking items between users
+      try { localStorage.removeItem("poItems"); } catch (e) {}
+      // Refresh and navigate home
+      window.location.href = "/";
     } catch (err) {
       console.error("Logout error:", err);
     }

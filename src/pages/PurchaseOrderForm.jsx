@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./PurchaseOrderForm.css";
+import "./CSS/PurchaseOrderForm.css";
 import { usePO } from "../context/PurchaseOrderContext.jsx";
 
 export default function PurchaseOrderForm({ items }) {

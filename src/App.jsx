@@ -9,7 +9,6 @@ import Footer from "./components/footer/Footer.jsx";
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 /* Pages */
-import Home from "./pages/Home/Home.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Category from "./pages/Category.jsx";

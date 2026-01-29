@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePO } from "../context/PurchaseOrderContext.jsx";
 import { UserContext } from "../context/UserContext";
-import "./purchaseorder.css";
+import "./CSS/purchaseorder.css";
 
 function PurchaseOrder() {
   const { user, loading } = useContext(UserContext);

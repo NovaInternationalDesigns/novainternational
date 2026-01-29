@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ProductCard from "../features/products/ProductCard";
-import "./category.css"; 
+import "./CSS/category.css"; 
 
 function Category() {
   const { category, subcategory } = useParams();
