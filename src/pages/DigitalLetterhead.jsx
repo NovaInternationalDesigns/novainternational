@@ -39,6 +39,7 @@ function DigitalLetterHead() {
     <div className="header-section">
   <div className="header-left">
     <p>Company: {order.customerName}</p>
+    {order.email && <p>Email: {order.email}</p>}
     <p>ATTN: {order.attn}</p>
     <p>Address: {order.address}</p>
     <p>Tel: {order.tel}</p>

@@ -12,6 +12,7 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,8 +26,8 @@ const SignUp = () => {
       // 2️ Fetch user context
       await signIn();
 
-      // 3️ Redirect
-      navigate("/");
+      // 3️ Show success popup (server already sends welcome email)
+      setShowPopup(true);
     } catch (err) {
       setError(err.message || "Signup failed");
     } finally {
@@ -73,6 +74,18 @@ const SignUp = () => {
       <div className="signup-footer">
         Already have an account? <Link to="/signin">Sign In</Link>
       </div>
+
+      {showPopup && (
+        <div className="signup-popup-overlay">
+          <div className="signup-popup">
+            <h3>Account Created</h3>
+            <p>Your account was created successfully. A welcome email has been sent to {email}.</p>
+            <div style={{ textAlign: "right" }}>
+              <button onClick={() => { setShowPopup(false); navigate('/'); }}>OK</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

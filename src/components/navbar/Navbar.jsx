@@ -3,10 +3,12 @@ import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
 import SignOutButton from "../SignOutButton";  // For sign-out functionality
+import { usePO } from "../../context/PurchaseOrderContext.jsx";
 import "./navbar.css";
 
 const Navbar = () => {
   const { user, signOut, loading } = useContext(UserContext);  // Get user, signOut, and loading from context
+  const { poItems } = usePO();
   const [activeMenu, setActiveMenu] = useState(null);  // Manage active menu item state
 
   if (loading) return null;  // Return null while the loading state is true
@@ -14,7 +16,7 @@ const Navbar = () => {
   // Top utility links
   const topLinks = [
     { title: "About Us", path: "/about" },
-    { title: "Add to Purchase Order", path: "/purchase-order" },
+    // { title: "Add to Purchase Order", path: "/purchase-order" },
     { title: "Gift Cards", path: "#" },
     { title: "Sign In", path: "/signin" },
     { title: "Contact Us", path: "/contact" },
@@ -170,6 +172,12 @@ const Navbar = () => {
               <>
                 <li>Welcome, {user.name || user.email}</li>
                 <li><SignOutButton onSignOut={signOut} /></li>
+                <li>
+                  <Link to="/purchase-order">
+                    <span className="cart-icon">🛒</span>
+                    <span className="cart-count">{poItems?.length || 0}</span>
+                  </Link>
+                </li>
               </>
             )}
           </ul>

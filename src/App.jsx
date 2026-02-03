@@ -23,6 +23,7 @@ import Signup from './pages/Signup.jsx';
 import CheckoutGuest from './pages/CheckoutGuest.jsx';
 import PurchaseOrderSummary from './pages/PurchaseOrderSummary.jsx';
 import OrderConfirmation from "./pages/OrderConfirmation";
+import AdminOrders from "./pages/AdminOrders.jsx";
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
         <Route path="/purchaseordersummary" element={<ProtectedRoute><PurchaseOrderSummary /></ProtectedRoute>} />
 
         <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+        <Route path="/admin/orders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
       </Routes>
 
       <Footer />

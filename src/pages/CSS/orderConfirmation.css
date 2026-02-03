@@ -1,0 +1,136 @@
+/* Order Confirmation Page */
+
+.order-confirmation {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+    "Helvetica Neue", sans-serif;
+}
+
+.order-confirmation h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #1a1a1a;
+}
+
+.order-confirmation .success-text {
+  color: #2e7d32;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+.order-summary {
+  margin-top: 30px;
+  border-top: 1px solid #eaeaea;
+  padding-top: 20px;
+}
+
+.order-summary h3 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.order-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #555;
+}
+
+.order-meta span {
+  font-weight: 600;
+  color: #222;
+}
+
+.order-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: 1fr 80px 120px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  font-weight: 500;
+}
+
+.item-qty {
+  text-align: center;
+  color: #555;
+}
+
+.item-total {
+  text-align: right;
+  font-weight: 600;
+}
+
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.shipping-info {
+  margin-top: 35px;
+  padding-top: 25px;
+  border-top: 1px dashed #ddd;
+}
+
+.shipping-info h4 {
+  margin-bottom: 10px;
+}
+
+.shipping-info p {
+  margin: 4px 0;
+  color: #444;
+}
+
+.back-home {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.back-home a {
+  display: inline-block;
+  padding: 12px 26px;
+  background: #000;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.back-home a:hover {
+  background: #333;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .order-confirmation {
+    padding: 25px;
+    margin: 30px 15px;
+  }
+
+  .order-item {
+    grid-template-columns: 1fr 60px 90px;
+    font-size: 14px;
+  }
+}

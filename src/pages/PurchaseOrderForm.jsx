@@ -7,14 +7,15 @@ import { usePO } from "../context/PurchaseOrderContext.jsx";
 export default function PurchaseOrderForm({ items }) {
   const navigate = useNavigate();
 
-  const { poItems, clearPO } = usePO();
+  const { poItems, clearPO, removeFromPO } = usePO();
 
-  const [authChecked, setAuthChecked] = useState(false); // 🔐 auth state
+  const [authChecked, setAuthChecked] = useState(false); // auth state
 
   const [formData, setFormData] = useState({
     bankName: "",
     accountNo: "",
     routingNo: "",
+    email: "",
     customerName: "",
     attn: "",
     address: "",
@@ -22,10 +23,11 @@ export default function PurchaseOrderForm({ items }) {
     fax: "",
     notes: ""
   });
+  const [formError, setFormError] = useState("");
 
   const [orderItems, setOrderItems] = useState([]);
 
-  // 🔐 CHECK LOGIN STATUS (REDIRECT IF NOT LOGGED IN)
+  // CHECK LOGIN STATUS (REDIRECT IF NOT LOGGED IN)
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -33,16 +35,16 @@ export default function PurchaseOrderForm({ items }) {
           `${import.meta.env.VITE_API_URL}/api/auth/me`,
           { withCredentials: true }
         );
-        setAuthChecked(true); // ✅ logged in
+        setAuthChecked(true); // logged in
       } catch (error) {
-        navigate("/signin"); // ❌ not logged in → sign in
+        navigate("/signin"); // not logged in → sign in
       }
     };
 
     checkAuth();
   }, [navigate]);
 
-  // ✅ LOAD ITEMS FROM SUMMARY PAGE
+  // LOAD ITEMS FROM SUMMARY PAGE
   useEffect(() => {
     const source = items && items.length > 0 ? items : poItems;
 
@@ -63,6 +65,7 @@ export default function PurchaseOrderForm({ items }) {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === "email") setFormError("");
   };
 
   const handleItemChange = (index, field, value) => {
@@ -77,46 +80,46 @@ export default function PurchaseOrderForm({ items }) {
     setOrderItems(updated);
   };
 
-  const addRow = () =>
-    setOrderItems([
-      ...orderItems,
-      { styleNo: "", description: "", color: "", qty: 0, price: 0, total: 0 }
-    ]);
+  const removeRow = async (index) => {
+    const item = orderItems[index];
 
-  const removeRow = (index) =>
-    setOrderItems(orderItems.filter((_, i) => i !== index));
+    // Optimistic UI update
+    setOrderItems((prev) => prev.filter((_, i) => i !== index));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/purchase-order`,
-        { ...formData, items: orderItems },
-        { withCredentials: true } // 🔐 send session cookie
-      );
-
-      alert("Purchase order submitted successfully!");
-      // clear client-side PO after successful submit
-      if (clearPO) clearPO();
-      navigate(`/digital-letter-head/${res.data.order._id}`);
-    } catch (error) {
-      console.error(error);
-
-      if (error.response?.status === 401) {
-        navigate("/signin"); // session expired
-      } else {
-        alert("Error submitting purchase order");
+    // If this item maps to a draft PO item (has productId/styleNo), remove from server and PO context
+    const productId = item.productId || item.styleNo;
+    if (productId) {
+      try {
+        await removeFromPO({ productId, color: item.color, size: item.size });
+      } catch (err) {
+        console.error('Failed to remove PO item on server:', err);
+        setFormError('Failed to remove item from Purchase Order');
       }
     }
   };
 
-  // ⛔ DO NOT RENDER UNTIL AUTH IS VERIFIED
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Client-side email validation (only if provided)
+    if (formData.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(String(formData.email).toLowerCase())) {
+        setFormError("Please enter a valid email address.");
+        return;
+      }
+    }
+    // Compute grand total and navigate to Checkout with order data
+    const totalAmount = orderItems.reduce((sum, it) => sum + (it.qty || 0) * (it.price || 0), 0);
+    navigate('/checkout', { state: { items: orderItems, form: formData, totalAmount } });
+  };
+
+  // DO NOT RENDER UNTIL AUTH IS VERIFIED
   if (!authChecked) {
     return <p>Checking login status...</p>;
   }
 
-  // ⛔ SAFETY CHECK
+  // SAFETY CHECK
   if (orderItems.length === 0) {
     return <p>Loading order items...</p>;
   }
@@ -136,10 +139,12 @@ export default function PurchaseOrderForm({ items }) {
         <h3>BUSINESS DETAILS</h3>
         <div className="input-row">
           <input name="customerName" placeholder="Customer Name" onChange={handleChange} required />
+          <input name="email" placeholder="Email" onChange={handleChange} />
           <input name="attn" placeholder="ATTN" onChange={handleChange} required />
           <input name="tel" placeholder="Telephone" onChange={handleChange} required />
           <input name="fax" placeholder="Fax" onChange={handleChange} />
         </div>
+        {formError && <p className="po-form-error" style={{ color: 'red' }}>{formError}</p>}
 
         <textarea
           name="address"
@@ -206,8 +211,12 @@ export default function PurchaseOrderForm({ items }) {
           </tbody>
         </table>
 
-        <button type="button" onClick={addRow}>+ Add Row</button>
-        <button type="submit">Submit Purchase Order</button>
+        <div style={{ marginTop: 12 }}>
+          <strong>Grand Total: $</strong>
+          <strong>{orderItems.reduce((sum, it) => sum + (it.qty || 0) * (it.price || 0), 0).toFixed(2)}</strong>
+        </div>
+
+        <button type="submit">Proceed to Checkout</button>
       </form>
     </div>
   );

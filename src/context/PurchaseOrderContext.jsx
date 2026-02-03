@@ -5,6 +5,7 @@ const POContext = createContext();
 
 export const PurchaseOrderProvider = ({ children }) => {
   const [poItems, setPoItems] = useState([]);
+  const [purchaseOrderId, setPurchaseOrderId] = useState(null);
   const { user } = useContext(UserContext);
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,7 +19,9 @@ export const PurchaseOrderProvider = ({ children }) => {
           });
           if (res.ok) {
             const data = await res.json();
-            const items = (data.items || []).map((i) => ({
+              // keep purchaseOrderId from draft
+              if (data.purchaseOrderId) setPurchaseOrderId(data.purchaseOrderId);
+              const items = (data.items || []).map((i) => ({
               productId: i.productId,
               name: i.name,
               price: i.price,
@@ -153,7 +156,7 @@ export const PurchaseOrderProvider = ({ children }) => {
   };
 
   return (
-    <POContext.Provider value={{ poItems, addToPO, removeFromPO, clearPO }}>
+    <POContext.Provider value={{ poItems, purchaseOrderId, setPurchaseOrderId, addToPO, removeFromPO, clearPO }}>
       {children}
     </POContext.Provider>
   );

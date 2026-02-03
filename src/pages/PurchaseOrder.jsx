@@ -84,7 +84,7 @@ function PurchaseOrder() {
       </button>
 
       <a
-        href="mailto:support@novainternationaldesigns.com?subject=Need%20Help%20with%20Purchase%20Order"
+        href="mailto:shila@novainternationaldesigns.com?subject=Need%20Help%20with%20Purchase%20Order"
         className="po-help-link"
       >
         Need Help?
