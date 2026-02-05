@@ -48,7 +48,13 @@
   border-radius: 5px;
   cursor: pointer;
   border: none;
+  background-color: #000;
+  color: #fff;
 }
+.add-po-btn:hover {
+  background-color: #333;
+}
+
 
 .buy-now-btn {
   border: 1px solid #df360c;
@@ -60,11 +66,3 @@
   color:white
 }
 
-.add-po-btn {
-  background-color: #000;
-  color: #fff;
-}
-
-.add-po-btn:hover {
-  background-color: #333;
-}

@@ -1,26 +1,31 @@
 import React, { useEffect, useState, useContext } from "react";
 import { UserContext } from "../context/UserContext";
+import { useGuest } from "../context/GuestContext";
 import { useNavigate } from "react-router-dom";
 
 function PurchaseOrderSummary() {
   const { user } = useContext(UserContext);
+  const { guest } = useGuest();
   const navigate = useNavigate();
   const [po, setPO] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!user || !user._id) {
-      alert("Please log in first");
+    if (!user && !guest) {
+      alert("Please log in or proceed as guest");
       navigate("/signin");
       return;
     }
 
     const fetchPO = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${user._id}`
-        );
+        // Determine which endpoint to use
+        const endpoint = user 
+          ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${user._id}`
+          : `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/guest/${guest._id}`;
+
+        const res = await fetch(endpoint);
         if (!res.ok) throw new Error("Failed to fetch purchase order");
 
         const data = await res.json();
@@ -33,7 +38,7 @@ function PurchaseOrderSummary() {
     };
 
     fetchPO();
-  }, [user, navigate]);
+  }, [user, guest, navigate]);
 
   if (loading) return <p>Loading Purchase Order...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;

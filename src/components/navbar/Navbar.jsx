@@ -2,12 +2,14 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
+import { useGuest } from "../../context/GuestContext.jsx";
 import SignOutButton from "../SignOutButton";  // For sign-out functionality
 import { usePO } from "../../context/PurchaseOrderContext.jsx";
 import "./navbar.css";
 
 const Navbar = () => {
   const { user, signOut, loading } = useContext(UserContext);  // Get user, signOut, and loading from context
+  const { guest, endGuestSession } = useGuest();  // Get guest context
   const { poItems } = usePO();
   const [activeMenu, setActiveMenu] = useState(null);  // Manage active menu item state
 
@@ -158,8 +160,8 @@ const Navbar = () => {
         <div className="container">
           <ul>
             {topLinks.map((link, i) => {
-              // If the user is logged in, hide the "Sign In" link
-              if (link.title === "Sign In" && user) return null;
+              // If the user is logged in or guest is active, hide the "Sign In" link
+              if (link.title === "Sign In" && (user || guest)) return null;
               return (
                 <li key={i}>
                   <Link to={link.path}>{link.title}</Link>
@@ -174,9 +176,33 @@ const Navbar = () => {
                 <li><SignOutButton onSignOut={signOut} /></li>
                 <li>
                   <Link to="/purchase-order">
-                    <span className="cart-icon">🛒</span>
+                    <span className="cart-icon">Purchase Order</span>
                     <span className="cart-count">{poItems?.length || 0}</span>
                   </Link>
+                </li>
+                <li>
+                  <Link to="/purchase-history">Purchase History</Link>
+                </li>
+              </>
+            )}
+
+            {/* If guest is active, show welcome message and sign out button */}
+            {!user && guest && (
+              <>
+                <li>Welcome, {guest.name}</li>
+                <li>
+                  <button onClick={endGuestSession} className="signout-btn">
+                    Sign Out
+                  </button>
+                </li>
+                <li>
+                  <Link to="/purchase-order">
+                    <span className="cart-icon">Purchase Order</span>
+                    <span className="cart-count">{poItems?.length || 0}</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/purchase-history">Purchase History</Link>
                 </li>
               </>
             )}

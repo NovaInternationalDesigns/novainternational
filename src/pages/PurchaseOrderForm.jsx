@@ -1,11 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
+import { useGuest } from "../context/GuestContext";
 import "./CSS/PurchaseOrderForm.css";
 import { usePO } from "../context/PurchaseOrderContext.jsx";
 
 export default function PurchaseOrderForm({ items }) {
   const navigate = useNavigate();
+  const { user } = useContext(UserContext);
+  const { guest } = useGuest();
 
   const { poItems, clearPO, removeFromPO } = usePO();
 
@@ -27,22 +31,15 @@ export default function PurchaseOrderForm({ items }) {
 
   const [orderItems, setOrderItems] = useState([]);
 
-  // CHECK LOGIN STATUS (REDIRECT IF NOT LOGGED IN)
+  // CHECK LOGIN STATUS (ALLOW USER OR GUEST)
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/auth/me`,
-          { withCredentials: true }
-        );
-        setAuthChecked(true); // logged in
-      } catch (error) {
-        navigate("/signin"); // not logged in → sign in
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
+    // Allow access if user is logged in OR guest session exists
+    if (user || guest) {
+      setAuthChecked(true);
+    } else {
+      navigate("/signin");
+    }
+  }, [user, guest, navigate]);
 
   // LOAD ITEMS FROM SUMMARY PAGE
   useEffect(() => {
@@ -62,6 +59,17 @@ export default function PurchaseOrderForm({ items }) {
       );
     }
   }, [items, poItems]);
+
+  // PRE-FILL FORM WITH USER/GUEST DATA
+  useEffect(() => {
+    if (user || guest) {
+      setFormData((prev) => ({
+        ...prev,
+        customerName: user?.name || guest?.name || "",
+        email: user?.email || guest?.email || "",
+      }));
+    }
+  }, [user, guest]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

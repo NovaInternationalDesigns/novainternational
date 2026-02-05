@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { UserContext } from "./UserContext";
+import { useGuest } from "./GuestContext";
 
 const POContext = createContext();
 
@@ -7,11 +8,13 @@ export const PurchaseOrderProvider = ({ children }) => {
   const [poItems, setPoItems] = useState([]);
   const [purchaseOrderId, setPurchaseOrderId] = useState(null);
   const { user } = useContext(UserContext);
+  const { guest } = useGuest();
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // Load from server (when logged in) or from localStorage
+  // Load from server (when logged in or guest) or from localStorage
   useEffect(() => {
     const load = async () => {
+      // If user is logged in
       if (user && user._id) {
         try {
           const res = await fetch(`${API_URL}/api/purchaseOrderDraft/${user._id}`, {
@@ -19,9 +22,8 @@ export const PurchaseOrderProvider = ({ children }) => {
           });
           if (res.ok) {
             const data = await res.json();
-              // keep purchaseOrderId from draft
-              if (data.purchaseOrderId) setPurchaseOrderId(data.purchaseOrderId);
-              const items = (data.items || []).map((i) => ({
+            if (data.purchaseOrderId) setPurchaseOrderId(data.purchaseOrderId);
+            const items = (data.items || []).map((i) => ({
               productId: i.productId,
               name: i.name,
               price: i.price,
@@ -33,16 +35,42 @@ export const PurchaseOrderProvider = ({ children }) => {
             return;
           }
         } catch (err) {
-          console.error("Failed to fetch PO draft:", err);
+          console.error("Failed to fetch user PO draft:", err);
         }
       }
 
+      // If guest is logged in
+      if (guest && guest._id) {
+        try {
+          const res = await fetch(`${API_URL}/api/purchaseOrderDraft/guest/${guest._id}`, {
+            credentials: "include",
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.purchaseOrderId) setPurchaseOrderId(data.purchaseOrderId);
+            const items = (data.items || []).map((i) => ({
+              productId: i.productId,
+              name: i.name,
+              price: i.price,
+              quantity: i.qty ?? i.quantity ?? 0,
+              color: i.color || null,
+              size: i.size || null,
+            }));
+            setPoItems(items);
+            return;
+          }
+        } catch (err) {
+          console.error("Failed to fetch guest PO draft:", err);
+        }
+      }
+
+      // Fall back to localStorage
       const saved = localStorage.getItem("poItems");
       if (saved) setPoItems(JSON.parse(saved));
     };
 
     load();
-  }, [user]);
+  }, [user, guest]);
 
   // Save to localStorage
   useEffect(() => {
@@ -77,8 +105,15 @@ export const PurchaseOrderProvider = ({ children }) => {
     // Accept either a productId string or an object { productId, color, size }
     if (!productId) return;
 
-    // If user is logged in, request backend to remove
-    if (user && user._id) {
+    // Determine endpoint based on user or guest
+    const endpoint = user && user._id
+      ? `${API_URL}/api/purchaseOrderDraft/${user._id}/items`
+      : guest && guest._id
+      ? `${API_URL}/api/purchaseOrderDraft/guest/${guest._id}/items`
+      : null;
+
+    // If user or guest is logged in, request backend to remove
+    if (endpoint) {
       try {
         let body = null;
         if (typeof productId === "string") body = { productId };
@@ -88,7 +123,7 @@ export const PurchaseOrderProvider = ({ children }) => {
           size: productId.size,
         };
 
-        const res = await fetch(`${API_URL}/api/purchaseOrderDraft/${user._id}/items`, {
+        const res = await fetch(endpoint, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -130,9 +165,16 @@ export const PurchaseOrderProvider = ({ children }) => {
   };
 
   const clearPO = async () => {
-    if (user && user._id) {
+    // Determine endpoint based on user or guest
+    const endpoint = user && user._id
+      ? `${API_URL}/api/purchaseOrderDraft/${user._id}/items`
+      : guest && guest._id
+      ? `${API_URL}/api/purchaseOrderDraft/guest/${guest._id}/items`
+      : null;
+
+    if (endpoint) {
       try {
-        const res = await fetch(`${API_URL}/api/purchaseOrderDraft/${user._id}/items`, {
+        const res = await fetch(endpoint, {
           method: "DELETE",
           credentials: "include",
           headers: { "Content-Type": "application/json" },

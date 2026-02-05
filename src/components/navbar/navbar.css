@@ -45,6 +45,32 @@
   z-index: 100;
 }
 
+.cart-icon{
+  color:goldenrod;
+}
+.cart-count{
+  color:goldenrod;
+  padding-left: 5px;
+}
+
+/* Guest signout button styling */
+.signout-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: inherit;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.signout-btn:hover {
+  color: #ff6b6b;
+  text-decoration: underline;
+}
+
 /* Main menu */
 .menu {
   display: flex;
@@ -72,29 +98,7 @@
   border-bottom: 2px solid #ffffff;
 }
 
- /* Cart Icon */
-.cart-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-left: 20px;
-}
 
-.cart-icon {
-  font-size: 24px;
-  color: #333;
-}
-
-.cart-item-count {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background-color: red;
-  color: white;
-  border-radius: 50%;
-  padding: 5px;
-  font-size: 12px;
-}
 
 /* ---------------- Mega Menu ---------------- */
 .mega-menu {

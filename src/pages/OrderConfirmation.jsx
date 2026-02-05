@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { usePO } from "../context/PurchaseOrderContext"; // make sure path is correct
+import { useGuest } from "../context/GuestContext"; // for guest session
 import "./CSS/orderconfirmation.css";
 
 export default function OrderConfirmation() {
@@ -10,6 +11,8 @@ export default function OrderConfirmation() {
 
   const API_URL = import.meta.env.VITE_API_URL || "";
   const { clearPO } = usePO();
+  const { endGuestSession } = useGuest(); // get guest session handler
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!sessionId) return;
@@ -23,15 +26,21 @@ export default function OrderConfirmation() {
         const data = await res.json();
         setOrder(data);
 
-        // Clear the frontend purchase order after successful fetch
+        // Clear the frontend purchase order
         clearPO();
+
+        // End guest session automatically
+        endGuestSession();
+
+        // Optional: redirect after 5s (if you want to auto go home)
+        // setTimeout(() => navigate("/"), 5000);
       } catch (err) {
         console.error("Fetch order error:", err);
       }
     };
 
     fetchOrder();
-  }, [sessionId, API_URL, clearPO]);
+  }, [sessionId, API_URL, clearPO, endGuestSession, navigate]);
 
   if (!order) return <div>Loading...</div>;
 
@@ -53,9 +62,9 @@ export default function OrderConfirmation() {
         <ul className="order-items">
           {order.items.map((item, idx) => (
             <li className="order-item" key={idx}>
-              <div className="item-name">{item.description}</div>
+              <div className="item-name">{item.description || item.name}</div>
               <div className="item-qty">x {item.qty}</div>
-              <div className="item-total">${item.total}</div>
+              <div className="item-total">${(item.qty * item.price).toFixed(2)}</div>
             </li>
           ))}
         </ul>

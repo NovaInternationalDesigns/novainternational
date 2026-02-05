@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
+import { useGuest } from "../context/GuestContext";
 import { usePO } from "../context/PurchaseOrderContext.jsx";
 import "./CSS/ProductDetails.css";
 
@@ -8,6 +9,7 @@ function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
+  const { guest } = useGuest();
   const { addToPO, poItems } = usePO();
 
   const MIN_QTY = 500;
@@ -95,9 +97,10 @@ function ProductDetails() {
 
   // ADD TO PO (DB-BACKED)
   const handleAddToPO = async () => {
-    if (!user || !user._id) {
-      alert("Please log in first");
-      navigate("/signin");
+    // Check if user is logged in OR guest session exists
+    if (!user && !guest) {
+      alert("Please log in or proceed as guest");
+      navigate("/checkout-guest");
       return;
     }
 
@@ -114,15 +117,17 @@ function ProductDetails() {
     }));
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${user._id}/items`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ items: poData }),
-        }
-      );
+      // Determine endpoint based on user or guest
+      const endpoint = user 
+        ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${user._id}/items`
+        : `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/guest/${guest._id}/items`;
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ items: poData }),
+      });
 
       if (!res.ok) {
         const errData = await res.json();

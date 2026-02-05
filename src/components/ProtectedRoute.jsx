@@ -1,34 +1,19 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useContext, useState } from "react";
+import { UserContext } from "../context/UserContext";
+import { useGuest } from "../context/GuestContext";
 
 function ProtectedRoute({ children }) {
-  const [loading, setLoading] = useState(true);
-  const [isAuth, setIsAuth] = useState(false);
   const location = useLocation();
+  const { user, loading: userLoading } = useContext(UserContext);
+  const { guest } = useGuest();
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
-      credentials: "include",  // IMPORTANT: sends cookies
-    })
-      .then((res) => {
-        if (res.ok) {
-          setIsAuth(true);
-        } else {
-          setIsAuth(false);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setIsAuth(false);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
+  if (userLoading) {
     return <div>Loading...</div>;
   }
 
-  if (!isAuth) {
+  // Allow access if user is authenticated OR guest session is active
+  if (!user && !guest) {
     return (
       <Navigate
         to="/signin"

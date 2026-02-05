@@ -1,48 +1,53 @@
-import React, { useEffect, useState } from "react";
+// src/pages/Checkout.jsx
+import React, { useEffect, useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./CSS/checkout.css";
+
 import { usePO } from "../context/PurchaseOrderContext.jsx";
-import { useContext } from "react";
+import { useGuest } from "../context/GuestContext.jsx";
 import { UserContext } from "../context/UserContext.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const getQty = (item) =>
-  Number(item.qty ?? item.quantity ?? item.quantityOrdered ?? 0);
-
-const getPrice = (item) =>
-  Number(item.price ?? item.unitPrice ?? 0);
+// helpers to calculate qty & price
+const getQty = (item) => Number(item.qty ?? item.quantity ?? item.quantityOrdered ?? 0);
+const getPrice = (item) => Number(item.price ?? item.unitPrice ?? 0);
 
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { guest, endGuestSession } = useGuest();
+  const { user } = useContext(UserContext);
+  const { purchaseOrderId } = usePO();
+
   const { items = [], form = {} } = location.state || {};
   const [orderData] = useState(items);
-  const { purchaseOrderId } = usePO();
-  const { user } = useContext(UserContext);
 
   const [shippingInfo, setShippingInfo] = useState({
-    name: "",
+    name: guest?.name || user?.name || "",
     address: "",
     city: "",
     postalCode: "",
     country: "",
   });
 
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
+  // Block access if no user and no guest
+  useEffect(() => {
+    if (!user && !guest) {
+      navigate("/checkout-guest");
+    }
+  }, [user, guest, navigate]);
+
+  // Redirect home if no items
   useEffect(() => {
     if (!orderData.length) navigate("/");
   }, [orderData, navigate]);
 
-  const totalAmount = orderData.reduce((acc, item) => {
-    const qty = getQty(item);
-    const price = getPrice(item);
-    return acc + qty * price;
-  }, 0);
-
+  const totalAmount = orderData.reduce((acc, item) => acc + getQty(item) * getPrice(item), 0);
   const formattedTotal = totalAmount.toFixed(2);
 
   const handleInputChange = (e) => {
@@ -53,13 +58,8 @@ const Checkout = () => {
   const handleStripeCheckout = async () => {
     setError("");
 
-    if (
-      !shippingInfo.name ||
-      !shippingInfo.address ||
-      !shippingInfo.city ||
-      !shippingInfo.postalCode ||
-      !shippingInfo.country
-    ) {
+    // validate shipping info
+    if (!shippingInfo.name || !shippingInfo.address || !shippingInfo.city || !shippingInfo.postalCode || !shippingInfo.country) {
       setError("Please fill out all shipping information.");
       return;
     }
@@ -67,48 +67,44 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      // 1. Save the purchase order first, get orderId back
+      // 1️⃣ Save the purchase order in backend
       const saveOrderRes = await fetch(`${API_URL}/api/purchase-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: orderData.map((item) => ({
-            ...item,
-            qty: getQty(item),
-            price: getPrice(item),
-          })),
+          items: orderData.map((item) => ({ ...item, qty: getQty(item), price: getPrice(item) })),
           shippingInfo,
           totalAmount,
           form,
           purchaseOrderId,
-          userId: user?._id || undefined,
+          userId: user?._id || undefined, // undefined if guest
+          guestId: guest?._id || undefined, // Add guest ID
+          guestName: guest?.name || undefined,
+          guestEmail: guest?.email || undefined,
+          isGuest: !!guest,
         }),
         credentials: "include",
       });
-      // parse JSON safely (handle HTML error pages)
+
       const contentType = saveOrderRes.headers.get("content-type") || "";
-      if (!saveOrderRes.ok) {
-        if (contentType.includes("application/json")) {
-          const errData = await saveOrderRes.json();
-          throw new Error(errData.error || "Failed to save order");
-        } else {
-          const text = await saveOrderRes.text();
-          throw new Error(`Server error: ${text.slice(0, 200)}`);
-        }
+      let savedOrder;
+
+      if (contentType.includes("application/json")) {
+        savedOrder = await saveOrderRes.json();
+      } else {
+        throw new Error("Failed to parse order response");
       }
 
-      const savedOrder = contentType.includes("application/json") ? await saveOrderRes.json() : null;
-      if (!savedOrder) throw new Error("Failed to parse saved order response");
+      if (!saveOrderRes.ok) {
+        throw new Error(savedOrder.error || "Failed to save order");
+      }
 
-      // 2. Now create Stripe checkout session using orderId
-      const sessionRes = await fetch(
-        `${API_URL}/api/payment/create-checkout-session`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId: savedOrder.order._id }),
-        }
-      );
+      // 2️⃣ Create Stripe checkout session
+      const sessionRes = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: savedOrder.order._id }),
+      });
 
       const sessionData = await sessionRes.json();
 
@@ -116,14 +112,21 @@ const Checkout = () => {
         throw new Error(sessionData.error || "Stripe session creation failed");
       }
 
-      // 3. Redirect to Stripe Checkout page
+      // 3️⃣ Redirect to Stripe
       window.location.href = sessionData.url;
+
+      // 4️⃣ Clear guest session after order placed
+      // Note: If you want to auto sign-out only after Stripe success, you can handle in OrderConfirmation page
+      endGuestSession();
+
     } catch (err) {
       console.error("Checkout error:", err);
       setError(err.message || "Failed to start payment. Please try again.");
       setLoading(false);
     }
   };
+
+  if (!user && !guest) return null; // block access until guest/session exists
 
   return (
     <div className="checkout">
@@ -132,7 +135,6 @@ const Checkout = () => {
       {/* Order Summary */}
       <div className="order-summary">
         <h3>Order Summary</h3>
-
         <ul>
           {orderData.map((item, index) => {
             const qty = getQty(item);
@@ -142,71 +144,27 @@ const Checkout = () => {
             return (
               <li key={index}>
                 <p>{item.name || item.description || "Product"}</p>
-                <p>
-                  {qty} × ${price.toFixed(2)}
-                </p>
+                <p>{qty} × ${price.toFixed(2)}</p>
                 <p>Total: ${lineTotal}</p>
               </li>
             );
           })}
         </ul>
-
-        <p className="order-total">
-          <strong>Total Order Value: ${formattedTotal}</strong>
-        </p>
+        <p className="order-total"><strong>Total Order Value: ${formattedTotal}</strong></p>
       </div>
 
       {/* Shipping Info */}
       <div className="checkout-form">
         <h4>Shipping Information</h4>
+        <input name="name" placeholder="Full Name" value={shippingInfo.name} onChange={handleInputChange} disabled={loading} />
+        <input name="address" placeholder="Address" value={shippingInfo.address} onChange={handleInputChange} disabled={loading} />
+        <input name="city" placeholder="City" value={shippingInfo.city} onChange={handleInputChange} disabled={loading} />
+        <input name="postalCode" placeholder="Postal Code" value={shippingInfo.postalCode} onChange={handleInputChange} disabled={loading} />
+        <input name="country" placeholder="Country" value={shippingInfo.country} onChange={handleInputChange} disabled={loading} />
 
-        <input
-          name="name"
-          placeholder="Full Name"
-          value={shippingInfo.name}
-          onChange={handleInputChange}
-          disabled={loading}
-        />
-        <input
-          name="address"
-          placeholder="Address"
-          value={shippingInfo.address}
-          onChange={handleInputChange}
-          disabled={loading}
-        />
-        <input
-          name="city"
-          placeholder="City"
-          value={shippingInfo.city}
-          onChange={handleInputChange}
-          disabled={loading}
-        />
-        <input
-          name="postalCode"
-          placeholder="Postal Code"
-          value={shippingInfo.postalCode}
-          onChange={handleInputChange}
-          disabled={loading}
-        />
-        <input
-          name="country"
-          placeholder="Country"
-          value={shippingInfo.country}
-          onChange={handleInputChange}
-          disabled={loading}
-        />
+        {error && <p className="payment-error" style={{ color: "crimson" }}>{error}</p>}
 
-        {error && (
-          <p className="payment-error" style={{ color: "crimson" }}>
-            {error}
-          </p>
-        )}
-
-        <button
-          onClick={handleStripeCheckout}
-          className="place-order-btn"
-          disabled={loading}
-        >
+        <button onClick={handleStripeCheckout} className="place-order-btn" disabled={loading}>
           {loading ? "Processing..." : `Pay $${formattedTotal}`}
         </button>
       </div>

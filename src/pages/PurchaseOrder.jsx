@@ -2,18 +2,22 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePO } from "../context/PurchaseOrderContext.jsx";
+import { useGuest } from "../context/GuestContext.jsx";
 import { UserContext } from "../context/UserContext";
 import "./CSS/purchaseorder.css";
 
 function PurchaseOrder() {
   const { user, loading } = useContext(UserContext);
+  const { guest } = useGuest();
   const navigate = useNavigate();
   const { poItems, removeFromPO, clearPO } = usePO();
   const [error, setError] = useState("");
 
   if (loading) return <p className="po-loading">Checking login status...</p>;
-  if (!user || !user._id) {
-    alert("Please log in first");
+  
+  // Allow access if user OR guest is logged in
+  if (!user && !guest) {
+    alert("Please log in or proceed as guest");
     navigate("/signin");
     return null;
   }
