@@ -77,11 +77,8 @@ const Checkout = () => {
           totalAmount,
           form,
           purchaseOrderId,
-          userId: user?._id || undefined, // undefined if guest
-          guestId: guest?._id || undefined, // Add guest ID
-          guestName: guest?.name || undefined,
-          guestEmail: guest?.email || undefined,
-          isGuest: !!guest,
+          ownerType: guest ? "Guest" : "User",
+          ownerId: guest?._id || user?._id,
         }),
         credentials: "include",
       });

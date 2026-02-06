@@ -118,9 +118,9 @@ function ProductDetails() {
 
     try {
       // Determine endpoint based on user or guest
-      const endpoint = user 
-        ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${user._id}/items`
-        : `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/guest/${guest._id}/items`;
+      const ownerType = user ? "User" : "Guest";
+      const ownerId = user?._id || guest?._id;
+      const endpoint = `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`;
 
       const res = await fetch(endpoint, {
         method: "POST",

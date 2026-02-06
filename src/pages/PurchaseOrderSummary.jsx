@@ -21,9 +21,9 @@ function PurchaseOrderSummary() {
     const fetchPO = async () => {
       try {
         // Determine which endpoint to use
-        const endpoint = user 
-          ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${user._id}`
-          : `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/guest/${guest._id}`;
+        const ownerType = user ? "User" : "Guest";
+        const ownerId = user?._id || guest?._id;
+        const endpoint = `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}`;
 
         const res = await fetch(endpoint);
         if (!res.ok) throw new Error("Failed to fetch purchase order");

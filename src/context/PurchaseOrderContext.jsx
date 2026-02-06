@@ -14,35 +14,22 @@ export const PurchaseOrderProvider = ({ children }) => {
   // Load from server (when logged in or guest) or from localStorage
   useEffect(() => {
     const load = async () => {
+      let ownerType, ownerId;
+
       // If user is logged in
       if (user && user._id) {
-        try {
-          const res = await fetch(`${API_URL}/api/purchaseOrderDraft/${user._id}`, {
-            credentials: "include",
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.purchaseOrderId) setPurchaseOrderId(data.purchaseOrderId);
-            const items = (data.items || []).map((i) => ({
-              productId: i.productId,
-              name: i.name,
-              price: i.price,
-              quantity: i.qty ?? i.quantity ?? 0,
-              color: i.color || null,
-              size: i.size || null,
-            }));
-            setPoItems(items);
-            return;
-          }
-        } catch (err) {
-          console.error("Failed to fetch user PO draft:", err);
-        }
+        ownerType = "User";
+        ownerId = user._id;
+      } else if (guest && guest._id) {
+        // If guest is logged in
+        ownerType = "Guest";
+        ownerId = guest._id;
       }
 
-      // If guest is logged in
-      if (guest && guest._id) {
+      // Load from server if we have owner info
+      if (ownerType && ownerId) {
         try {
-          const res = await fetch(`${API_URL}/api/purchaseOrderDraft/guest/${guest._id}`, {
+          const res = await fetch(`${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}`, {
             credentials: "include",
           });
           if (res.ok) {
@@ -60,7 +47,7 @@ export const PurchaseOrderProvider = ({ children }) => {
             return;
           }
         } catch (err) {
-          console.error("Failed to fetch guest PO draft:", err);
+          console.error(`Failed to fetch ${ownerType} PO draft:`, err);
         }
       }
 
@@ -105,11 +92,18 @@ export const PurchaseOrderProvider = ({ children }) => {
     // Accept either a productId string or an object { productId, color, size }
     if (!productId) return;
 
-    // Determine endpoint based on user or guest
-    const endpoint = user && user._id
-      ? `${API_URL}/api/purchaseOrderDraft/${user._id}/items`
-      : guest && guest._id
-      ? `${API_URL}/api/purchaseOrderDraft/guest/${guest._id}/items`
+    // Determine ownerType and ownerId
+    let ownerType, ownerId;
+    if (user && user._id) {
+      ownerType = "User";
+      ownerId = user._id;
+    } else if (guest && guest._id) {
+      ownerType = "Guest";
+      ownerId = guest._id;
+    }
+
+    const endpoint = ownerType && ownerId
+      ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
       : null;
 
     // If user or guest is logged in, request backend to remove
@@ -165,11 +159,18 @@ export const PurchaseOrderProvider = ({ children }) => {
   };
 
   const clearPO = async () => {
-    // Determine endpoint based on user or guest
-    const endpoint = user && user._id
-      ? `${API_URL}/api/purchaseOrderDraft/${user._id}/items`
-      : guest && guest._id
-      ? `${API_URL}/api/purchaseOrderDraft/guest/${guest._id}/items`
+    // Determine ownerType and ownerId
+    let ownerType, ownerId;
+    if (user && user._id) {
+      ownerType = "User";
+      ownerId = user._id;
+    } else if (guest && guest._id) {
+      ownerType = "Guest";
+      ownerId = guest._id;
+    }
+
+    const endpoint = ownerType && ownerId
+      ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
       : null;
 
     if (endpoint) {

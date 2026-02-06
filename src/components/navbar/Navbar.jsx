@@ -201,9 +201,6 @@ const Navbar = () => {
                     <span className="cart-count">{poItems?.length || 0}</span>
                   </Link>
                 </li>
-                <li>
-                  <Link to="/purchase-history">Purchase History</Link>
-                </li>
               </>
             )}
           </ul>
