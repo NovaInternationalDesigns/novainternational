@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { UserContext } from "../context/UserContext";
 import { useGuest } from "../context/GuestContext";
-import "./CSS/orderconfirmation.css"; // reuse styles
+import "./CSS/orderConfirmation.css"; 
 
 const API_URL = import.meta.env.VITE_API_URL;
 
