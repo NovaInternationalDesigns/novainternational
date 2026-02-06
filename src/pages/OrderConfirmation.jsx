@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { usePO } from "../context/PurchaseOrderContext"; // make sure path is correct
 import { useGuest } from "../context/GuestContext"; // for guest session
-import "./CSS/orderconfirmation.css";
+import "./CSS/orderConfirmation.css";
 
 export default function OrderConfirmation() {
   const [order, setOrder] = useState(null);
