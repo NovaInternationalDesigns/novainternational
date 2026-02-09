@@ -134,38 +134,13 @@ export default function PurchaseOrderForm({ items }) {
 
   return (
     <div className="purchase-order-form">
-      <h2>Purchase Order</h2>
-
+      
       <form onSubmit={handleSubmit}>
-        <h3>BANK DETAILS</h3>
-        <div className="input-row">
-          <input name="bankName" placeholder="Bank Name" onChange={handleChange} required />
-          <input name="accountNo" placeholder="A/C Number" onChange={handleChange} required />
-          <input name="routingNo" placeholder="Routing Number" onChange={handleChange} required />
-        </div>
-
-        <h3>BUSINESS DETAILS</h3>
-        <div className="input-row">
-          <input name="customerName" placeholder="Customer Name" onChange={handleChange} required />
-          <input name="email" placeholder="Email" onChange={handleChange} />
-          <input name="attn" placeholder="ATTN" onChange={handleChange} required />
-          <input name="tel" placeholder="Telephone" onChange={handleChange} required />
-          <input name="fax" placeholder="Fax" onChange={handleChange} />
-        </div>
-        {formError && <p className="po-form-error" style={{ color: 'red' }}>{formError}</p>}
-
-        <textarea
-          name="address"
-          placeholder="Address"
-          onChange={handleChange}
-          required
-        />
-
-        <h3>ORDER ITEMS</h3>
+        <h3>Purchase Order Details</h3>
         <table className="po-table">
           <thead>
             <tr>
-              <th>Style</th>
+              <th>Style No</th>
               <th>Description</th>
               <th>Size</th>
               <th>Color</th>
@@ -223,6 +198,31 @@ export default function PurchaseOrderForm({ items }) {
           <strong>Grand Total: $</strong>
           <strong>{orderItems.reduce((sum, it) => sum + (it.qty || 0) * (it.price || 0), 0).toFixed(2)}</strong>
         </div>
+        <h3>BANK DETAILS</h3>
+        <div className="input-row">
+          <input name="bankName" placeholder="Bank Name" onChange={handleChange} required />
+          <input name="accountNo" placeholder="A/C Number" onChange={handleChange} required />
+          <input name="routingNo" placeholder="Routing Number" onChange={handleChange} required />
+        </div>
+
+        <h3>BUSINESS DETAILS</h3>
+        <div className="input-row">
+          <input name="customerName" placeholder="Customer Name" onChange={handleChange} required />
+          <input name="email" placeholder="Email" onChange={handleChange} />
+          <input name="attn" placeholder="ATTN" onChange={handleChange} required />
+          <input name="tel" placeholder="Telephone" onChange={handleChange} required />
+          <input name="fax" placeholder="Fax" onChange={handleChange} />
+        </div>
+        {formError && <p className="po-form-error" style={{ color: 'red' }}>{formError}</p>}
+
+        <textarea
+          name="address"
+          placeholder="Address"
+          onChange={handleChange}
+          required
+        />
+
+       
 
         <button type="submit">Proceed to Checkout</button>
       </form>

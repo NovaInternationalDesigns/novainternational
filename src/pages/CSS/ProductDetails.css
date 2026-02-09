@@ -33,8 +33,7 @@
 
 .info-section h1 {
   font-size: 32px;
-  font-weight: 600;
-  margin-bottom: 10px;
+ gin-bottom: 10px;
 }
 
 .price {
@@ -62,7 +61,7 @@
 
 .order-combinations h4 {
   margin-bottom: 10px;
-  font-weight: 600;
+
 }
 
 .order-row {

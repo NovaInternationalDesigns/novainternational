@@ -67,7 +67,7 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      // 1️⃣ Save the purchase order in backend
+      // 1 Save the purchase order in backend
       const saveOrderRes = await fetch(`${API_URL}/api/purchase-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,7 +96,7 @@ const Checkout = () => {
         throw new Error(savedOrder.error || "Failed to save order");
       }
 
-      // 2️⃣ Create Stripe checkout session
+      // 2️ Create Stripe checkout session
       const sessionRes = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,10 +109,10 @@ const Checkout = () => {
         throw new Error(sessionData.error || "Stripe session creation failed");
       }
 
-      // 3️⃣ Redirect to Stripe
+      // 3️ Redirect to Stripe
       window.location.href = sessionData.url;
 
-      // 4️⃣ Clear guest session after order placed
+      // 4️ Clear guest session after order placed
       // Note: If you want to auto sign-out only after Stripe success, you can handle in OrderConfirmation page
       endGuestSession();
 

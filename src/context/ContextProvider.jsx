@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-// 1️⃣ Create the Auth Context
+// 1️ Create the Auth Context
 const AuthContext = createContext();
 
-// 2️⃣ Auth Provider Component
+// 2️ Auth Provider Component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
@@ -41,5 +41,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// 3️⃣ Hook to use Auth Context in any component
+// 3 Hook to use Auth Context in any component
 export const useAuth = () => useContext(AuthContext);

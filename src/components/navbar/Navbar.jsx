@@ -176,7 +176,7 @@ const Navbar = () => {
                 <li><SignOutButton onSignOut={signOut} /></li>
                 <li>
                   <Link to="/purchase-order">
-                    <span className="cart-icon">Purchase Order</span>
+                    {/* <span className="cart-icon">Purchase Order</span> */}
                     <span className="cart-count">{poItems?.length || 0}</span>
                   </Link>
                 </li>

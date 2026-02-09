@@ -42,7 +42,7 @@ function PurchaseOrder() {
 
   return (
     <div className="purchase-order-page">
-      <h1 className="po-title">Your Purchase Order</h1>
+      <h1 className="po-title">Purchase Order</h1>
 
       {error && <p className="po-error">{error}</p>}
 

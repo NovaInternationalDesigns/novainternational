@@ -12,7 +12,7 @@ function ProductDetails() {
   const { guest } = useGuest();
   const { addToPO, poItems } = usePO();
 
-  const MIN_QTY = 500;
+  const MIN_QTY = 1;
 
   const [product, setProduct] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
@@ -38,7 +38,7 @@ function ProductDetails() {
             color: data.colors?.[0] || null,
             size: data.sizes?.[0] || null,
             quantity:
-              data.colors?.length > 0 && data.sizes?.length > 0 ? 0 : MIN_QTY,
+              data.colors?.length > 1 && data.sizes?.length > 1 ? 1 : MIN_QTY,
           },
         ]);
       } catch (err) {
@@ -99,8 +99,8 @@ function ProductDetails() {
   const handleAddToPO = async () => {
     // Check if user is logged in OR guest session exists
     if (!user && !guest) {
-      alert("Please log in or proceed as guest");
-      navigate("/checkout-guest");
+      alert("Please sign in to add items to your Purchase Order");
+      navigate("/signin");
       return;
     }
 

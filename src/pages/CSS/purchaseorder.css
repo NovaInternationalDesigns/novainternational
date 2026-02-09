@@ -46,9 +46,6 @@
   text-align: center;
 }
 
-.po-table th {
-  font-weight: 600;
-}
 
 .po-table tr:nth-child(even) {
   background-color: #fafafa;

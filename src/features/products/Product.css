@@ -15,7 +15,7 @@
 /* ---- GRID LAYOUT ---- */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* ✅ 5 products in one row */
+  grid-template-columns: repeat(5, 1fr); /* 5 products in one row */
   gap: 20px;
   align-items: stretch;
 }
@@ -67,7 +67,6 @@
   font-size: 1.1rem;
   color: #222;
   margin-bottom: 10px;
-  font-weight: 600;
   line-height: 1.2;
 }
 
