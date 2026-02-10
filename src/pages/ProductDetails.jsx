@@ -264,7 +264,7 @@ function ProductDetails() {
         {/* CONFIRMATION BAR */}
         {showAddedBar && (
           <div className="action-buttons">
-              <button onClick={() => navigate("/purchase-order")}>
+              <button onClick={() => navigate("/purchase-order/form")}>
                 View Purchase Order
               </button>
               <button onClick={() => navigate("/")}> {/* Navigate home */}

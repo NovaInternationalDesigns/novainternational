@@ -193,38 +193,37 @@ export default function PurchaseOrderForm({ items }) {
             ))}
           </tbody>
         </table>
+         <div className="purchase-order-form-details">
+            <div>
+              <strong>Grand Total: $</strong>
+              <strong>{orderItems.reduce((sum, it) => sum + (it.qty || 0) * (it.price || 0), 0).toFixed(2)}</strong>
+            </div>
+            <h3>BANK DETAILS</h3>
+            <div className="input-row">
+              <input name="bankName" placeholder="Bank Name" onChange={handleChange} required />
+              <input name="accountNo" placeholder="A/C Number" onChange={handleChange} required />
+              <input name="routingNo" placeholder="Routing Number" onChange={handleChange} required />
+            </div>
 
-        <div style={{ marginTop: 12 }}>
-          <strong>Grand Total: $</strong>
-          <strong>{orderItems.reduce((sum, it) => sum + (it.qty || 0) * (it.price || 0), 0).toFixed(2)}</strong>
-        </div>
-        <h3>BANK DETAILS</h3>
-        <div className="input-row">
-          <input name="bankName" placeholder="Bank Name" onChange={handleChange} required />
-          <input name="accountNo" placeholder="A/C Number" onChange={handleChange} required />
-          <input name="routingNo" placeholder="Routing Number" onChange={handleChange} required />
-        </div>
+            <h3>BUSINESS DETAILS</h3>
+            <div className="input-row">
+              <input name="customerName" placeholder="Customer Name" onChange={handleChange} required />
+              <input name="email" placeholder="Email" onChange={handleChange} />
+              <input name="attn" placeholder="ATTN" onChange={handleChange} required />
+              <input name="tel" placeholder="Telephone" onChange={handleChange} required />
+              <input name="fax" placeholder="Fax" onChange={handleChange} />
+            </div>
+            {formError && <p className="po-form-error" style={{ color: 'red' }}>{formError}</p>}
 
-        <h3>BUSINESS DETAILS</h3>
-        <div className="input-row">
-          <input name="customerName" placeholder="Customer Name" onChange={handleChange} required />
-          <input name="email" placeholder="Email" onChange={handleChange} />
-          <input name="attn" placeholder="ATTN" onChange={handleChange} required />
-          <input name="tel" placeholder="Telephone" onChange={handleChange} required />
-          <input name="fax" placeholder="Fax" onChange={handleChange} />
-        </div>
-        {formError && <p className="po-form-error" style={{ color: 'red' }}>{formError}</p>}
-
-        <textarea
-          name="address"
-          placeholder="Address"
-          onChange={handleChange}
-          required
-        />
-
-       
-
-        <button type="submit">Proceed to Checkout</button>
+            <textarea
+              name="address"
+              placeholder="Address"
+              onChange={handleChange}
+              required
+            />
+            </div>
+            <button type="submit">Proceed to Checkout</button>
+        
       </form>
     </div>
   );
