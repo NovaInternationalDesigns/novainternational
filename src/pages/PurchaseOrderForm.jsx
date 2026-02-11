@@ -134,6 +134,7 @@ export default function PurchaseOrderForm({ items }) {
 
   return (
     <div className="purchase-order-form">
+<<<<<<< HEAD
   <h2>Purchase Order</h2>
 
   {/* ORDER ITEMS TABLE */}
@@ -221,8 +222,98 @@ export default function PurchaseOrderForm({ items }) {
           <strong>Grand Total: $</strong>
           <strong>{orderItems.reduce((sum, it) => sum + (it.qty || 0) * (it.price || 0), 0).toFixed(2)}</strong>
         </div>
+=======
+      
+      <form onSubmit={handleSubmit}>
+        <h3>Purchase Order Details</h3>
+        <table className="po-table">
+          <thead>
+            <tr>
+              <th>Style No</th>
+              <th>Description</th>
+              <th>Size</th>
+              <th>Color</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
 
-        <button type="submit">Proceed to Checkout</button>
+          <tbody>
+            {orderItems.map((item, index) => (
+              <tr key={index}>
+                <td><input value={item.styleNo} readOnly /></td>
+                <td><input value={item.description} readOnly /></td>
+                <td>
+                  <input
+                    value={item.size}
+                    onChange={(e) => handleItemChange(index, "size", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={item.color}
+                    onChange={(e) => handleItemChange(index, "color", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={item.qty}
+                    onChange={(e) => handleItemChange(index, "qty", Number(e.target.value))}
+                    min={0}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={item.price}
+                    onChange={(e) => handleItemChange(index, "price", Number(e.target.value))}
+                  />
+                </td>
+                <td>
+                  <input value={item.total} readOnly />
+                </td>
+                <td>
+                  <button type="button" onClick={() => removeRow(index)}>X</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+         <div className="purchase-order-form-details">
+            <div>
+              <strong>Grand Total: $</strong>
+              <strong>{orderItems.reduce((sum, it) => sum + (it.qty || 0) * (it.price || 0), 0).toFixed(2)}</strong>
+            </div>
+            <h3>BANK DETAILS</h3>
+            <div className="input-row">
+              <input name="bankName" placeholder="Bank Name" onChange={handleChange} required />
+              <input name="accountNo" placeholder="A/C Number" onChange={handleChange} required />
+              <input name="routingNo" placeholder="Routing Number" onChange={handleChange} required />
+            </div>
+
+            <h3>BUSINESS DETAILS</h3>
+            <div className="input-row">
+              <input name="customerName" placeholder="Customer Name" onChange={handleChange} required />
+              <input name="email" placeholder="Email" onChange={handleChange} />
+              <input name="attn" placeholder="ATTN" onChange={handleChange} required />
+              <input name="tel" placeholder="Telephone" onChange={handleChange} required />
+              <input name="fax" placeholder="Fax" onChange={handleChange} />
+            </div>
+            {formError && <p className="po-form-error" style={{ color: 'red' }}>{formError}</p>}
+>>>>>>> 853d9c637187b3310af6f1ceb2a63b7be5ba9ec8
+
+            <textarea
+              name="address"
+              placeholder="Address"
+              onChange={handleChange}
+              required
+            />
+            </div>
+            <button type="submit">Proceed to Checkout</button>
+        
       </form>
     </div>
 

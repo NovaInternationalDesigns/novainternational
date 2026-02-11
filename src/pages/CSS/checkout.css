@@ -49,7 +49,6 @@
 
 .order-summary .order-total {
   font-size: 1.3rem;
-  font-weight: 600;
   text-align: right;
   margin-top: 15px;
   color: #111;
@@ -87,7 +86,6 @@
 .checkout-form button {
   padding: 12px;
   font-size: 1rem;
-  font-weight: 600;
   background-color: #4caf50;
   color: #fff;
   border: none;

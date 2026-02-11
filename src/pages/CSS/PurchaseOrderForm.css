@@ -1,3 +1,5 @@
+* { box-sizing: border-box; }
+
 /* ---------- Overall Container ---------- */
 .purchase-order-form {
   max-width: 1100px;
@@ -5,7 +7,12 @@
   padding: 30px;
   background: #ffffff;
   border-radius: 12px;
+<<<<<<< HEAD
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+=======
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  display: flex;
+>>>>>>> 853d9c637187b3310af6f1ceb2a63b7be5ba9ec8
 }
 
 .purchase-order-form h2 {

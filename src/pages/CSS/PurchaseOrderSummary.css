@@ -34,10 +34,6 @@
   text-align: center;
 }
 
-.po-summary th {
-  font-weight: 600;
-}
-
 .po-summary tbody tr:nth-child(even) {
   background-color: #fafafa;
 }

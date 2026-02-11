@@ -19,7 +19,6 @@
 
 .order-confirmation .success-text {
   color: #2e7d32;
-  font-weight: 600;
   margin-bottom: 30px;
 }
 
@@ -44,8 +43,7 @@
 }
 
 .order-meta span {
-  font-weight: 600;
-  color: #222;
+ color: #222;
 }
 
 .order-items {
@@ -66,10 +64,6 @@
   border-bottom: none;
 }
 
-.item-name {
-  font-weight: 500;
-}
-
 .item-qty {
   text-align: center;
   color: #555;
@@ -77,7 +71,6 @@
 
 .item-total {
   text-align: right;
-  font-weight: 600;
 }
 
 .order-total {
@@ -85,7 +78,6 @@
   justify-content: space-between;
   margin-top: 25px;
   font-size: 18px;
-  font-weight: 700;
 }
 
 .shipping-info {

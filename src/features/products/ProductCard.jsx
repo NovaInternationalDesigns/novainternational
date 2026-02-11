@@ -5,8 +5,8 @@ import "./productcard.css";
 function ProductCard({ product }) {
   const navigate = useNavigate();
 
-  // Product-specific minimum quantity (fallback to 500)
-  const MIN_QTY = product.minQty || 500;
+  // Product-specific minimum quantity (fallback to 1)
+  const MIN_QTY = product.minQty || 1;
 
   const [qty, setQty] = useState(MIN_QTY);
   const [selectedColor, setSelectedColor] = useState(
