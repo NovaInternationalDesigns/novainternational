@@ -89,29 +89,42 @@ const Checkout = () => {
       });
 
       const savedOrder = await saveOrderRes.json();
+      console.log("Saved Order Response:", savedOrder);
       if (!saveOrderRes.ok) throw new Error(savedOrder.error || "Failed to save order");
 
       // 2️⃣ Create Stripe Checkout Session
-      const res = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+
+      const orderId = savedOrder?.order?._id;
+
+      if (!orderId) {
+        throw new Error("Order ID not found in saved order response");
+      }
+
+      const sessionRes = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId }),
       });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url; // Redirect to Stripe hosted checkout
-      } else {
-        // Handle error
+
+      if (!sessionRes.ok) {
+        const errorText = await sessionRes.text();
+        console.error("Stripe session raw response:", errorText);
+        throw new Error("Stripe session creation failed");
       }
 
       const sessionData = await sessionRes.json();
-      if (!sessionRes.ok || !sessionData.url) throw new Error(sessionData.error || "Stripe session creation failed");
 
-      // 3️⃣ Clear guest session **before redirecting**
+      if (!sessionData.url) {
+        throw new Error("Stripe session URL missing");
+      }
+
+
+      // 3️⃣ Clear guest session before redirect
       if (guest && endGuestSession) endGuestSession();
 
-      // 4️⃣ Redirect to Stripe Hosted Checkout
+      // 4️⃣ Redirect to Stripe
       window.location.assign(sessionData.url);
+
 
     } catch (err) {
       console.error("Checkout error:", err);
