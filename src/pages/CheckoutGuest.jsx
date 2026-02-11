@@ -14,7 +14,7 @@ const CheckoutGuest = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { setGuest } = useGuest(); // Update guest context
+  const { setGuest, endGuestSession } = useGuest(); // add endGuestSession
   const { clearPO } = usePO(); // Clear any previous purchase order items
 
   const handleGuestCheckout = async (e) => {
@@ -36,36 +36,40 @@ const CheckoutGuest = () => {
     setLoading(true);
 
     try {
-      // 1. Create guest in backend database
+      // 1️⃣ Create guest in backend
       const guestRes = await fetch(`${API_URL}/api/guests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          name: name.trim(), 
-          email: email.trim() 
-        }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
       });
-
-      if (!guestRes.ok) {
-        const errData = await guestRes.json();
-        throw new Error(errData.error || "Failed to create guest session");
-      }
 
       const guestData = await guestRes.json();
 
-      // 2. Set guest in context (includes _id from DB)
+      if (!guestRes.ok) {
+        throw new Error(guestData.error || "Failed to create guest session");
+      }
+
+      // 2️⃣ Set guest in context
       setGuest(guestData.guest);
 
-      // 3. Clear any old purchase orders (optional)
+      // Optional: clear any old purchase orders
       clearPO();
 
-      // 4. Redirect to products/category page to add items to purchase order
+      // Redirect to products/category page to add items
       navigate("/category/fashion/women");
     } catch (err) {
-      setError("Failed to proceed as guest. Please try again.");
-      console.error(err);
+      console.error("Guest checkout error:", err);
+      setError(err.message || "Failed to proceed as guest. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleClearGuest = () => {
+    if (endGuestSession) {
+      endGuestSession();
+      clearPO();
+      navigate("/");
     }
   };
 
@@ -92,6 +96,11 @@ const CheckoutGuest = () => {
 
         <button type="submit" disabled={loading}>
           {loading ? "Proceeding..." : "Proceed as Guest"}
+        </button>
+
+        {/* Optional: Button to clear guest session */}
+        <button type="button" onClick={handleClearGuest} className="clear-guest-btn">
+          Cancel Guest Checkout
         </button>
       </form>
     </div>

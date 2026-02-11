@@ -1,4 +1,3 @@
-// src/pages/Checkout.jsx
 import React, { useEffect, useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./CSS/checkout.css";
@@ -17,7 +16,7 @@ const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { guest } = useGuest();
+  const { guest, endGuestSession } = useGuest(); // Correctly inside component
   const { user } = useContext(UserContext);
   const { purchaseOrderId } = usePO();
 
@@ -51,7 +50,6 @@ const Checkout = () => {
     (acc, item) => acc + getQty(item) * getPrice(item),
     0
   );
-
   const formattedTotal = totalAmount.toFixed(2);
 
   const handleInputChange = (e) => {
@@ -91,10 +89,7 @@ const Checkout = () => {
       });
 
       const savedOrder = await saveOrderRes.json();
-
-      if (!saveOrderRes.ok) {
-        throw new Error(savedOrder.error || "Failed to save order");
-      }
+      if (!saveOrderRes.ok) throw new Error(savedOrder.error || "Failed to save order");
 
       // 2️⃣ Create Stripe Checkout Session
       const sessionRes = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
@@ -104,17 +99,14 @@ const Checkout = () => {
       });
 
       const sessionData = await sessionRes.json();
+      if (!sessionRes.ok || !sessionData.url) throw new Error(sessionData.error || "Stripe session creation failed");
 
-      if (!sessionRes.ok || !sessionData.url) {
-        throw new Error(sessionData.error || "Stripe session creation failed");
-      }
+      // 3️⃣ Clear guest session **before redirecting**
+      if (guest && endGuestSession) endGuestSession();
 
-      // 3️⃣ Redirect to Stripe Hosted Checkout
+      // 4️⃣ Redirect to Stripe Hosted Checkout
       window.location.assign(sessionData.url);
 
-       // 4️⃣ Clear guest session after order placed
-    endGuestSession();
-    
     } catch (err) {
       console.error("Checkout error:", err);
       setError(err.message || "Failed to start payment. Please try again.");
