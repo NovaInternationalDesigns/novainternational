@@ -31,7 +31,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import AdminOrders from "./pages/AdminOrders.jsx";
 import PurchaseHistory from "./pages/PurchaseHistory.jsx";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = loadStripe(import.meta.env.VITE_PUBLISHABLE_KEY);
 
 
 function App() {

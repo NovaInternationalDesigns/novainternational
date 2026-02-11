@@ -134,16 +134,71 @@ export default function PurchaseOrderForm({ items }) {
 
   return (
     <div className="purchase-order-form">
-      <h2>Purchase Order</h2>
+  <h2>Purchase Order</h2>
 
+  {/* ORDER ITEMS TABLE */}
+  <div className="po-left">
+    <table className="po-table">
+      <thead>
+        <tr>
+          <th>Style</th>
+          <th>Description</th>
+          <th>Size</th>
+          <th>Color</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Total</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {orderItems.map((item, index) => (
+          <tr key={index}>
+            <td><input value={item.styleNo} readOnly /></td>
+            <td><input value={item.description} readOnly /></td>
+            <td>
+              <input
+                value={item.size}
+                onChange={(e) => handleItemChange(index, "size", e.target.value)}
+              />
+            </td>
+            <td>
+              <input
+                value={item.color}
+                onChange={(e) => handleItemChange(index, "color", e.target.value)}
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                value={item.qty}
+                onChange={(e) => handleItemChange(index, "qty", Number(e.target.value))}
+                min={0}
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                value={item.price}
+                onChange={(e) => handleItemChange(index, "price", Number(e.target.value))}
+              />
+            </td>
+            <td>
+              <input value={item.total} readOnly />
+            </td>
+            <td>
+              <button type="button" onClick={() => removeRow(index)}>X</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <div className="po-container">
+    {/* LEFT: Bank Details */}
+      <div className="po-right po-form-section">
       <form onSubmit={handleSubmit}>
-        <h3>BANK DETAILS</h3>
-        <div className="input-row">
-          <input name="bankName" placeholder="Bank Name" onChange={handleChange} required />
-          <input name="accountNo" placeholder="A/C Number" onChange={handleChange} required />
-          <input name="routingNo" placeholder="Routing Number" onChange={handleChange} required />
-        </div>
-
         <h3>BUSINESS DETAILS</h3>
         <div className="input-row">
           <input name="customerName" placeholder="Customer Name" onChange={handleChange} required />
@@ -152,7 +207,6 @@ export default function PurchaseOrderForm({ items }) {
           <input name="tel" placeholder="Telephone" onChange={handleChange} required />
           <input name="fax" placeholder="Fax" onChange={handleChange} />
         </div>
-        {formError && <p className="po-form-error" style={{ color: 'red' }}>{formError}</p>}
 
         <textarea
           name="address"
@@ -161,65 +215,9 @@ export default function PurchaseOrderForm({ items }) {
           required
         />
 
-        <h3>ORDER ITEMS</h3>
-        <table className="po-table">
-          <thead>
-            <tr>
-              <th>Style</th>
-              <th>Description</th>
-              <th>Size</th>
-              <th>Color</th>
-              <th>Qty</th>
-              <th>Price</th>
-              <th>Total</th>
-              <th></th>
-            </tr>
-          </thead>
+        {formError && <p className="po-form-error">{formError}</p>}
 
-          <tbody>
-            {orderItems.map((item, index) => (
-              <tr key={index}>
-                <td><input value={item.styleNo} readOnly /></td>
-                <td><input value={item.description} readOnly /></td>
-                <td>
-                  <input
-                    value={item.size}
-                    onChange={(e) => handleItemChange(index, "size", e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    value={item.color}
-                    onChange={(e) => handleItemChange(index, "color", e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={item.qty}
-                    onChange={(e) => handleItemChange(index, "qty", Number(e.target.value))}
-                    min={0}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={item.price}
-                    onChange={(e) => handleItemChange(index, "price", Number(e.target.value))}
-                  />
-                </td>
-                <td>
-                  <input value={item.total} readOnly />
-                </td>
-                <td>
-                  <button type="button" onClick={() => removeRow(index)}>X</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div style={{ marginTop: 12 }}>
+        <div>
           <strong>Grand Total: $</strong>
           <strong>{orderItems.reduce((sum, it) => sum + (it.qty || 0) * (it.price || 0), 0).toFixed(2)}</strong>
         </div>
@@ -227,5 +225,21 @@ export default function PurchaseOrderForm({ items }) {
         <button type="submit">Proceed to Checkout</button>
       </form>
     </div>
+
+    {/* RIGHT: Business Details */}
+     <div className="po-left po-form-section">
+      <form>
+        <h3>BANK DETAILS</h3>
+        <div className="input-row">
+          <input name="bankName" placeholder="Bank Name" onChange={handleChange} required />
+          <input name="accountNo" placeholder="A/C Number" onChange={handleChange} required />
+          <input name="routingNo" placeholder="Routing Number" onChange={handleChange} required />
+        </div>
+      </form>
+    </div>
+ 
+  </div>
+</div>
+
   );
 }

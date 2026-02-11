@@ -112,6 +112,9 @@ const Checkout = () => {
       // 3️⃣ Redirect to Stripe Hosted Checkout
       window.location.assign(sessionData.url);
 
+       // 4️⃣ Clear guest session after order placed
+    endGuestSession();
+    
     } catch (err) {
       console.error("Checkout error:", err);
       setError(err.message || "Failed to start payment. Please try again.");
