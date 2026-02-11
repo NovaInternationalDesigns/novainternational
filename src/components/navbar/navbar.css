@@ -51,14 +51,8 @@
 } */
 .cart-count{
   color:black;
-<<<<<<< HEAD
   padding: 20px;
   background-color: goldenrod ;
-=======
-  background-color: goldenrod;
-  padding:8px;
-  border-radius: 5px;
->>>>>>> 853d9c637187b3310af6f1ceb2a63b7be5ba9ec8
 }
 
 /* Guest signout button styling */

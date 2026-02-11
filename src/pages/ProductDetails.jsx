@@ -99,11 +99,7 @@ function ProductDetails() {
   const handleAddToPO = async () => {
     // Check if user is logged in OR guest session exists
     if (!user && !guest) {
-<<<<<<< HEAD
       alert("Please log in or proceed as guest");
-=======
-      alert("Please sign in to add items to your Purchase Order");
->>>>>>> 853d9c637187b3310af6f1ceb2a63b7be5ba9ec8
       navigate("/signin");
       return;
     }
@@ -268,11 +264,7 @@ function ProductDetails() {
         {/* CONFIRMATION BAR */}
         {showAddedBar && (
           <div className="action-buttons">
-<<<<<<< HEAD
               <button onClick={() => navigate("/purchase-order/form")}> {/* Navigate to PO form */}
-=======
-              <button onClick={() => navigate("/purchase-order/form")}>
->>>>>>> 853d9c637187b3310af6f1ceb2a63b7be5ba9ec8
                 View Purchase Order
               </button>
               <button onClick={() => navigate("/")}> {/* Navigate home */}
