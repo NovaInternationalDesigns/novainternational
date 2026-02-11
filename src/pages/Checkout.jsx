@@ -92,11 +92,17 @@ const Checkout = () => {
       if (!saveOrderRes.ok) throw new Error(savedOrder.error || "Failed to save order");
 
       // 2️⃣ Create Stripe Checkout Session
-      const sessionRes = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: savedOrder.order._id }),
+      const res = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId }),
       });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url; // Redirect to Stripe hosted checkout
+      } else {
+        // Handle error
+      }
 
       const sessionData = await sessionRes.json();
       if (!sessionRes.ok || !sessionData.url) throw new Error(sessionData.error || "Stripe session creation failed");
