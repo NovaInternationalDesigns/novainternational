@@ -9,7 +9,7 @@ import { UserContext } from "../context/UserContext.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// helpers to calculate qty & price
+// helpers
 const getQty = (item) => Number(item.qty ?? item.quantity ?? item.quantityOrdered ?? 0);
 const getPrice = (item) => Number(item.price ?? item.unitPrice ?? 0);
 
@@ -17,7 +17,7 @@ const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { guest, endGuestSession } = useGuest();
+  const { guest } = useGuest();
   const { user } = useContext(UserContext);
   const { purchaseOrderId } = usePO();
 
@@ -47,7 +47,11 @@ const Checkout = () => {
     if (!orderData.length) navigate("/");
   }, [orderData, navigate]);
 
-  const totalAmount = orderData.reduce((acc, item) => acc + getQty(item) * getPrice(item), 0);
+  const totalAmount = orderData.reduce(
+    (acc, item) => acc + getQty(item) * getPrice(item),
+    0
+  );
+
   const formattedTotal = totalAmount.toFixed(2);
 
   const handleInputChange = (e) => {
@@ -58,7 +62,6 @@ const Checkout = () => {
   const handleStripeCheckout = async () => {
     setError("");
 
-    // validate shipping info
     if (!shippingInfo.name || !shippingInfo.address || !shippingInfo.city || !shippingInfo.postalCode || !shippingInfo.country) {
       setError("Please fill out all shipping information.");
       return;
@@ -67,12 +70,17 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      // 1️⃣ Save the purchase order in backend
+      // 1️⃣ Save Order
       const saveOrderRes = await fetch(`${API_URL}/api/purchase-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
-          items: orderData.map((item) => ({ ...item, qty: getQty(item), price: getPrice(item) })),
+          items: orderData.map((item) => ({
+            ...item,
+            qty: getQty(item),
+            price: getPrice(item),
+          })),
           shippingInfo,
           totalAmount,
           form,
@@ -80,23 +88,15 @@ const Checkout = () => {
           ownerType: guest ? "Guest" : "User",
           ownerId: guest?._id || user?._id,
         }),
-        credentials: "include",
       });
 
-      const contentType = saveOrderRes.headers.get("content-type") || "";
-      let savedOrder;
-
-      if (contentType.includes("application/json")) {
-        savedOrder = await saveOrderRes.json();
-      } else {
-        throw new Error("Failed to parse order response");
-      }
+      const savedOrder = await saveOrderRes.json();
 
       if (!saveOrderRes.ok) {
         throw new Error(savedOrder.error || "Failed to save order");
       }
 
-      // 2️⃣ Create Stripe checkout session
+      // 2️⃣ Create Stripe Checkout Session
       const sessionRes = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,12 +109,8 @@ const Checkout = () => {
         throw new Error(sessionData.error || "Stripe session creation failed");
       }
 
-      // 3️⃣ Redirect to Stripe
-      window.location.href = sessionData.url;
-
-      // 4️⃣ Clear guest session after order placed
-      // Note: If you want to auto sign-out only after Stripe success, you can handle in OrderConfirmation page
-      endGuestSession();
+      // 3️⃣ Redirect to Stripe Hosted Checkout
+      window.location.assign(sessionData.url);
 
     } catch (err) {
       console.error("Checkout error:", err);
@@ -123,7 +119,7 @@ const Checkout = () => {
     }
   };
 
-  if (!user && !guest) return null; // block access until guest/session exists
+  if (!user && !guest) return null;
 
   return (
     <div className="checkout">
@@ -147,22 +143,34 @@ const Checkout = () => {
             );
           })}
         </ul>
-        <p className="order-total"><strong>Total Order Value: ${formattedTotal}</strong></p>
+
+        <p className="order-total">
+          <strong>Total Order Value: ${formattedTotal}</strong>
+        </p>
       </div>
 
       {/* Shipping Info */}
       <div className="checkout-form">
         <h4>Shipping Information</h4>
+
         <input name="name" placeholder="Full Name" value={shippingInfo.name} onChange={handleInputChange} disabled={loading} />
         <input name="address" placeholder="Address" value={shippingInfo.address} onChange={handleInputChange} disabled={loading} />
         <input name="city" placeholder="City" value={shippingInfo.city} onChange={handleInputChange} disabled={loading} />
         <input name="postalCode" placeholder="Postal Code" value={shippingInfo.postalCode} onChange={handleInputChange} disabled={loading} />
         <input name="country" placeholder="Country" value={shippingInfo.country} onChange={handleInputChange} disabled={loading} />
 
-        {error && <p className="payment-error" style={{ color: "crimson" }}>{error}</p>}
+        {error && (
+          <p className="payment-error" style={{ color: "crimson" }}>
+            {error}
+          </p>
+        )}
 
-        <button onClick={handleStripeCheckout} className="place-order-btn" disabled={loading}>
-          {loading ? "Processing..." : `Pay $${formattedTotal}`}
+        <button
+          onClick={handleStripeCheckout}
+          className="place-order-btn"
+          disabled={loading}
+        >
+          {loading ? "Redirecting to secure payment..." : `Pay $${formattedTotal}`}
         </button>
       </div>
     </div>

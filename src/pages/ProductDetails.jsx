@@ -100,7 +100,7 @@ function ProductDetails() {
     // Check if user is logged in OR guest session exists
     if (!user && !guest) {
       alert("Please log in or proceed as guest");
-      navigate("/checkout-guest");
+      navigate("/signin");
       return;
     }
 

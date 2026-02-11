@@ -20,24 +20,25 @@ export default function OrderConfirmation() {
 
   useEffect(() => {
     if (!sessionId) {
-      setError("No session ID found.");
+      setError("No session ID found in the URL.");
       setLoading(false);
       return;
     }
 
     const fetchOrder = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/payment/order/${sessionId}`);
+        const res = await fetch(`${API_URL}/api/payment/order/${sessionId}`, {
+          credentials: "include",
+        });
 
         if (!res.ok) {
+          if (res.status === 404) throw new Error("Order not found for this session.");
           throw new Error(`Failed to fetch order. Status: ${res.status}`);
         }
 
         const data = await res.json();
 
-        if (!data) {
-          throw new Error("Order not found.");
-        }
+        if (!data) throw new Error("Order data is empty.");
 
         setOrder(data);
 
@@ -55,49 +56,66 @@ export default function OrderConfirmation() {
     fetchOrder();
   }, [sessionId, API_URL, clearPO, endGuestSession]);
 
+  // Loading state
   if (loading) return <div className="loading">Loading your order...</div>;
-  if (error) return <div className="error">{error}</div>;
+
+  // Error state
+  if (error)
+    return (
+      <div className="error">
+        <p>{error}</p>
+        <button onClick={() => navigate("/")}>Back to Home</button>
+      </div>
+    );
+
+  // Safe rendering with defaults
+  const items = order.items || [];
+  const shipping = order.shippingInfo || {};
 
   return (
     <div className="order-confirmation">
       <h2>
         Thank you for your order, {order.customerName || order.form?.customerName || "Customer"}!
       </h2>
-      <p><strong>Purchase Order ID:</strong> {order.purchaseOrderId || order._id}</p>
+      <p><strong>Purchase Order ID:</strong> {order.purchaseOrderId || order._id || "N/A"}</p>
       <p className="success-text">Your payment was successful.</p>
 
       <div className="order-summary">
         <div className="order-meta">
           <div>
-            <span>Order Total:</span> ${order.totalAmount.toFixed(2)}
+            <span>Order Total:</span> ${order.totalAmount?.toFixed(2) || "0.00"}
           </div>
         </div>
 
         <ul className="order-items">
-          {order.items.map((item, idx) => (
-            <li className="order-item" key={idx}>
-              <div className="item-name">{item.description || item.name}</div>
-              <div className="item-qty">x {item.qty}</div>
-              <div className="item-total">${(item.qty * item.price).toFixed(2)}</div>
-            </li>
-          ))}
+          {items.length ? (
+            items.map((item, idx) => (
+              <li className="order-item" key={idx}>
+                <div className="item-name">{item.description || item.name || "Item"}</div>
+                <div className="item-qty">x {item.qty || 1}</div>
+                <div className="item-total">
+                  ${((item.qty || 1) * (item.price || 0)).toFixed(2)}
+                </div>
+              </li>
+            ))
+          ) : (
+            <li>No items found in this order.</li>
+          )}
         </ul>
 
         <div className="order-total">
           <span>Total</span>
-          <span>${order.totalAmount.toFixed(2)}</span>
+          <span>${order.totalAmount?.toFixed(2) || "0.00"}</span>
         </div>
       </div>
 
-      {order.shippingInfo?.name && (
+      {shipping.name && (
         <div className="shipping-info">
           <h4>Shipping Information</h4>
-          <p>{order.shippingInfo.name}</p>
-          <p>{order.shippingInfo.address}</p>
-          <p>
-            {order.shippingInfo.city}, {order.shippingInfo.postalCode}
-          </p>
-          <p>{order.shippingInfo.country}</p>
+          <p>{shipping.name}</p>
+          <p>{shipping.address}</p>
+          <p>{shipping.city}, {shipping.postalCode}</p>
+          <p>{shipping.country}</p>
         </div>
       )}
 
