@@ -151,15 +151,15 @@ const Checkout = () => {
             return (
               <li key={index}>
                 <p>{item.name || item.description || "Product"}</p>
-                <p>{qty} × ${price.toFixed(2)}</p>
-                <p>Total: ${lineTotal}</p>
+                <p>{qty} × US${price.toFixed(2)}</p>
+                <p>Total: US${lineTotal}</p>
               </li>
             );
           })}
         </ul>
 
         <p className="order-total">
-          <strong>Total Order Value: ${formattedTotal}</strong>
+          <strong>Total Order Value: US${formattedTotal}</strong>
         </p>
       </div>
 

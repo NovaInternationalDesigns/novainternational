@@ -175,7 +175,7 @@ function ProductDetails() {
 
       <div className="info-section">
         <h1>{product.name}</h1>
-        <h2 className="price">${product.price}</h2>
+        <h2 className="price">US${product.price}</h2>
         <p className="category">{product.category}</p>
         <p className="description">{product.description}</p>
 
