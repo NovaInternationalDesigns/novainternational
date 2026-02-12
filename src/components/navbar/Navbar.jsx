@@ -67,25 +67,25 @@ const Navbar = () => {
         {
           heading: "Vacuum Sealers >",
           links: [
-            { title: "Zip Lock Vacuum Sealers", path: "/product/6973b8c221ef7c5ee004fbbe" },
-            { title: "Kitchenware Vacuum Sealers", path: "/product/6973b8c221ef7c5ee004fbbf" },
-            { title: "Technologically Advance Vacuum Sealers", path: "/product/6973b8c221ef7c5ee004fbc0" },
+            { title: "Zip Lock Vacuum Sealers", path: "/product/698e59824dc3e3356cb8a3af" },
+            { title: "Kitchenware Vacuum Sealers", path: "/product/698e59824dc3e3356cb8a3b0" },
+            { title: "Technologically Advance Vacuum Sealers", path: "/product/698e59824dc3e3356cb8a3b1" },
           ],
         },
         {
           heading: "Speakers & Audio >",
           links: [
-            { title: "Bluetooth & Wireless Speakers", path: "/product/6973b8c221ef7c5ee004fbc4" },
-            { title: "Campfire Bluetooth Speakers", path: "/product/6973b8c221ef7c5ee004fbc5" },
-            { title: "Technologically Advanced Bluetooth Speakers", path: "/product/6973b8c221ef7c5ee004fbc6" },
+            { title: "Bluetooth & Wireless Speakers", path: "/product/698e59824dc3e3356cb8a3b5" },
+            { title: "Campfire Bluetooth Speakers", path: "/product/698e59824dc3e3356cb8a3b6" },
+            { title: "Technologically Advanced Bluetooth Speakers", path: "/product/698e59824dc3e3356cb8a3b7" },
           ],
         },
         {
           heading: "Fans >",
           links: [
-            { title: "Technologically Advanced Fans", path: "/product/6973b8c221ef7c5ee004fbd8" },
-            { title: "Bladeless Fans", path: "/product/6973b8c221ef7c5ee004fbd7" },
-            { title: "Musical Fans", path: "/product/6973b8c221ef7c5ee004fbd9" },
+            { title: "Technologically Advanced Fans", path: "/product/698e59824dc3e3356cb8a3c9" },
+            { title: "Bladeless Fans", path: "/product/698e59824dc3e3356cb8a3c8" },
+            { title: "Musical Fans", path: "/product/698e59824dc3e3356cb8a3ca" },
           ],
         },
         {
@@ -97,8 +97,8 @@ const Navbar = () => {
         {
           heading: "Kids Tech and Electronics >",
           links: [
-            { title: "Kids Robot", path: "/product/6973b8c221ef7c5ee004fbbb" },
-            { title: "Technologically Advanced Robots", path: "/product/6973b8c221ef7c5ee004fbbc" },
+            { title: "Kids Robot", path: "/product/698e59824dc3e3356cb8a3ac" },
+            { title: "Technologically Advanced Robots", path: "/product/698e59824dc3e3356cb8a3ad" },
           ],
         },
         {
@@ -119,7 +119,7 @@ const Navbar = () => {
         {
           heading: "Bags And Accessories >",
           links: [
-            { title: "Jute Bags", path: "/product/69667a55081e46fbb391cf08" },
+            { title: "Jute Bags", path: "/product/698e59824dc3e3356cb8a3be" },
             { title: "Evening Designer Bags", path: "/category/accessories/clutch" },
             { title: "Designer Bags", path: "/category/accessories" },
           ],
