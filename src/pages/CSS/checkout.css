@@ -105,6 +105,7 @@
   cursor: not-allowed;
 }
 
+
 @media (max-width: 768px) {
   .checkout {
     margin: 20px;

@@ -68,7 +68,7 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      // 1️⃣ Save Order
+      // 1️ Save Order
       const saveOrderRes = await fetch(`${API_URL}/api/purchase-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -92,7 +92,7 @@ const Checkout = () => {
       console.log("Saved Order Response:", savedOrder);
       if (!saveOrderRes.ok) throw new Error(savedOrder.error || "Failed to save order");
 
-      // 2️⃣ Create Stripe Checkout Session
+      // 2️ Create Stripe Checkout Session
 
       const orderId = savedOrder?.order?._id;
 
@@ -119,10 +119,10 @@ const Checkout = () => {
       }
 
 
-      // 3️⃣ Clear guest session before redirect
+      // 3️ Clear guest session before redirect
       if (guest && endGuestSession) endGuestSession();
 
-      // 4️⃣ Redirect to Stripe
+      // 4️ Redirect to Stripe
       window.location.assign(sessionData.url);
 
 

@@ -5,19 +5,20 @@ const Carousel = () => {
   const slides = [
     { type: "image", src: "/images/black-clutch.png" },
     { type: "image", src: "/images/red-clutch.png" },
+    { type: "image", src: "/images/bladeless-fan-novainternationaldesigns.png" },
     { type: "image", src: "/images/golden-clutch.png" },
+    { type: "image", src: "/images/Baby-monitor-blue.png" },
     { type: "image", src: "/images/magenta-clutch2.png" },
     { type: "image", src: "/images/digital-photoframe.png" },
     { type: "image", src: "/images/gittery-gold-clutch.png" },
     { type: "image", src: "/images/silver-clutch.png" },
     { type: "image", src: "/images/vaccum-sealing-machine-by-Nova-International-Designs-Corporation.png" },  
     { type: "image", src: "/images/robot.png" },
-    { type: "image", src: "/images/light.png" },
+    { type: "image", src: "/images/light.png" },  
     { type: "video", src: "/videos/Robot-final.mp4" },
     { type: "video", src: "/videos/campfire-speaker-black-logo.mp4" },
     { type: "video", src: "/videos/Bladeless-fan-final.mp4" },
-    { type: "video", src: "/videos/SeasonsGreeting3.mp4" },
-    { type: "image", src: "/images/black-clutch.png" },
+    { type: "video", src: "/videos/SeasonsGreeting3.mp4" },  
   ];
 
   // Clone first and last slide for seamless loop

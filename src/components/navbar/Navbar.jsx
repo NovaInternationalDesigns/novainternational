@@ -67,38 +67,38 @@ const Navbar = () => {
         {
           heading: "Vacuum Sealers >",
           links: [
-            { title: "Zip Lock Vacuum Sealers", path: "/product/698e59824dc3e3356cb8a3af" },
-            { title: "Kitchenware Vacuum Sealers", path: "/product/698e59824dc3e3356cb8a3b0" },
-            { title: "Technologically Advance Vacuum Sealers", path: "/product/698e59824dc3e3356cb8a3b1" },
+            { title: "Zip Lock Vacuum Sealers", path: "/product/698f8b73e919b26009cf49c9" },
+            { title: "Kitchenware Vacuum Sealers", path: "/product/698f8b73e919b26009cf49ca" },
+            { title: "Technologically Advance Vacuum Sealers", path: "/product/698f8b73e919b26009cf49cb" },
           ],
         },
         {
           heading: "Speakers & Audio >",
           links: [
-            { title: "Bluetooth & Wireless Speakers", path: "/product/698e59824dc3e3356cb8a3b5" },
-            { title: "Campfire Bluetooth Speakers", path: "/product/698e59824dc3e3356cb8a3b6" },
-            { title: "Technologically Advanced Bluetooth Speakers", path: "/product/698e59824dc3e3356cb8a3b7" },
+            { title: "Bluetooth & Wireless Speakers", path: "/product/698f8b73e919b26009cf49cf" },
+            { title: "Campfire Bluetooth Speakers", path: "/product/698f8b73e919b26009cf49d0" },
+            { title: "Technologically Advanced Bluetooth Speakers", path: "/product/698f8b73e919b26009cf49d1" },
           ],
         },
         {
           heading: "Fans >",
           links: [
-            { title: "Technologically Advanced Fans", path: "/product/698e59824dc3e3356cb8a3c9" },
-            { title: "Bladeless Fans", path: "/product/698e59824dc3e3356cb8a3c8" },
-            { title: "Musical Fans", path: "/product/698e59824dc3e3356cb8a3ca" },
+            { title: "Technologically Advanced Fans", path: "/product/698f8b73e919b26009cf49e3" },
+            { title: "Bladeless Fans", path: "/product/698f8b73e919b26009cf49e2" },
+            { title: "Musical Fans", path: "/product/698f8b73e919b26009cf49e4" },
           ],
         },
         {
           heading: "Digital Photo Frames >",
           links: [
-            { title: "Digital Photo Frames", path: "/product/6973b8c221ef7c5ee004fbc2" },
+            { title: "Digital Photo Frames", path: "/product/698f8b73e919b26009cf49cc" },
           ],
         },
         {
           heading: "Kids Tech and Electronics >",
           links: [
-            { title: "Kids Robot", path: "/product/698e59824dc3e3356cb8a3ac" },
-            { title: "Technologically Advanced Robots", path: "/product/698e59824dc3e3356cb8a3ad" },
+            { title: "Kids Robot", path: "/product/698f8b73e919b26009cf49c6" },
+            { title: "Technologically Advanced Robots", path: "/product/698f8b73e919b26009cf49c7" },
           ],
         },
         {

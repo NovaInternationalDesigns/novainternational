@@ -10,7 +10,7 @@ function ProductDetails() {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const { guest } = useGuest();
-  const { addToPO, poItems } = usePO();
+  const { addToPO } = usePO();
 
   const MIN_QTY = 1;
 
@@ -33,12 +33,12 @@ function ProductDetails() {
         const data = await res.json();
         setProduct(data);
 
+        // ✅ Start quantity as blank
         setOrderItems([
           {
             color: data.colors?.[0] || null,
             size: data.sizes?.[0] || null,
-            quantity:
-              data.colors?.length > 1 && data.sizes?.length > 1 ? 1 : MIN_QTY,
+            quantity: "",
           },
         ]);
       } catch (err) {
@@ -54,10 +54,20 @@ function ProductDetails() {
   const hasVariations =
     product?.colors?.length > 0 && product?.sizes?.length > 0;
 
+  // ✅ Updated to allow blank quantity
   const updateOrderItem = (index, field, value) => {
     const updated = [...orderItems];
-    if (field === "quantity") value = Number(value);
-    updated[index][field] = value;
+
+    if (field === "quantity") {
+      if (value === "") {
+        updated[index][field] = "";
+      } else {
+        updated[index][field] = Number(value);
+      }
+    } else {
+      updated[index][field] = value;
+    }
+
     setOrderItems(updated);
     setValidationError("");
   };
@@ -68,7 +78,7 @@ function ProductDetails() {
       {
         color: product.colors?.[0] || null,
         size: product.sizes?.[0] || null,
-        quantity: 0,
+        quantity: "",
       },
     ]);
     setValidationError("");
@@ -95,9 +105,7 @@ function ProductDetails() {
     return true;
   };
 
-  // ADD TO PO (DB-BACKED)
   const handleAddToPO = async () => {
-    // Check if user is logged in OR guest session exists
     if (!user && !guest) {
       alert("Please log in or proceed as guest");
       navigate("/signin");
@@ -106,18 +114,17 @@ function ProductDetails() {
 
     if (!validateTotalQty()) return;
 
-    // Prepare purchase order data
     const poData = orderItems.map((item) => ({
       productId: product._id,
       name: product.name,
       price: product.price,
-      quantity: item.quantity,
+      quantity: Number(item.quantity || 0),
       color: item.color || null,
       size: item.size || null,
+      images: product.images, // keep image if needed later
     }));
 
     try {
-      // Determine endpoint based on user or guest
       const ownerType = user ? "User" : "Guest";
       const ownerId = user?._id || guest?._id;
       const endpoint = `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`;
@@ -137,19 +144,10 @@ function ProductDetails() {
       const data = await res.json();
       console.log("PO Response:", data);
 
-      // Also add to client-side PO context for immediate UX
       poData.forEach((itm) => {
-        addToPO({
-          productId: itm.productId,
-          name: itm.name,
-          price: itm.price,
-          quantity: itm.quantity,
-          color: itm.color,
-          size: itm.size,
-        });
+        addToPO(itm);
       });
 
-      // Show confirmation bar
       setShowAddedBar(true);
     } catch (err) {
       console.error("Error adding PO:", err);
@@ -175,15 +173,17 @@ function ProductDetails() {
 
       <div className="info-section">
         <h1>{product.name}</h1>
-        <h2 className="price">US${product.price}</h2>
+        <h2 className="price">US$ {product.price}</h2>
         <p className="category">{product.category}</p>
         <p className="description">{product.description}</p>
 
         {hasVariations ? (
           <div className="order-combinations">
             <h4>Order Combinations</h4>
+
             {orderItems.map((item, idx) => (
               <div key={idx} className="order-row">
+
                 <select
                   value={item.color || ""}
                   onChange={(e) =>
@@ -214,9 +214,9 @@ function ProductDetails() {
                   type="number"
                   min={0}
                   step={1}
-                  value={item.quantity}
+                  value={item.quantity ?? ""}
                   onChange={(e) =>
-                    updateOrderItem(idx, "quantity", Number(e.target.value))
+                    updateOrderItem(idx, "quantity", e.target.value)
                   }
                 />
 
@@ -228,7 +228,10 @@ function ProductDetails() {
               </div>
             ))}
 
-            <button onClick={addOrderItem}>Add Another Combination</button>
+            <button onClick={addOrderItem}>
+              Add Another Combination
+            </button>
+
             <p>Total Quantity: {totalQuantity}</p>
             <p className="min-qty-note">
               Minimum total order quantity: <strong>{MIN_QTY}</strong>
@@ -242,12 +245,11 @@ function ProductDetails() {
                 type="number"
                 min={MIN_QTY}
                 step={1}
-                value={orderItems[0]?.quantity || MIN_QTY}
+                value={orderItems[0]?.quantity ?? ""}
                 onChange={(e) =>
-                  updateOrderItem(0, "quantity", Number(e.target.value))
+                  updateOrderItem(0, "quantity", e.target.value)
                 }
               />
-
             </div>
           </div>
         )}
@@ -259,30 +261,32 @@ function ProductDetails() {
             </button>
           )}
         </div>
-      
 
-        {/* CONFIRMATION BAR */}
         {showAddedBar && (
           <div className="action-buttons">
-              <button onClick={() => navigate("/purchase-order/form")}> {/* Navigate to PO form */}
-                View Purchase Order
-              </button>
-              <button onClick={() => navigate("/")}> {/* Navigate home */}
-                Continue Shopping
-              </button>
+            <button onClick={() => navigate("/purchase-order/form")}>
+              View Purchase Order
+            </button>
+            <button onClick={() => navigate("/")}>
+              Continue Shopping
+            </button>
           </div>
         )}
-          {showPopup && (
-            <div className="po-popup-overlay">
-              <div className="po-popup">
-                <p>{validationError}</p>
-                <div className="po-popup-actions">
-                  <button onClick={() => setShowPopup(false)}>OK</button>
-                </div>
+
+        {showPopup && (
+          <div className="po-popup-overlay">
+            <div className="po-popup">
+              <p>{validationError}</p>
+              <div className="po-popup-actions">
+                <button onClick={() => setShowPopup(false)}>
+                  OK
+                </button>
               </div>
             </div>
-          )}
-</div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }

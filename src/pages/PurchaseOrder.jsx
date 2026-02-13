@@ -42,6 +42,7 @@ function PurchaseOrder() {
 
   return (
     <div className="purchase-order-page">
+      <div className="business-log-purchase"><img src="/images/logo.png" alt="Company Logo" /></div>
       <h1 className="po-title">Purchase Order</h1>
 
       {error && <p className="po-error">{error}</p>}
@@ -88,7 +89,7 @@ function PurchaseOrder() {
       </button>
 
       <a
-        href="mailto:shila@novainternationaldesigns.com?subject=Need%20Help%20with%20Purchase%20Order"
+        href="mailto:ritika@novainternationaldesigns.com?subject=Need%20Help%20with%20Purchase%20Order"
         className="po-help-link"
       >
         Need Help?

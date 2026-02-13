@@ -68,7 +68,7 @@ function ProductCard({ product }) {
       />
 
       <h3 className="product-name" onClick={() => navigate(`/product/${product._id}`)}>{product.name}</h3>
-      <p className="price">${product.price}</p>
+      <p className="price">US$ {product.price}</p>
 
     </div>
   );
