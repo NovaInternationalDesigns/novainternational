@@ -74,37 +74,47 @@ const CheckoutGuest = () => {
   };
 
   return (
-    <div className="checkout-guest-container">
-      <h2>Checkout as Guest</h2>
-      <form onSubmit={handleGuestCheckout} className="checkout-form">
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+  <div className="purchase-order-form">
+    <h2>Checkout as Guest</h2>
 
-        {error && <p className="checkout-error">{error}</p>}
+    <div className="po-container">
+      <div className="po-left">
+        <form onSubmit={handleGuestCheckout}>
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Proceeding..." : "Proceed as Guest"}
-        </button>
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-        {/* Optional: Button to clear guest session */}
-        <button type="button" onClick={handleClearGuest} className="clear-guest-btn">
-          Cancel Guest Checkout
-        </button>
-      </form>
+          {error && <p className="po-form-error">{error}</p>}
+          <br />
+          <button type="submit" disabled={loading}>
+            {loading ? "Proceeding..." : "Proceed as Guest"}
+          </button>
+       
+          <button
+            type="button"
+            onClick={handleClearGuest}
+            style={{ marginTop: "10px", background: "#555" }}
+          >
+            Cancel Guest Checkout
+          </button>
+        </form>
+      </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default CheckoutGuest;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./CSS/checkout.css";
 
@@ -7,50 +7,52 @@ import { useGuest } from "../context/GuestContext.jsx";
 import { UserContext } from "../context/UserContext.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const TAX_RATE = 0.07;
+const SHIPPING_FLAT = 15;
+const FREE_SHIPPING_THRESHOLD = 500;
 
-// helpers
-const getQty = (item) => Number(item.qty ?? item.quantity ?? item.quantityOrdered ?? 0);
+const getQty = (item) => Number(item.qty ?? item.quantity ?? 0);
 const getPrice = (item) => Number(item.price ?? item.unitPrice ?? 0);
 
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { guest, endGuestSession } = useGuest(); // Correctly inside component
-  const { user } = useContext(UserContext);
+  const { guest, endGuestSession } = useGuest();
+  const { user, loading } = useContext(UserContext);
   const { purchaseOrderId } = usePO();
 
   const { items = [], form = {} } = location.state || {};
   const [orderData] = useState(items);
 
   const [shippingInfo, setShippingInfo] = useState({
-    name: guest?.name || user?.name || "",
+    firstName: "",
+    lastName: "",
+    company: "",
     address: "",
     city: "",
-    postalCode: "",
+    state: "",
+    zip: "",
     country: "",
+    phone: "",
   });
 
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // Block access if no user and no guest
   useEffect(() => {
-    if (!user && !guest) {
-      navigate("/checkout-guest");
+    // Wait until user loading finishes to avoid redirecting prematurely
+    if (!loading) {
+      if (!user && !guest) navigate("/checkout-guest");
+      if (!orderData.length) navigate("/");
     }
-  }, [user, guest, navigate]);
+  }, [user, guest, loading, navigate, orderData]);
 
-  // Redirect home if no items
-  useEffect(() => {
-    if (!orderData.length) navigate("/");
-  }, [orderData, navigate]);
-
-  const totalAmount = orderData.reduce(
-    (acc, item) => acc + getQty(item) * getPrice(item),
-    0
-  );
-  const formattedTotal = totalAmount.toFixed(2);
+  // CALCULATIONS
+  const subtotal = useMemo(() => orderData.reduce((acc, item) => acc + getQty(item) * getPrice(item), 0), [orderData]);
+  const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT;
+  const estimatedTax = (subtotal + shippingCost) * TAX_RATE;
+  const total = subtotal + shippingCost + estimatedTax;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -60,132 +62,177 @@ const Checkout = () => {
   const handleStripeCheckout = async () => {
     setError("");
 
-    if (!shippingInfo.name || !shippingInfo.address || !shippingInfo.city || !shippingInfo.postalCode || !shippingInfo.country) {
-      setError("Please fill out all shipping information.");
+    const requiredFields = ["firstName", "address", "city", "zip", "country"];
+    const missing = requiredFields.filter((f) => !shippingInfo[f]?.trim());
+    if (missing.length) {
+      setError("Please fill all required shipping fields.");
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
 
     try {
-      // 1️ Save Order
-      const saveOrderRes = await fetch(`${API_URL}/api/purchase-order`, {
+      // Save Purchase Order
+      const saveRes = await fetch(`${API_URL}/api/purchase-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          items: orderData.map((item) => ({
-            ...item,
-            qty: getQty(item),
-            price: getPrice(item),
-          })),
+          items: orderData,
           shippingInfo,
-          totalAmount,
+          subtotal,
+          shippingCost,
+          estimatedTax,
+          totalAmount: total,
           form,
           purchaseOrderId,
           ownerType: guest ? "Guest" : "User",
           ownerId: guest?._id || user?._id,
         }),
       });
+      const saved = await saveRes.json();
+      if (!saveRes.ok) throw new Error(saved.error || "Failed to save order");
+      const orderId = saved?.order?._id;
+      if (!orderId) throw new Error("Order ID not returned");
 
-      const savedOrder = await saveOrderRes.json();
-      console.log("Saved Order Response:", savedOrder);
-      if (!saveOrderRes.ok) throw new Error(savedOrder.error || "Failed to save order");
-
-      // 2️ Create Stripe Checkout Session
-
-      const orderId = savedOrder?.order?._id;
-
-      if (!orderId) {
-        throw new Error("Order ID not found in saved order response");
-      }
-
+      // Create Stripe session
       const sessionRes = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId }),
       });
-
-      if (!sessionRes.ok) {
-        const errorText = await sessionRes.text();
-        console.error("Stripe session raw response:", errorText);
-        throw new Error("Stripe session creation failed");
-      }
-
       const sessionData = await sessionRes.json();
+      if (!sessionRes.ok) throw new Error(sessionData.error || "Stripe session creation failed");
 
-      if (!sessionData.url) {
-        throw new Error("Stripe session URL missing");
-      }
-
-
-      // 3️ Clear guest session before redirect
       if (guest && endGuestSession) endGuestSession();
 
-      // 4️ Redirect to Stripe
       window.location.assign(sessionData.url);
-
-
     } catch (err) {
       console.error("Checkout error:", err);
-      setError(err.message || "Failed to start payment. Please try again.");
-      setLoading(false);
+      setError(err.message || "Checkout failed");
+      setSubmitting(false);
     }
   };
 
+  if (loading) return null;
   if (!user && !guest) return null;
 
   return (
-    <div className="checkout">
+    <div className="purchase-order-form">
       <h2>Checkout</h2>
 
-      {/* Order Summary */}
-      <div className="order-summary">
-        <h3>Order Summary</h3>
-        <ul>
-          {orderData.map((item, index) => {
-            const qty = getQty(item);
-            const price = getPrice(item);
-            const lineTotal = (qty * price).toFixed(2);
+      <div className="po-container">
+        {/* LEFT COLUMN – SHIPPING */}
+        <div className="po-left po-form-section">
+          <h3>Shipping Details</h3>
 
-            return (
-              <li key={index}>
-                <p>{item.name || item.description || "Product"}</p>
-                <p>{qty} × US${price.toFixed(2)}</p>
-                <p>Total: US${lineTotal}</p>
-              </li>
-            );
-          })}
-        </ul>
+          <div className="input-row">
+            <input
+              name="firstName"
+              placeholder="First Name"
+              value={shippingInfo.firstName}
+              onChange={handleInputChange}
+              required
+            />
+            <input
+              name="lastName"
+              placeholder="Last Name"
+              value={shippingInfo.lastName}
+              onChange={handleInputChange}
+            />
+          </div>
 
-        <p className="order-total">
-          <strong>Total Order Value: US${formattedTotal}</strong>
-        </p>
-      </div>
+          <input
+            name="company"
+            placeholder="Company"
+            value={shippingInfo.company}
+            onChange={handleInputChange}
+          />
 
-      {/* Shipping Info */}
-      <div className="checkout-form">
-        <h4>Shipping Information</h4>
+          <textarea
+            name="address"
+            placeholder="Address"
+            value={shippingInfo.address}
+            onChange={handleInputChange}
+            required
+          />
 
-        <input name="name" placeholder="Full Name" value={shippingInfo.name} onChange={handleInputChange} disabled={loading} />
-        <input name="address" placeholder="Address" value={shippingInfo.address} onChange={handleInputChange} disabled={loading} />
-        <input name="city" placeholder="City" value={shippingInfo.city} onChange={handleInputChange} disabled={loading} />
-        <input name="postalCode" placeholder="Postal Code" value={shippingInfo.postalCode} onChange={handleInputChange} disabled={loading} />
-        <input name="country" placeholder="Country" value={shippingInfo.country} onChange={handleInputChange} disabled={loading} />
+          <div className="input-row">
+            <input
+              name="city"
+              placeholder="City"
+              value={shippingInfo.city}
+              onChange={handleInputChange}
+              required
+            />
+            <input
+              name="state"
+              placeholder="State"
+              value={shippingInfo.state}
+              onChange={handleInputChange}
+            />
+          </div>
 
-        {error && (
-          <p className="payment-error" style={{ color: "crimson" }}>
-            {error}
-          </p>
-        )}
+          <div className="input-row">
+            <input
+              name="zip"
+              placeholder="ZIP Code"
+              value={shippingInfo.zip}
+              onChange={handleInputChange}
+              required
+            />
+            <input
+              name="country"
+              placeholder="Country"
+              value={shippingInfo.country}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
 
-        <button
-          onClick={handleStripeCheckout}
-          className="place-order-btn"
-          disabled={loading}
-        >
-          {loading ? "Redirecting to secure payment..." : `Pay $${formattedTotal}`}
-        </button>
+          <input
+            name="phone"
+            placeholder="Phone"
+            value={shippingInfo.phone}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        {/* RIGHT COLUMN – ORDER SUMMARY */}
+        <div className="po-right po-form-section">
+          <h3>Purchase Order Summary</h3>
+
+          <div className="summary-row">
+            <span>Subtotal</span>
+            <span>${subtotal.toFixed(2)}</span>
+          </div>
+
+          <div className="summary-row">
+            <span>Shipping</span>
+            <span>${shippingCost.toFixed(2)}</span>
+          </div>
+
+          <div className="summary-row">
+            <span>Estimated Tax</span>
+            <span>${estimatedTax.toFixed(2)}</span>
+          </div>
+
+          <hr />
+
+          <div className="grand-total">
+            <strong>Total: ${total.toFixed(2)}</strong>
+          </div>
+
+          {error && <p className="po-form-error">{error}</p>}
+
+          <button
+            type="button"
+            onClick={handleStripeCheckout}
+            disabled={submitting}
+          >
+            {submitting ? "Redirecting..." : "Place Order"}
+          </button>
+        </div>
       </div>
     </div>
   );

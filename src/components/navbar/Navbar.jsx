@@ -175,7 +175,7 @@ const Navbar = () => {
                 <li>Welcome, {user.name || user.email}</li>
                 <li><SignOutButton onSignOut={signOut} /></li>
                 <li>
-                  <Link to="/purchase-order">
+                  <Link to="/purchase-order/form">
                     {/* <span className="cart-icon">Purchase Order</span> */}
                     <span className="cart-count">{poItems?.length || 0}</span>
                   </Link>
@@ -196,7 +196,7 @@ const Navbar = () => {
                   </button>
                 </li>
                 <li>
-                  <Link to="/purchase-order">
+                  <Link to="/purchase-order/form">
                     {/* <span className="cart-icon">Purchase Order</span> */}
                     <span className="cart-count">{poItems?.length || 0}</span>
                   </Link>

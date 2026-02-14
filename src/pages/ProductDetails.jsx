@@ -33,7 +33,7 @@ function ProductDetails() {
         const data = await res.json();
         setProduct(data);
 
-        // ✅ Start quantity as blank
+        // Start quantity as blank
         setOrderItems([
           {
             color: data.colors?.[0] || null,
@@ -54,7 +54,7 @@ function ProductDetails() {
   const hasVariations =
     product?.colors?.length > 0 && product?.sizes?.length > 0;
 
-  // ✅ Updated to allow blank quantity
+  // Allow blank quantity
   const updateOrderItem = (index, field, value) => {
     const updated = [...orderItems];
 
@@ -277,11 +277,11 @@ function ProductDetails() {
           <div className="po-popup-overlay">
             <div className="po-popup">
               <p>{validationError}</p>
-              <div className="po-popup-actions">
+              {/* <div className="po-popup-actions">
                 <button onClick={() => setShowPopup(false)}>
                   OK
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         )}

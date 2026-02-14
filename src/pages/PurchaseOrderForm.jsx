@@ -108,7 +108,7 @@ export default function PurchaseOrderForm({ items }) {
   };
 
   if (!authChecked) return <p>Checking login status...</p>;
-  if (orderItems.length === 0) return <p>Loading order items...</p>;
+  if (orderItems.length === 0) return <p>No items in Purchase Order.</p>;
 
   return (
       <div className="purchase-order-form">
@@ -119,7 +119,7 @@ export default function PurchaseOrderForm({ items }) {
           <table className="po-table">
             <thead>
               <tr>
-                <th>Style</th>
+                <th>Style No</th>
                 <th>Description</th>
                 <th>Size</th>
                 <th>Color</th>
@@ -137,7 +137,7 @@ export default function PurchaseOrderForm({ items }) {
                   <td><input value={item.size} onChange={(e) => handleItemChange(index, "size", e.target.value)} /></td>
                   <td><input value={item.color} onChange={(e) => handleItemChange(index, "color", e.target.value)} /></td>
                   <td><input type="number" value={item.qty} onChange={(e) => handleItemChange(index, "qty", Number(e.target.value))} min={0} /></td>
-                  <td><input type="number" value={item.price} onChange={(e) => handleItemChange(index, "price", Number(e.target.value))} /></td>
+                  <td><input type="number" value={item.price} readOnly /></td>
                   <td><input value={item.total} readOnly /></td>
                   <td><button type="button" onClick={() => removeRow(index)}>X</button></td>
                 </tr>
@@ -174,7 +174,6 @@ export default function PurchaseOrderForm({ items }) {
                 {formError && <p className="po-form-error">{formError}</p>}
 
                 <div>
-                  <br></br>
                   <strong>Grand Total: $</strong>
                   <strong>{orderItems.reduce((sum, it) => sum + (it.qty || 0) * (it.price || 0), 0).toFixed(2)}</strong>
                 </div>
