@@ -34,8 +34,10 @@ export default function OrderConfirmation() {
           credentials: "include",
         });
 
+        const payload = await res.json().catch(() => ({}));
+
         if (res.ok) {
-          return res.json();
+          return payload;
         }
 
         if (res.status === 404 && attempt < maxAttempts) {
@@ -44,10 +46,13 @@ export default function OrderConfirmation() {
         }
 
         if (res.status === 404) {
-          throw new Error("Order not found for this session.");
+          throw new Error(payload.error || "Order not found for this session.");
         }
 
-        throw new Error(`Failed to fetch order. Status: ${res.status}`);
+        const detailText = payload.details ? ` ${payload.details}` : "";
+        throw new Error(
+          payload.error || `Failed to fetch order. Status: ${res.status}.${detailText}`
+        );
       }
 
       throw new Error("Unable to fetch order confirmation.");
