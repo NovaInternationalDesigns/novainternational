@@ -3,8 +3,6 @@ import { UserContext } from "../context/UserContext";
 import { useGuest } from "../context/GuestContext";
 import "./CSS/orderConfirmation.css"; 
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 export default function PurchaseHistory() {
   const { user } = useContext(UserContext);
   const { guest } = useGuest();
@@ -24,8 +22,8 @@ export default function PurchaseHistory() {
         setLoading(true);
         // Determine which endpoint to use
         const endpoint = user
-          ? `${API_URL}/api/orders/my-orders`
-          : `${API_URL}/api/orders/guest/${guest._id}?sessionId=${encodeURIComponent(
+          ? `${import.meta.env.VITE_API_URL}/api/orders/my-orders`
+          : `${import.meta.env.VITE_API_URL}/api/orders/guest/${guest._id}?sessionId=${encodeURIComponent(
               guest.sessionId || ""
             )}`;
 

@@ -3,8 +3,6 @@ import React, { createContext, useState, useEffect } from "react";
 
 export const UserContext = createContext();
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,7 +10,7 @@ export const UserProvider = ({ children }) => {
   // Fetch current logged-in user from backend
   const fetchUser = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/auth/me`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
         credentials: "include", // important for cookies
       });
 
@@ -33,7 +31,7 @@ export const UserProvider = ({ children }) => {
   // Signup new user
   const signUp = async (name, email, password) => {
     try {
-      const res = await fetch(`${API_URL}/api/auth/signup`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // session cookie
@@ -73,7 +71,7 @@ export const UserProvider = ({ children }) => {
   // Logout user
   const signOut = async () => {
     try {
-      await fetch(`${API_URL}/api/auth/logout`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

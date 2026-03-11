@@ -6,7 +6,6 @@ import { usePO } from "../context/PurchaseOrderContext.jsx";
 import { useGuest } from "../context/GuestContext.jsx";
 import { UserContext } from "../context/UserContext.jsx";
 
-const API_URL = import.meta.env.VITE_API_URL;
 const TAX_RATE = 0.07;
 const SHIPPING_FLAT = 15;
 const FREE_SHIPPING_THRESHOLD = 500;
@@ -223,7 +222,7 @@ const Checkout = () => {
 
     try {
       const sessionRes = await fetch(
-        `${API_URL}/api/payment/create-checkout-session`,
+        `${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

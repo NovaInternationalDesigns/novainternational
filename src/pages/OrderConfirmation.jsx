@@ -11,8 +11,7 @@ export default function OrderConfirmation() {
 
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
-
-  const API_URL = import.meta.env.VITE_API_URL || "";
+  
   const { clearPO } = usePO();
   const navigate = useNavigate();
 
@@ -30,7 +29,7 @@ export default function OrderConfirmation() {
       const retryDelayMs = 1200;
 
       for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-        const res = await fetch(`${API_URL}/api/payment/order/${sessionId}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/order/${sessionId}`, {
           credentials: "include",
         });
 
@@ -77,7 +76,7 @@ export default function OrderConfirmation() {
     };
 
     fetchOrder();
-  }, [sessionId, API_URL, clearPO]);
+  }, [sessionId, import.meta.env.VITE_API_URL, clearPO]);
 
   useEffect(() => {
     if (loading || error || !order) return undefined;

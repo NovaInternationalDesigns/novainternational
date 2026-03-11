@@ -9,7 +9,6 @@ export const PurchaseOrderProvider = ({ children }) => {
   const [purchaseOrderId, setPurchaseOrderId] = useState(null);
   const { user } = useContext(UserContext);
   const { guest } = useGuest();
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const mapDraftItems = (source) =>
     (source || []).map((i) => ({
@@ -40,7 +39,7 @@ export const PurchaseOrderProvider = ({ children }) => {
       // Load from server if we have owner info
       if (ownerType && ownerId) {
         try {
-          const res = await fetch(`${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}`, {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}`, {
             credentials: "include",
           });
           if (res.ok) {
@@ -102,7 +101,7 @@ export const PurchaseOrderProvider = ({ children }) => {
     }
 
     const endpoint = ownerType && ownerId
-      ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
+      ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
       : null;
 
     // If user or guest is logged in, request backend to remove
@@ -167,7 +166,7 @@ export const PurchaseOrderProvider = ({ children }) => {
     }
 
     const endpoint = ownerType && ownerId
-      ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
+      ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
       : null;
 
     if (endpoint) {
@@ -214,7 +213,7 @@ export const PurchaseOrderProvider = ({ children }) => {
     }
 
     const endpoint = ownerType && ownerId
-      ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
+      ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
       : null;
 
     if (endpoint) {

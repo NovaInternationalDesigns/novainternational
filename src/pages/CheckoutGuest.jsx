@@ -5,8 +5,6 @@ import { useGuest } from "../context/GuestContext.jsx";
 import { usePO } from "../context/PurchaseOrderContext.jsx";
 import "./CSS/checkout.css";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 const CheckoutGuest = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -37,7 +35,7 @@ const CheckoutGuest = () => {
 
     try {
       // 1️⃣ Create guest in backend
-      const guestRes = await fetch(`${API_URL}/api/guests`, {
+      const guestRes = await fetch(`${import.meta.env.VITE_API_URL}/api/guests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), email: email.trim() }),
