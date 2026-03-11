@@ -1,0 +1,54 @@
+.job-page {
+  max-width: 900px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.job-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.job-header h1 {
+  color: #222;
+}
+
+.job-header h2 {
+  color: #555;
+}
+
+section {
+  margin-bottom: 25px;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+.careers-page {
+  padding: 40px 20px;
+}
+
+.job-page {
+  margin-bottom: 50px;
+}
+
+.job-logo{
+    width: 250px;
+}
+
+.careers-apply-btn{
+    background-color: #000000;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.careers-apply-btn a {
+    color: white;
+    text-decoration: none;
+}

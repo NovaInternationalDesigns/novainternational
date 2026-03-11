@@ -4,13 +4,14 @@ import "./App.css";
 
 /* Components */
 import Navbar from "./components/navbar/Navbar.jsx";
-import Carousel from "./components/carousel/Carousel.jsx";
+import Billboard from "./components/billboard/Billboard.jsx";
 import Footer from "./components/footer/Footer.jsx";
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 /* Pages */
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
+import Careers from "./pages/Careers.jsx";
 import Category from "./pages/Category.jsx";
 import Product from "./features/products/Product.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
@@ -34,9 +35,10 @@ function App() {
 
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Carousel />} />
+        <Route path="/" element={<Billboard />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/careers" element={<Careers />} />
         <Route path="/products" element={<Product />} />
         <Route path="/product/:slug" element={<ProductDetails />} />
 

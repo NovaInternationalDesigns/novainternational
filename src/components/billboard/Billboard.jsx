@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./carousel.css";
+import "./billboard.css";
 
-const Carousel = () => {
+const Billboard = () => {
   const slides = [
     { type: "image", src: "/images/black-clutch.png" },
     { type: "image", src: "/images/red-clutch.png" },
@@ -92,10 +92,10 @@ const Carousel = () => {
   }, [transition]);
 
   return (
-    <div className="carousel-container">
+    <div className="billboard-container">
       {/* SLIDES */}
       <div
-        className="carousel-inner"
+        className="billboard-inner"
         style={{
           transform: `translateX(-${index * 100}%)`,
           transition: transition ? "transform 0.5s ease" : "none",
@@ -103,7 +103,7 @@ const Carousel = () => {
         onTransitionEnd={handleTransitionEnd}
       >
         {extendedSlides.map((slide, i) => (
-          <div className="carousel-item" key={i}>
+          <div className="billboard-item" key={i}>
             {slide.type === "image" ? (
               <img src={slide.src} alt={`Slide ${i}`} />
             ) : (
@@ -159,4 +159,4 @@ const Carousel = () => {
   );
 };
 
-export default Carousel;
+export default Billboard;

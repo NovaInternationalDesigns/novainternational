@@ -5,7 +5,38 @@ import "./footer.css";
 const Footer = () => {
   return (
     <div className="footer">
-      <p>© Nova International Designs Corporation. All rights reserved.</p>
+      <div className="footer-container">
+
+        <div className="footer-col">
+          <h4>Customer Service</h4>
+          <ul>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+          </ul>
+        </div>
+
+        <div className="footer-col">
+          <h4>My Account</h4>
+          <ul>
+            <li><a href="signin">Sign In</a></li>         
+            <li><a href="#">Gift Cards</a></li>
+           
+          </ul>
+        </div>
+
+        <div className="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about">About Us</a></li>
+            <li><a href="careers">Careers</a></li>
+            <li><a href="contact">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        <p>© Nova International Designs Corporation.<br />All rights reserved.</p>
+      </div>
 
       <div className="social-icons">
         <a href="https://www.facebook.com/profile.php?id=61584196192112" target="_blank"><img src="/images/facebook-logo.png" alt="Facebook" /></a>

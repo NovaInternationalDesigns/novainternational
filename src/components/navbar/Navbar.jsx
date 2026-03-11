@@ -23,6 +23,7 @@ const Navbar = () => {
     { title: "Gift Cards", path: "#" },
     { title: "Sign In", path: "/signin" },
     { title: "Contact Us", path: "/contact" },
+    { title: "Careers", path: "/careers" },
   ];
 
   // Menu Data
