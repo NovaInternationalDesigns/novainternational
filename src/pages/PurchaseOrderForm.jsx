@@ -9,7 +9,7 @@ export default function PurchaseOrderForm({ items }) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const { guest } = useGuest();
-  const { poItems, clearPO, removeFromPO } = usePO();
+  const { poItems, removeFromPO, updatePOItemQty } = usePO();
 
   const [authChecked, setAuthChecked] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,6 +26,11 @@ export default function PurchaseOrderForm({ items }) {
   });
   const [formError, setFormError] = useState("");
   const [orderItems, setOrderItems] = useState([]);
+  const [minQtyMap, setMinQtyMap] = useState({});
+  const [qtyErrors, setQtyErrors] = useState({});
+  const productIdsSignature = [...new Set(orderItems.map((item) => item.productId).filter(Boolean))]
+    .sort()
+    .join("|");
 
   // Check login status
   useEffect(() => {
@@ -39,8 +44,7 @@ export default function PurchaseOrderForm({ items }) {
     if (source && source.length > 0) {
       setOrderItems(
         source.map((item) => ({
-          productId: item.productId || item.styleNo,
-          styleNo: item.styleNo || item.productId,
+          productId: item.productId || "",
           name: item.name || item.description || "",
           description: item.name || item.description,
           color: item.color || "",
@@ -59,6 +63,54 @@ export default function PurchaseOrderForm({ items }) {
     }
   }, [items, poItems]);
 
+  useEffect(() => {
+    const loadMinQty = async () => {
+      const productIds = productIdsSignature ? productIdsSignature.split("|") : [];
+      if (productIds.length === 0) {
+        setMinQtyMap({});
+        return;
+      }
+
+      try {
+        const responses = await Promise.all(
+          productIds.map(async (id) => {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/id/${id}`);
+            if (!res.ok) return [id, 1];
+            const data = await res.json();
+            const minQty = Number(data?.minQty) >= 1 ? Number(data.minQty) : 1;
+            return [id, minQty];
+          })
+        );
+
+        setMinQtyMap(Object.fromEntries(responses));
+      } catch (err) {
+        console.error("Failed to load min quantity:", err);
+        const fallback = Object.fromEntries(productIds.map((id) => [id, 1]));
+        setMinQtyMap(fallback);
+      }
+    };
+
+    loadMinQty();
+  }, [productIdsSignature]);
+
+  useEffect(() => {
+    if (orderItems.length === 0) return;
+
+    const adjusted = orderItems.map((item) => {
+      const minQty = Number(minQtyMap[item.productId]) > 0 ? Number(minQtyMap[item.productId]) : 1;
+      const qty = Number(item.qty) || 0;
+      if (qty < minQty) {
+        return { ...item, qty: minQty, total: minQty * (item.price || 0) };
+      }
+      return item;
+    });
+
+    const hasChanges = adjusted.some((item, idx) => item.qty !== orderItems[idx].qty);
+    if (hasChanges) {
+      setOrderItems(adjusted);
+    }
+  }, [minQtyMap]);
+
   // Pre-fill form with user/guest data
   useEffect(() => {
     if (user || guest) {
@@ -75,10 +127,60 @@ export default function PurchaseOrderForm({ items }) {
     if (e.target.name === "email") setFormError("");
   };
 
-  const handleItemChange = (index, field, value) => {
+  const handleItemChange = async (index, field, value) => {
     const updated = [...orderItems];
+
+    if (field === "qty") {
+      const item = updated[index];
+      const minQty = Number(minQtyMap[item.productId]) > 0 ? Number(minQtyMap[item.productId]) : 1;
+      const numericValue = Number(value);
+
+      if (!Number.isFinite(numericValue) || numericValue < minQty || numericValue < 1) {
+        updated[index].qty = minQty;
+        updated[index].total = minQty * (updated[index].price || 0);
+        setOrderItems(updated);
+        setQtyErrors((prev) => ({
+          ...prev,
+          [index]: `Minimum quantity should be ${minQty}.`,
+        }));
+
+        try {
+          await updatePOItemQty({
+            productId: item.productId,
+            color: item.color || null,
+            size: item.size || null,
+            qty: minQty,
+          });
+        } catch (err) {
+          console.error("Failed to update PO qty:", err);
+        }
+        return;
+      }
+
+      updated[index].qty = numericValue;
+      updated[index].total = numericValue * (updated[index].price || 0);
+      setOrderItems(updated);
+      setQtyErrors((prev) => ({ ...prev, [index]: "" }));
+
+      try {
+        await updatePOItemQty({
+          productId: item.productId,
+          color: item.color || null,
+          size: item.size || null,
+          qty: numericValue,
+        });
+      } catch (err) {
+        const minFromApi = Number(err?.message?.match(/Minimum quantity should be (\d+)/)?.[1]) || minQty;
+        setQtyErrors((prev) => ({
+          ...prev,
+          [index]: `Minimum quantity should be ${minFromApi}.`,
+        }));
+      }
+      return;
+    }
+
     updated[index][field] = value;
-    if (field === "qty" || field === "price") {
+    if (field === "price") {
       updated[index].total =
         (updated[index].qty || 0) * (updated[index].price || 0);
     }
@@ -88,7 +190,7 @@ export default function PurchaseOrderForm({ items }) {
   const removeRow = async (index) => {
     const item = orderItems[index];
     setOrderItems((prev) => prev.filter((_, i) => i !== index));
-    const productId = item.productId || item.styleNo;
+    const productId = item.productId;
     if (productId) {
       try {
         await removeFromPO({ productId, color: item.color, size: item.size });
@@ -108,6 +210,19 @@ export default function PurchaseOrderForm({ items }) {
         return;
       }
     }
+
+    for (let i = 0; i < orderItems.length; i += 1) {
+      const item = orderItems[i];
+      const minQty = Number(minQtyMap[item.productId]) > 0 ? Number(minQtyMap[item.productId]) : 1;
+      const qty = Number(item.qty) || 0;
+      if (qty < minQty) {
+        setQtyErrors((prev) => ({ ...prev, [i]: `Minimum quantity should be ${minQty}.` }));
+        setFormError(`Please fix quantity for ${item.description || item.name || "an item"}.`);
+        return;
+      }
+    }
+
+    setFormError("");
     const totalAmount = orderItems.reduce(
       (sum, it) => sum + (it.qty || 0) * (it.price || 0),
       0
@@ -127,7 +242,7 @@ export default function PurchaseOrderForm({ items }) {
           <table className="po-table">
             <thead>
               <tr>
-                <th>Style No</th>
+                <th>Product ID</th>
                 <th>Description</th>
                 <th>Size</th>
                 <th>Color</th>
@@ -140,11 +255,28 @@ export default function PurchaseOrderForm({ items }) {
             <tbody>
               {orderItems.map((item, index) => (
                 <tr key={index}>
-                  <td><input value={item.styleNo} readOnly /></td>
+                  <td><input value={item.productId} readOnly /></td>
                   <td><input value={item.description} readOnly /></td>
-                  <td><input value={item.size} onChange={(e) => handleItemChange(index, "size", e.target.value)} /></td>
+                  <td>
+                    <input
+                      value={item.size && String(item.size).trim() ? item.size : "N/A"}
+                      onChange={(e) => handleItemChange(index, "size", e.target.value)}
+                      readOnly={!item.size || !String(item.size).trim()}
+                    />
+                  </td>
                   <td><input value={item.color} onChange={(e) => handleItemChange(index, "color", e.target.value)} /></td>
-                  <td><input type="number" value={item.qty} onChange={(e) => handleItemChange(index, "qty", Number(e.target.value))} min={0} /></td>
+                  <td>
+                    <input
+                      type="number"
+                      value={item.qty}
+                      onChange={(e) => handleItemChange(index, "qty", e.target.value)}
+                      min={Number(minQtyMap[item.productId]) > 0 ? Number(minQtyMap[item.productId]) : 1}
+                    />
+                    <small className="po-min-note">
+                      Min: {Number(minQtyMap[item.productId]) > 0 ? Number(minQtyMap[item.productId]) : 1}
+                    </small>
+                    {qtyErrors[index] && <div className="po-row-error">{qtyErrors[index]}</div>}
+                  </td>
                   <td><input type="number" value={item.price} readOnly /></td>
                   <td><input value={item.total} readOnly /></td>
                   <td><button type="button" onClick={() => removeRow(index)}>X</button></td>

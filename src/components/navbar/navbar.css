@@ -51,9 +51,13 @@
   color:goldenrod;
 } */
 .cart-count {
-  color: black;
-  padding: 20px;
-  background-color: goldenrod;
+  color: rgb(0, 0, 0);
+  padding: 25px 20px 30px 25px;
+  font-size: 14px;
+  font-weight: bold;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-11z"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M6 6l-1-3H2"/></svg>');
+  background-position: center;
+  background-repeat: no-repeat; 
 }
 
 /* Guest signout button styling */

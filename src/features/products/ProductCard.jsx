@@ -10,7 +10,7 @@ function ProductCard({ product }) {
 
   const [qty, setQty] = useState(MIN_QTY);
   const [selectedColor, setSelectedColor] = useState(
-    product.colors?.[0] || ""
+    product.color?.[0] || ""
   );
 
   const handleQtyChange = (value) => {
@@ -70,7 +70,7 @@ function ProductCard({ product }) {
       />
 
       <h3 className="product-name" onClick={() => navigate(`/product/${product.slug || product._id}`)}>{product.name}</h3>
-      <p className="price">US$ {product.price}</p>
+      <p className="price">USD {product.price}</p>
 
     </div>
   );

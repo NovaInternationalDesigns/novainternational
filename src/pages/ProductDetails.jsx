@@ -12,8 +12,6 @@ function ProductDetails() {
   const { guest } = useGuest();
   const { addToPO } = usePO();
 
-  const MIN_QTY = 1;
-
   const [product, setProduct] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
   const [selectedColor, setSelectedColor] = useState(null);
@@ -23,7 +21,6 @@ function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [validationError, setValidationError] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -44,10 +41,10 @@ function ProductDetails() {
         const data = await res.json();
 
         const variants = data.variants || [];
-        const colors =
+        const color =
           variants.length > 0
             ? [...new Set(variants.map((v) => v.color).filter(Boolean))]
-            : data.colors || [];
+            : data.color || [];
         const sizes =
           variants.length > 0
             ? [...new Set(variants.map((v) => v.size).filter(Boolean))]
@@ -57,17 +54,17 @@ function ProductDetails() {
         const imageMatchedVariant = firstImage
           ? variants.find((v) => v.image && v.image === firstImage)
           : null;
-        const defaultColor = imageMatchedVariant?.color || colors?.[0] || null;
+        const defaultColor = imageMatchedVariant?.color || color?.[0] || null;
         const defaultSize = sizes?.[0] || null;
 
-        setProduct({ ...data, colors, sizes });
+        setProduct({ ...data, color, sizes });
         setSelectedImage(firstImage); // set default main image
 
         setOrderItems([
           {
             color: defaultColor,
             size: defaultSize,
-            quantity: "",
+            quantity: Number(data?.minQty) > 0 ? Number(data.minQty) : 1,
           },
         ]);
 
@@ -87,6 +84,8 @@ function ProductDetails() {
   }, [slug]);
 
   const hasColorVariants = product?.variants && product.variants.length > 0;
+  const hasColors = hasColorVariants || (product?.color && product.color.length > 0);
+  const minQty = Number(product?.minQty) > 0 ? Number(product.minQty) : 1;
   const variantHasSizes =
     (product?.sizes && product.sizes.length > 0) ||
     (hasColorVariants && product.variants.some((v) => v.size && v.size.trim().length > 0));
@@ -95,7 +94,7 @@ function ProductDetails() {
     if (product?.variants && product.variants.length > 0) {
       return [...new Set(product.variants.map((v) => v.color).filter(Boolean))];
     }
-    return product?.colors || [];
+    return product?.color || [];
   };
 
   const getVariantSizes = () => {
@@ -154,7 +153,12 @@ function ProductDetails() {
     const updated = [...orderItems];
 
     if (field === "quantity") {
-      updated[index][field] = value === "" ? "" : Number(value);
+      if (value === "") {
+        updated[index][field] = minQty;
+      } else {
+        const numericValue = Number(value);
+        updated[index][field] = Number.isFinite(numericValue) ? Math.max(minQty, numericValue) : minQty;
+      }
     } else {
       updated[index][field] = value;
     }
@@ -180,9 +184,9 @@ function ProductDetails() {
     setOrderItems([
       ...orderItems,
       {
-        color: product.colors?.[0] || null,
+        color: product.color?.[0] || null,
         size: product.sizes?.[0] || null,
-        quantity: "",
+        quantity: minQty,
       },
     ]);
     setValidationError("");
@@ -196,9 +200,8 @@ function ProductDetails() {
   const totalQuantity = orderItems.reduce((acc, item) => acc + Number(item.quantity || 0), 0);
 
   const validateTotalQty = () => {
-    if (totalQuantity < MIN_QTY) {
-      setValidationError(`Minimum total order quantity is ${MIN_QTY}. Selected: ${totalQuantity}`);
-      setShowPopup(true);
+    if (totalQuantity < minQty) {
+      setValidationError(`Minimum quantity should be ${minQty}. Selected: ${totalQuantity}`);
       return false;
     }
     setValidationError("");
@@ -242,6 +245,12 @@ function ProductDetails() {
 
       if (!res.ok) {
         const errData = await res.json();
+        if (res.status === 400 && errData?.minQty) {
+          setValidationError(
+            `Minimum quantity should be ${errData.minQty}. Selected: ${errData.selectedQty ?? 0}`
+          );
+          return;
+        }
         throw new Error(errData.error || "Failed to add to Purchase Order");
       }
 
@@ -264,10 +273,7 @@ function ProductDetails() {
     <div className="product-details">
 
     <div className="images-section">
-      <div className="main-image">
-        <img src={selectedImage || defaultImage} alt={product.name} />
-      </div>
-      <div className="thumbnails">
+       <div className="thumbnails">
         {product.images?.map((img, idx) => (
           <img
             key={idx}
@@ -278,6 +284,10 @@ function ProductDetails() {
           />
         ))}
       </div>
+      <div className="main-image">
+        <img src={selectedImage || defaultImage} alt={product.name} />
+      </div>
+     
     </div>
 
       <div className="info-section">
@@ -295,18 +305,22 @@ function ProductDetails() {
             return selectedColor ? `${baseName} - ${selectedColor}` : baseName;
           })()}
         </h1>
-        <h2 className="price">US$ {selectedVariant?.price ?? product.price}</h2>
+        <h2 className="price">USD {selectedVariant?.price ?? product.price}</h2>
         <p className="category">{product.category}</p>
         <p className="description">{product.description}</p>
 
-        {hasColorVariants && (
+        {hasColors && (
           <div className="color-selector">
             <h4>Available Colors</h4>
             <div className="color-options">
               {getVariantColors().map((colorOpt) => (
                 <button
                   key={colorOpt}
-                  onClick={() => navigateToColorProduct(colorOpt)}
+                  onClick={() =>
+                    hasColorVariants
+                      ? navigateToColorProduct(colorOpt)
+                      : updateOrderItem(0, "color", colorOpt)
+                  }
                   className={`color-btn ${
                     (orderItems[0]?.color || selectedColor) === colorOpt ? "active" : ""
                   }`}
@@ -339,7 +353,7 @@ function ProductDetails() {
 
                   <input
                     type="number"
-                    min={0}
+                    min={minQty}
                     step={1}
                     placeholder="Qty"
                     value={item.quantity ?? ""}
@@ -355,8 +369,9 @@ function ProductDetails() {
               <button onClick={addOrderItem}>Add Another Size</button>
               <p>Total Quantity: {totalQuantity}</p>
               <p className="min-qty-note">
-                Minimum total order quantity: <strong>{MIN_QTY}</strong>
+                Minimum total order quantity: <strong>{minQty}</strong>
               </p>
+              {validationError && <p className="min-qty-inline-error">{validationError}</p>}
             </div>
           </div>
         )}
@@ -367,13 +382,17 @@ function ProductDetails() {
             <div className="single-qty-wrap">
               <input
                 type="number"
-                min={MIN_QTY}
+                min={minQty}
                 step={1}
                 placeholder="Qty"
                 value={orderItems[0]?.quantity ?? ""}
                 onChange={(e) => updateOrderItem(0, "quantity", e.target.value)}
               />
             </div>
+            <p className="min-qty-note">
+              Minimum total order quantity: <strong>{minQty}</strong>
+            </p>
+            {validationError && <p className="min-qty-inline-error">{validationError}</p>}
           </div>
         )}
 
@@ -391,14 +410,6 @@ function ProductDetails() {
               View Purchase Order
             </button>
             <button onClick={() => navigate("/")}>Continue Shopping</button>
-          </div>
-        )}
-
-        {showPopup && (
-          <div className="po-popup-overlay">
-            <div className="po-popup">
-              <p>{validationError}</p>
-            </div>
           </div>
         )}
       </div>

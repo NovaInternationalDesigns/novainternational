@@ -130,6 +130,19 @@ button[type="submit"]:hover {
   margin-top: 10px;
 }
 
+.po-min-note {
+  display: block;
+  margin-top: 4px;
+  color: #666;
+  font-size: 12px;
+}
+
+.po-row-error {
+  margin-top: 4px;
+  color: #b42318;
+  font-size: 12px;
+}
+
 .checkout-section {
   margin-top: 20px;
   text-align: right;

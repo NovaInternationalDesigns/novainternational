@@ -154,7 +154,10 @@ export const PurchaseOrderProvider = ({ children }) => {
   const updatePOItemQty = async ({ productId, color = null, size = null, qty }) => {
     if (!productId) throw new Error("productId is required");
 
-    const numericQty = Math.max(1, Number(qty) || 1);
+    const numericQty = Number(qty);
+    if (!Number.isFinite(numericQty)) {
+      throw new Error("qty must be a valid number");
+    }
 
     let ownerType, ownerId;
     if (user && user._id) {
