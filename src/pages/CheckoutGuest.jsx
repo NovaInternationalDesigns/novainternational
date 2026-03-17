@@ -79,6 +79,8 @@ const CheckoutGuest = () => {
       <div className="po-left">
         <form onSubmit={handleGuestCheckout}>
           <input
+            id="guest-full-name"
+            name="guestFullName"
             type="text"
             placeholder="Full Name"
             value={name}
@@ -87,6 +89,8 @@ const CheckoutGuest = () => {
           />
 
           <input
+            id="guest-email"
+            name="guestEmail"
             type="email"
             placeholder="Email Address"
             value={email}

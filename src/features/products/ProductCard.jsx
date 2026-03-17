@@ -68,8 +68,8 @@ function ProductCard({ product }) {
         className="product-image"
         onClick={() => navigate(`/product/${product.slug || product._id}`)}
       />
-
       <h3 className="product-name" onClick={() => navigate(`/product/${product.slug || product._id}`)}>{product.name}</h3>
+      <h4>Style No: {product.styleNo}</h4>
       <p className="price">USD {product.price}</p>
 
     </div>

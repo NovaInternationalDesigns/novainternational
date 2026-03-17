@@ -12,8 +12,6 @@ function ProductDetails() {
   const { guest } = useGuest();
   const { addToPO } = usePO();
 
-  const MIN_QTY = 1;
-
   const [product, setProduct] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
   const [selectedColor, setSelectedColor] = useState(null);
@@ -196,8 +194,9 @@ function ProductDetails() {
   const totalQuantity = orderItems.reduce((acc, item) => acc + Number(item.quantity || 0), 0);
 
   const validateTotalQty = () => {
-    if (totalQuantity < MIN_QTY) {
-      setValidationError(`Minimum total order quantity is ${MIN_QTY}. Selected: ${totalQuantity}`);
+    const minQty = product?.minQty ?? 1;
+    if (totalQuantity < minQty) {
+      setValidationError(`Minimum total order quantity is ${minQty}. You selected: ${totalQuantity}`);
       setShowPopup(true);
       return false;
     }
@@ -217,8 +216,10 @@ function ProductDetails() {
     const poData = orderItems.map((item) => {
       const variant = findVariant(item.color, item.size);
       return {
-        productId: product._id,
+        productId: variant?.productId || product._id,
+        styleNo: variant?.styleNo || product.styleNo || null,
         name: product.name,
+        description: product.description || null,
         price: variant?.price ?? product.price,
         quantity: Number(item.quantity || 0),
         color: item.color || null,
@@ -282,7 +283,6 @@ function ProductDetails() {
     </div>
 
       <div className="info-section">
-        <p className="style-no">Style No: {product.styleNo}</p>
         <h1>
           {(() => {
             const colors = getVariantColors();
@@ -297,9 +297,10 @@ function ProductDetails() {
             return selectedColor ? `${baseName} - ${selectedColor}` : baseName;
           })()}
         </h1>
+        <p className="style-no">Style No: {selectedVariant?.styleNo || product.styleNo}</p>
         <h2 className="price">USD {selectedVariant?.price ?? product.price}</h2>
         <p className="category">{product.category}</p>
-        <p className="description">{product.description}</p>
+        <p className="description">{product.description || "N/A"}</p>
 
         {hasColorVariants && (
           <div className="color-selector">
@@ -328,6 +329,8 @@ function ProductDetails() {
               {orderItems.map((item, idx) => (
                 <div key={idx} className="order-row">
                   <select
+                    id={`product-size-${idx}`}
+                    name={`productSize-${idx}`}
                     value={item.size || ""}
                     onChange={(e) => updateOrderItem(idx, "size", e.target.value)}
                   >
@@ -340,6 +343,8 @@ function ProductDetails() {
                   </select>
 
                   <input
+                    id={`product-qty-${idx}`}
+                    name={`productQty-${idx}`}
                     type="number"
                     min={0}
                     step={1}
@@ -357,7 +362,7 @@ function ProductDetails() {
               <button onClick={addOrderItem}>Add Another Size</button>
               {/* <p>Total Quantity: {totalQuantity}</p>
               <p className="min-qty-note">
-                Minimum total order quantity: <strong>{MIN_QTY}</strong>
+                Minimum total order quantity: <strong>{product?.minQty ?? 1}</strong>
               </p> */}
             </div>
           </div>
@@ -368,8 +373,10 @@ function ProductDetails() {
             <label>Quantity:</label>
             <div className="single-qty-wrap">
               <input
+                id="product-qty-single"
+                name="productQtySingle"
                 type="number"
-                min={MIN_QTY}
+                min={product?.minQty ?? 1}
                 step={1}
                 placeholder="Qty"
                 value={orderItems[0]?.quantity ?? ""}

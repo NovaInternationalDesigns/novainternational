@@ -28,6 +28,8 @@ function AddProduct() {
       <h2>Add Product</h2>
       <form onSubmit={handleSubmit}>
         <input
+          id="add-product-name"
+          name="productName"
           type="text"
           placeholder="Name"
           value={name}
@@ -36,12 +38,16 @@ function AddProduct() {
         />
         <br />
         <textarea
+          id="add-product-description"
+          name="productDescription"
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
         <br />
         <input
+          id="add-product-price"
+          name="productPrice"
           type="number"
           placeholder="Price"
           value={price}
@@ -50,6 +56,8 @@ function AddProduct() {
         />
         <br />
         <input
+          id="add-product-images"
+          name="productImages"
           type="text"
           placeholder="Images URLs (comma separated)"
           value={images.join(",")}

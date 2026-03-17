@@ -6,6 +6,7 @@ const Contact = () => {
     <div className="contact-page">     
       <p>You can contact us at</p>
       <p><a href="mailto:ritika@novainternationaldesigns.com">Email: ritika@novainternationaldesigns.com</a></p>
+      <p><a href="mailto:info@novainternationaldesigns.com">Email: info@novainternationaldesigns.com</a></p>
       {/* You can add a form here */}
     </div>
   );

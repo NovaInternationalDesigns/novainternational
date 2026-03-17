@@ -60,6 +60,8 @@ const SignUp = () => {
 
       <form className="signup-form" onSubmit={handleSubmit}>
         <input
+          id="signup-name"
+          name="signupName"
           type="text"
           placeholder="Full Name"
           value={name}
@@ -68,6 +70,8 @@ const SignUp = () => {
         />
 
         <input
+          id="signup-email"
+          name="signupEmail"
           type="email"
           placeholder="Email"
           value={email}
@@ -76,6 +80,8 @@ const SignUp = () => {
         />
 
         <input
+          id="signup-password"
+          name="signupPassword"
           type="password"
           placeholder="Password"
           value={password}

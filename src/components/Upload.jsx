@@ -36,7 +36,7 @@ function Upload() {
     <div>
       <h2>Upload Images</h2>
 
-      <input type="file" multiple onChange={handleFileChange} />
+      <input id="upload-files" name="uploadFiles" type="file" multiple onChange={handleFileChange} />
 
       <button onClick={uploadImages}>Upload</button>
 

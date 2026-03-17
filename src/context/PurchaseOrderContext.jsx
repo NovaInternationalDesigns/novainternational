@@ -13,7 +13,9 @@ export const PurchaseOrderProvider = ({ children }) => {
   const mapDraftItems = (source) =>
     (source || []).map((i) => ({
       productId: i.productId,
+      styleNo: i.styleNo || "",
       name: i.name,
+      description: i.description || "",
       price: i.price,
       quantity: i.qty ?? i.quantity ?? 0,
       color: i.color || null,
@@ -131,6 +133,7 @@ export const PurchaseOrderProvider = ({ children }) => {
       }
 
       const data = await res.json();
+      console.log("PO Response:", data);
       const items = mapDraftItems(data.po?.items || data.po);
       setPoItems(items);
       return items;
@@ -172,6 +175,7 @@ export const PurchaseOrderProvider = ({ children }) => {
       }
 
       const data = await res.json();
+      console.log("PO Response:", data);
       const items = mapDraftItems(data.po?.items || data.po);
       setPoItems(items);
       return items;
@@ -230,8 +234,70 @@ export const PurchaseOrderProvider = ({ children }) => {
     setPoItems([]);
   };
 
+  const updatePOItemSize = async ({
+    productId,
+    color = null,
+    size = null,
+    newSize = null,
+    newProductId,
+    newStyleNo,
+    newPrice,
+    newImage,
+  }) => {
+    if (!productId) throw new Error("productId is required");
+
+    let ownerType, ownerId;
+    if (user && user._id) {
+      ownerType = "User";
+      ownerId = user._id;
+    } else if (guest && guest._id) {
+      ownerType = "Guest";
+      ownerId = guest._id;
+    }
+
+    const endpoint = ownerType && ownerId
+      ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items/size`
+      : null;
+
+    if (!endpoint) {
+      throw new Error("Session not ready. Please wait a moment and try again.");
+    }
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          productId,
+          color,
+          size,
+          newSize,
+          newProductId,
+          newStyleNo,
+          newPrice,
+          newImage,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || err.message || "Failed to update item size");
+      }
+
+      const data = await res.json();
+      console.log("PO Response:", data);
+      const items = mapDraftItems(data.po?.items || data.po);
+      setPoItems(items);
+      return items;
+    } catch (err) {
+      console.error("Error updating item size in server PO:", err);
+      throw err;
+    }
+  };
+
   return (
-    <POContext.Provider value={{ poItems, purchaseOrderId, setPurchaseOrderId, addToPO, removeFromPO, updatePOItemQty, clearPO }}>
+    <POContext.Provider value={{ poItems, purchaseOrderId, setPurchaseOrderId, addToPO, removeFromPO, updatePOItemQty, updatePOItemSize, clearPO }}>
       {children}
     </POContext.Provider>
   );

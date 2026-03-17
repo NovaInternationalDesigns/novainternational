@@ -6,8 +6,8 @@ import { usePO } from "../context/PurchaseOrderContext.jsx";
 import { useGuest } from "../context/GuestContext.jsx";
 import { UserContext } from "../context/UserContext.jsx";
 
-const TAX_RATE = 0.07;
-const EXTRA_FEE = 4.7;
+const TAX_RATE = 0.11; // 11% tax rate
+const PROCESSING_FEE_RATE = 0.05; // 5% of subtotal
 // const SHIPPING_FLAT = 15;
 // const FREE_SHIPPING_THRESHOLD = 500;
 
@@ -20,10 +20,25 @@ const Checkout = () => {
 
   const { guest } = useGuest();
   const { user, loading } = useContext(UserContext);
-  const { purchaseOrderId, removeFromPO, updatePOItemQty } = usePO();
+  const { purchaseOrderId, poItems, removeFromPO, updatePOItemQty } = usePO();
 
   const { items = [], form = {} } = location.state || {};
-  const [orderData, setOrderData] = useState(items);
+  const normalizeOrderItems = (source) =>
+    (source || []).map((item) => ({
+      ...item,
+      qty: item.quantity ?? item.qty ?? 0,
+      _draftKey:
+        item._draftKey ||
+        {
+          productId: item.productId || item.styleNo,
+          color: item.color ?? null,
+          size: item.size ?? null,
+        },
+    }));
+
+  const [orderData, setOrderData] = useState(() =>
+    normalizeOrderItems(poItems?.length ? poItems : items)
+  );
 
   const [shippingInfo, setShippingInfo] = useState({
     email: "",
@@ -45,9 +60,16 @@ const Checkout = () => {
   useEffect(() => {
     if (!loading) {
       if (!user && !guest) navigate("/checkout-guest");
-      if (!items.length) navigate("/");
+      if (!items.length && !poItems.length) navigate("/");
     }
-  }, [user, guest, loading, navigate, items]);
+  }, [user, guest, loading, navigate, items, poItems]);
+
+  useEffect(() => {
+    const source = poItems?.length ? poItems : items;
+    if (source.length) {
+      setOrderData(normalizeOrderItems(source));
+    }
+  }, [poItems, items]);
 
   useEffect(() => {
     setShippingInfo((prev) => ({
@@ -70,7 +92,8 @@ const Checkout = () => {
 
   const shippingCost = 0;
   const estimatedTax = subtotal <= 0 ? 0 : subtotal * TAX_RATE;
-  const total = subtotal + estimatedTax + EXTRA_FEE;
+  const processingFee = subtotal <= 0 ? 0 : subtotal * PROCESSING_FEE_RATE;
+  const total = subtotal + estimatedTax + processingFee;
 
   // ------------------------
   // VALIDATION
@@ -137,6 +160,15 @@ const Checkout = () => {
     const targetItem = orderData[index];
     if (!targetItem) return;
 
+    // Prefer the original draft key (set in PurchaseOrderForm) so the server
+    // UPDATE matches the stored productId/color/size even if the user edited
+    // those fields in the form before proceeding to checkout.
+    const updateKey = targetItem._draftKey ?? {
+      productId: targetItem.productId || targetItem.styleNo,
+      color: targetItem.color || null,
+      size: targetItem.size || null,
+    };
+
     const previousQty = getQty(targetItem);
 
     setOrderData((prev) =>
@@ -153,9 +185,7 @@ const Checkout = () => {
 
     try {
       const updatedItems = await updatePOItemQty({
-        productId: targetItem.productId || targetItem.styleNo,
-        color: targetItem.color || null,
-        size: targetItem.size || null,
+        ...updateKey,
         qty: nextQty,
       });
 
@@ -189,15 +219,20 @@ const Checkout = () => {
     const targetItem = orderData[index];
     if (!targetItem) return;
 
+    // Prefer the original draft key (set in PurchaseOrderForm) so the server
+    // DELETE matches the stored productId/color/size even if the user edited
+    // those fields in the form before proceeding to checkout.
+    const deleteKey = targetItem._draftKey ?? {
+      productId: targetItem.productId || targetItem.styleNo,
+      color: targetItem.color || null,
+      size: targetItem.size || null,
+    };
+
     const previousItems = orderData;
     setOrderData((prev) => prev.filter((_, i) => i !== index));
 
     try {
-      const updatedItems = await removeFromPO({
-        productId: targetItem.productId || targetItem.styleNo,
-        color: targetItem.color || null,
-        size: targetItem.size || null,
-      });
+      const updatedItems = await removeFromPO(deleteKey);
 
       if (Array.isArray(updatedItems)) {
         setOrderData(
@@ -237,7 +272,7 @@ const Checkout = () => {
             purchaseOrderId,
             shippingCost,
             estimatedTax,
-            extraFee: EXTRA_FEE,
+            Processing_Fee: processingFee,
             subtotal,
             totalAmount: total,
             shippingInfo,
@@ -423,6 +458,8 @@ const Checkout = () => {
                       <label className="checkout-qty-wrap">
                         <span className="checkout-summary-meta">Qty</span>
                         <input
+                          id={`checkout-qty-${idx}`}
+                          name={`checkoutQty-${idx}`}
                           type="number"
                           min="1"
                           value={qty}
@@ -463,7 +500,7 @@ const Checkout = () => {
 
           <div className="summary-row">
           <span>Processing Fee</span>
-          <span>${EXTRA_FEE.toFixed(2)}</span>
+          <span>${processingFee.toFixed(2)}</span>
           </div>
 
           <hr />
