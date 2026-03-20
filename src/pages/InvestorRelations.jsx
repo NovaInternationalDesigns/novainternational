@@ -6,11 +6,10 @@ function InvestorRelations() {
     <div className="investor-page">
 
       <div className="investor-logo">
-        <img src="/images/logo.png" alt="Nova Logo" />
+        <img src="/images/logo2.png" alt="Nova International Designs Corporation Logo" />
       </div>
 
       <div className="investor-header">
-        <h1>Nova International Designs Corporation</h1>
         <h2>Investor Relations</h2>
       </div>
 
