@@ -6,49 +6,38 @@ const About = () => {
     <div className="about-page">
       <p><img src="images/logo2.png" alt="Nova International Designs Logo"></img></p>
       <p className="red-text">
-        Nova International Designs Corporation, based in Naperville, Illinois, is a women-owned business operating across multiple sectors including fashion, electronics, and lifestyle products. The company focuses exclusively on high-quality consumer lifestyle and luxury goods with strict quality control standards.
+        Nova International Designs Corporation is a NO Show Business and is not directly or indirectly NOT linked with Video gaming or entertainment digitalization  and we do not accept any bitcoins or crypto or money with QR code scanning's
       </p>
 
       <p className="red-text">
-        Nova International Designs Corporation is a strictly B2B (Business-to-Business) organization with its buying office located in Naperville, Illinois. We specialize in sourcing and supplying products that meet high standards of quality, consistency, and compliance for retailers, department stores, and online businesses.
-      </p>
-
-      <p className="red-text">
-        Identifying the right supplier is critical to business success. We help our partners meet their sourcing needs by ensuring competitive pricing, reliable delivery timelines, regulatory compliance, and consistent product quality.
+        We will only accept payments via credit or debit cards and by legal bank to bank wire transfers
       </p>
 
       <p>
-        Our product categories include fashion accessories, electronics, and gourmet lifestyle offerings. Our Nova Chocolates collection provides a premium option for corporate gifting and special occasions.
-      </p>
-
-      <h2>Business Policy & Compliance</h2>
-      <p>
-        Nova International Designs Corporation is a NO SHOW business model and is not directly or indirectly associated with video gaming, digital entertainment platforms, or any form of digital monetization services.
+        Nova International Designs Corporation is in Naperville, Illinois and is a women owned Business  with Various Business line including Fashion and Electronics and more.
       </p>
 
       <p>
-        We do not accept any form of cryptocurrency, including Bitcoin, nor do we process payments through QR code-based transactions.
+        The company strictly focusing on consumer lifestyle and luxury goods with quality checks and is a NO SHOW Business and is Directly or indirectly not linked with any video gaming or digital money market  and does not accept crypto and Bitcoins and does not Offer QR code based transactions.
       </p>
 
       <p>
-        All payments are accepted strictly through secure and legally recognized methods, including:
-      </p>
-      <ul>
-        <li>Credit Cards</li>
-        <li>Debit Cards</li>
-        <li>Bank-to-Bank Wire Transfers</li>
-      </ul>
-
-      <h2>Our Commitment</h2>
-      <p>
-        As a sourcing and buying partner, we are committed to delivering excellence across all product categories. Whether in fashion, electronics, or lifestyle goods, we ensure every product meets rigorous quality standards and aligns with current market expectations.
+        Identifying the perfect supplier for your business requirements is always considered to be the most critical for the success in any business. Considering multiple factors such as cost, quality, consistency, on-time delivery, meeting regulations, compliances, and much more.
       </p>
 
       <p>
-        Nova International Designs Corporation focuses exclusively on bulk (B2B) transactions and does not engage in direct-to-consumer sales.
+        As a sourcing partner, we help businesses meet their requirements at guaranteed competitive prices.
+      </p>
+
+      <p>
+       Nova Chocolates with Nova International Designs Corporation collection offers a sophisticated gourmet option for high-end Corporate gifting and special occasions
       </p>
       <p>
-        Email - ritika@novainternationaldesigns.com
+        Nova International Designs Corporation is a Business to Business with it's Buying Office in Naperville, IL .
+      </p>
+
+      <p>
+        Contact Information: For Business inquiries or Questions you can email at: ritika@novainternationaldesigns.com
       </p>
     </div>
   );
