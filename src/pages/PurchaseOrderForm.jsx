@@ -293,7 +293,7 @@ export default function PurchaseOrderForm({ items }) {
   };
 
   if (!authChecked) return <p>Checking login status...</p>;
-  if (orderItems.length === 0) return <p>No items in Purchase Order.</p>;
+  if (orderItems.length === 0) return <p className="po-empty">No items added in Purchase Order.</p>;
 
   return (
       <div className="purchase-order-form">

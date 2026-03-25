@@ -24,7 +24,7 @@ function PurchaseOrder() {
   }
 
   if (!poItems || poItems.length === 0)
-    return <p className="po-empty">No items in your Purchase Order.</p>;
+    return <p className="po-empty">No items added in Purchase Order.</p>;
 
   const totalAmount = poItems.reduce(
     (acc, item) => acc + (item.price || 0) * (item.quantity || item.qty || 0),
