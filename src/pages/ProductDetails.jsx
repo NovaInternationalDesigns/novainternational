@@ -24,59 +24,23 @@ function ProductDetails() {
   const [validationError, setValidationError] = useState("");
   const [showPopup, setShowPopup] = useState(false);
 
-  // ✅ SAFE IMAGE HELPERS (ORDER FIXED)
-  const getSafeImage = (img) => {
-    if (!img) return null;
-
-    if (Array.isArray(img)) {
-      return img[0] || null;
+  // ✅ SAFE IMAGE HELPER
+  const getSafeImage = (image_public_id) => {
+    if (!image_public_id) return null;
+    if (Array.isArray(image_public_id)) {
+      return image_public_id[0] || null;
     }
-
-    if (typeof img === "object") {
-      return (
-        img.images_public_id ||
-        img.image_public_id ||
-        img.public_id ||
-        img.secure_url ||
-        img.url ||
-        img.image ||
-        null
-      );
-    }
-
-    return img;
+    return image_public_id;
   };
 
   const getVariantImageValue = (variant) => {
     if (!variant) return null;
-    return getSafeImage(
-      variant.images_public_id ||
-      variant.image_public_id ||
-      variant.image ||
-      null
-    );
+    return getSafeImage(variant.images_public_id);
   };
 
-  const getProductImages = (item) => {
-    const rawImages = item?.images_public_id?.length
-      ? item.images_public_id
-      : item?.images?.length
-        ? item.images
-        : item?.images_public_id || item?.images || [];
-
-    const normalizedImages = Array.isArray(rawImages)
-      ? rawImages
-      : [rawImages];
-
-    const productImages = normalizedImages
-      .map((image) => getSafeImage(image))
-      .filter(Boolean);
-
-    if (productImages.length > 0) return productImages;
-
-    return (item?.variants || [])
-      .map((variant) => getVariantImageValue(variant))
-      .filter(Boolean);
+  const getProductImages = (product) => {
+    const images_public_id = product?.images_public_id || [];
+    return Array.isArray(images_public_id) ? images_public_id : [images_public_id];
   };
 
   useEffect(() => {
@@ -97,6 +61,12 @@ function ProductDetails() {
 
         const data = await res.json();
 
+        console.log("✅ Product Fetched:", {
+          name: data.name,
+          images_public_id: data.images_public_id,
+          images_count: data.images_public_id?.length || 0
+        });
+
         const variants = data.variants || [];
         const colors =
           variants.length > 0
@@ -107,8 +77,8 @@ function ProductDetails() {
             ? [...new Set(variants.map((v) => v.size).filter(Boolean))]
             : data.sizes || [];
 
-        // ✅ FIXED IMAGE SELECTION
-        const firstImage = getProductImages(data)[0] || null;
+        const product_images_public_id = getProductImages(data);
+        const firstImage = product_images_public_id[0] || null;
 
         const imageMatchedVariant = firstImage
           ? variants.find(
@@ -220,11 +190,11 @@ function ProductDetails() {
     updateOrderItem(0, "color", targetColor);
     const variant = findVariant(targetColor, orderItems[0]?.size);
 
-    const img =
+    const selected_images_public_id =
       getVariantImageValue(variant) ||
       getProductImages(product)[0];
 
-    if (img) setSelectedImage(img);
+    if (selected_images_public_id) setSelectedImage(selected_images_public_id);
   };
 
   const updateOrderItem = (index, field, value) => {
@@ -238,26 +208,26 @@ function ProductDetails() {
 
     if (field === "color") {
       setSelectedColor(value);
-      const v = findVariant(value, updated[index].size || null);
-      setSelectedVariant(v || null);
+      const variant = findVariant(value, updated[index].size || null);
+      setSelectedVariant(variant || null);
 
-      const img =
-        getVariantImageValue(v) ||
+      const selected_images_public_id =
+        getVariantImageValue(variant) ||
         getProductImages(product)[0];
 
-      if (img) setSelectedImage(img);
+      if (selected_images_public_id) setSelectedImage(selected_images_public_id);
     }
 
     if (field === "size") {
-      const v = findVariant(updated[index].color, value);
+      const variant = findVariant(updated[index].color, value);
 
-      const img =
-        getVariantImageValue(v) ||
+      const selected_images_public_id =
+        getVariantImageValue(variant) ||
         getProductImages(product)[0];
 
-      if (img) setSelectedImage(img);
+      if (selected_images_public_id) setSelectedImage(selected_images_public_id);
 
-      setSelectedVariant(v || null);
+      setSelectedVariant(variant || null);
     }
 
     setOrderItems(updated);
@@ -356,14 +326,14 @@ function ProductDetails() {
     <div className="product-details">
       <div className="images-section">
         <div className="thumbnails">
-          {getProductImages(product).map((img, idx) => (
+          {getProductImages(product).map((images_public_id, idx) => (
           <img
             key={idx}
-            src={getImageUrl(img)}
+            src={getImageUrl(images_public_id)}
             className={
-              selectedImage === img ? "thumbnail active" : "thumbnail"
+              selectedImage === images_public_id ? "thumbnail active" : "thumbnail"
             }
-            onClick={() => setSelectedImage(img)}
+            onClick={() => setSelectedImage(images_public_id)}
             alt=""
           />
         ))}

@@ -29,9 +29,9 @@ const Footer = () => {
         <div className="footer-col">
           <h4>Company</h4>
           <ul>
-            <li><a href="about">About Us</a></li>
-            <li><a href="careers">Careers</a></li>
-            <li><a href="contact">Contact Us</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/careers">Careers</a></li>
+            <li><a href="/contact">Contact Us</a></li>
           </ul>
         </div>
       </div>

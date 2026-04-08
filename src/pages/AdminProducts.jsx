@@ -29,6 +29,7 @@ function AdminProducts() {
     sizes: "",
     slug: "",
     images_public_id: [],
+    imageUrl: "",
   });
   const [uploading, setUploading] = useState(false);
 
@@ -52,10 +53,6 @@ function AdminProducts() {
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  const authHeaders = () => {
-    return { "Content-Type": "application/json" };
-  };
 
   const resetForm = () => {
     setFormState({
@@ -102,9 +99,13 @@ function AdminProducts() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Image upload failed");
+      console.log("📸 Image Uploaded:", {
+        public_id: data.public_id,
+        imageUrl: data.imageUrl
+      });
       setFormState((prev) => ({
         ...prev,
-        images_public_id: [...prev.images_public_id, data.public_id],
+        images_public_id: [...prev.images_public_id, data.imageUrl],
       }));
       setError("");
     } catch (err) {
@@ -121,6 +122,15 @@ function AdminProducts() {
       setError("Please enter a valid image URL.");
       return;
     }
+
+    // Basic URL validation
+    try {
+      new URL(url);
+    } catch {
+      setError("Please enter a valid URL (must start with http:// or https://).");
+      return;
+    }
+
     setFormState((prev) => ({
       ...prev,
       images_public_id: [...prev.images_public_id, url],
@@ -150,6 +160,13 @@ function AdminProducts() {
       slug: formState.slug || undefined,
       images_public_id: formState.images_public_id,
     };
+
+    console.log("Saving Product Payload:", {
+      name: payload.name,
+      images_public_id: payload.images_public_id,
+      images_count: payload.images_public_id?.length || 0,
+      full_payload: payload
+    });
 
     const method = formState._id ? "PUT" : "POST";
     const url = formState._id
@@ -326,11 +343,11 @@ function AdminProducts() {
           />
 
           <div style={{ display: "grid", gap: "12px", maxWidth: "100%" }}>
-            {/* <label style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+            <label style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
               Upload image
               <input type="file" accept="image/*" onChange={handleUploadImage} />
             </label>
-            {uploading && <span>Uploading...</span>} */}
+            {uploading && <span>Uploading...</span>}
 
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
               <input
@@ -349,10 +366,10 @@ function AdminProducts() {
 
           {formState.images_public_id.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {formState.images_public_id.map((imageValue, idx) => (
+                {formState.images_public_id.map((images_public_id, idx) => (
                 <div key={idx} style={{ position: "relative" }}>
                     <img
-                    src={getImageUrl(imageValue)}
+                    src={getImageUrl(images_public_id)}
                     alt={`upload-${idx}`}
                     style={{ width: "90px", height: "90px", objectFit: "cover", borderRadius: "6px" }}
                     />
