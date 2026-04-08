@@ -36,11 +36,38 @@
   color: #fff;
 }
 
+.team-member {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid #e0e0e0; /* visible border */
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  align-items: center;
+}
+
 .team-photo {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
+  border-radius: 10px;
+  margin-right: 16px;
+}
+
+.team-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.team-info p {
+  margin: 4px 0;
+}
+
+.team-info a {
+  color: #1a0dab;
+  text-decoration: none
 }
 
 .team-table tr:hover {

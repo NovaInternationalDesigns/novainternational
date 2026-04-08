@@ -4,86 +4,72 @@ import "./CSS/about.css";
 const About = () => {
   return (
     <div className="about-page">
-      <p><img src="images/logo2.png" alt="Nova International Designs Logo"></img></p>
-      <p className="red-text">
-        Nova International Designs Corporation is a NO Show Business and is not directly or indirectly NOT linked with Video gaming or entertainment digitalization  and we do not accept any bitcoins or crypto or money with QR code scanning's
+      <p>
+        <img src="images/logo2.png" alt="Nova International Designs Logo" />
       </p>
 
       <p className="red-text">
-        We will only accept payments via credit or debit cards and by legal bank to bank wire transfers
+        Nova International Designs Corporation is a NO Show Business and is not directly or indirectly linked with video gaming or entertainment digitalization. We do not accept any bitcoins, crypto, or QR code payments.
+      </p>
+
+      <p className="red-text">
+        Payments are accepted only via credit/debit cards or legal bank-to-bank wire transfers.
       </p>
 
       <p>
-        Nova International Designs Corporation is in Naperville, Illinois and is a women owned Business  with Various Business line including Fashion and Electronics and more.
+        Nova International Designs Corporation is located in Naperville, Illinois and is a women-owned business with various lines including Fashion, Electronics, and more.
       </p>
 
       <p>
-        The company strictly focusing on consumer lifestyle and luxury goods with quality checks and is a NO SHOW Business and is Directly or indirectly not linked with any video gaming or digital money market  and does not accept crypto and Bitcoins and does not Offer QR code based transactions.
-      </p>
-
-      <p>
-        Identifying the perfect supplier for your business requirements is always considered to be the most critical for the success in any business. Considering multiple factors such as cost, quality, consistency, on-time delivery, meeting regulations, compliances, and much more.
-      </p>
-
-      <p>
-        As a sourcing partner, we help businesses meet their requirements at guaranteed competitive prices.
-      </p>
-
-      <p>
-       Nova Chocolates with Nova International Designs Corporation collection offers a sophisticated gourmet option for high-end Corporate gifting and special occasions
-      </p>
-      <p>
-        Nova International Designs Corporation is a Business to Business with it's Buying Office in Naperville, IL .
-      </p>
-
-      <p>
-        Contact Information: For Business inquiries or Questions you can email at: ritika@novainternationaldesigns.com
+        The company focuses on consumer lifestyle and luxury goods with quality checks. It is a NO SHOW Business and is not linked with any video gaming or digital money markets. Crypto, Bitcoin, and QR code transactions are not accepted.
       </p>
 
       <h2 className="team-heading">Meet The Team</h2>
 
-      <table className="team-table">
-        <thead>
-          <tr>
-            <th>Photo</th>
-            <th>Name</th>
-            <th>Role</th>
-            <th>Profile</th>
-            <th>Linked In</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <img src="images/Ritika-photo.JPG" alt="Ritika" className="team-photo" />
-            </td>
-            <td>Ritika</td>
-            <td>Founder and Owner for Nova International Designs Corporation</td>
-            <td>Ritika has over 15 plus years experience in Various Business lines and has completed her Masters Degree in International Business Management .</td>
-            <td>Linked In : https://www.linkedin.com/in/ritika-aurora-81797b35</td>
-          </tr>
+      <div className="team-member">
+        <img src="images/Ritika-photo.JPG" alt="Ritika" className="team-photo" />
+        <div className="team-info">
+          <p><strong>Name:</strong> Ritika</p>
+          <p><strong>Designation:</strong> Founder and Owner</p>
+          <p><strong>Experience:</strong> Over 15 years in various business lines, Master's in International Business Management</p>
+          <p>
+            <strong>LinkedIn:</strong>{" "}
+            <a href="https://www.linkedin.com/in/ritika-aurora-81797b35" target="_blank" >
+              Visit Profile
+            </a>
+          </p>
+        </div>
+      </div>
 
-          <tr>
-            <td>
-              <img src="/images/Shila-photo.jpeg" alt="Shila Pattewar" className="team-photo" />
-            </td>
-            <td>Shila Pattewar</td>
-            <td>Software Developer</td>
-            <td>Shila has extensive experience in software development and has contributed to various projects within Nova International Designs Corporation.</td>
-            <td>Linked In : https://www.linkedin.com/in/shila-front-end-developer/ </td>
-          </tr>
+      <div className="team-member">
+        <img src="images/Shila-photo.jpeg" alt="Shila Pattewar" className="team-photo" />
+        <div className="team-info">
+          <p><strong>Name:</strong> Shila Pattewar</p>
+          <p><strong>Designation:</strong> Software Developer</p>
+          <p><strong>Experience:</strong> Extensive experience in software development and contributed to various projects at Nova International Designs Corporation</p>
+          <p>
+            <strong>LinkedIn:</strong>{" "}
+            <a href="https://www.linkedin.com/in/shila-front-end-developer/" target="_blank" >
+              Visit Profile
+            </a>
+          </p>
+        </div>
+      </div>
 
-          <tr>
-            <td>
-              <img src="/images/Kmohana-photo.jpg" alt="Krishna Mohana" className="team-photo" />
-            </td>
-            <td>Krishna Mohana</td>
-            <td>Cyber Security Engineer</td>
-            <td>Krishna has extensive experience in cyber security and that helps ensure the safety and security in Nova International Designs Corporation.</td>
-            <td>Linked In : https://www.linkedin.com/in/mohana-krishna-chaganti-914823249</td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="team-member">
+        <img src="images/Kmohana-photo.jpg" alt="Krishna Mohana" className="team-photo" />
+        <div className="team-info">
+          <p><strong>Name:</strong> Krishna Mohana</p>
+          <p><strong>Designation:</strong> Cyber Security Engineer</p>
+          <p><strong>Experience:</strong> Experience in cyber security ensuring safety and security at Nova International Designs Corporation</p>
+          <p>
+            <strong>LinkedIn:</strong>{" "}
+            <a href="https://www.linkedin.com/in/mohana-krishna-chaganti-914823249" target="_blank" >
+              Visit Profile
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
