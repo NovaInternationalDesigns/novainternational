@@ -13,7 +13,7 @@ const CATEGORY_SUBCATEGORY_MAP = {
 const AVAILABLE_SIZES = ["S", "M", "L"];
 
 function AdminProducts() {
-  const { token } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -54,11 +54,7 @@ function AdminProducts() {
   }, []);
 
   const authHeaders = () => {
-    const headers = { "Content-Type": "application/json" };
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-    return headers;
+    return { "Content-Type": "application/json" };
   };
 
   const resetForm = () => {
@@ -83,6 +79,13 @@ function AdminProducts() {
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleRemoveImage = (index) => {
+  setFormState((prev) => ({
+    ...prev,
+    images_public_id: prev.images_public_id.filter((_, i) => i !== index),
+    }));
+    };
+
   const handleUploadImage = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -94,7 +97,7 @@ function AdminProducts() {
     try {
       const res = await fetch(`${apiUrl}/api/upload`, {
         method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: "include",
         body: formData,
       });
       const data = await res.json();
@@ -156,7 +159,8 @@ function AdminProducts() {
     try {
       const res = await fetch(url, {
         method,
-        headers: authHeaders(),
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -193,7 +197,7 @@ function AdminProducts() {
     try {
       const res = await fetch(`${apiUrl}/api/products/${productId}`, {
         method: "DELETE",
-        headers: authHeaders(),
+        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Delete failed");
@@ -247,6 +251,7 @@ function AdminProducts() {
             name="subcategory"
             value={formState.subcategory}
             onChange={handleInputChange}
+            required
           >
             <option value="">Select Subcategory (Optional)</option>
             {formState.category && CATEGORY_SUBCATEGORY_MAP[formState.category]?.map((subcat) => (
@@ -344,14 +349,37 @@ function AdminProducts() {
 
           {formState.images_public_id.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-              {formState.images_public_id.map((imageValue, idx) => (
-                <img
-                  key={idx}
-                  src={getImageUrl(imageValue)}
-                  alt={`upload-${idx}`}
-                  style={{ width: "90px", height: "90px", objectFit: "cover", borderRadius: "6px" }}
-                />
-              ))}
+                {formState.images_public_id.map((imageValue, idx) => (
+                <div key={idx} style={{ position: "relative" }}>
+                    <img
+                    src={getImageUrl(imageValue)}
+                    alt={`upload-${idx}`}
+                    style={{ width: "90px", height: "90px", objectFit: "cover", borderRadius: "6px" }}
+                    />
+                    {/* Remove Button */}
+                    <button
+                    type="button"
+                    onClick={() => handleRemoveImage(idx)}
+                    style={{
+                        position: "absolute",
+                        top: "-6px",
+                        right: "-6px",
+                        background: "#c00",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "50%",
+                        width: "20px",
+                        height: "20px",
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                        lineHeight: "18px",
+                        padding: 0,
+                    }}
+                    >
+                    ×
+                    </button>
+                </div>
+                ))}
             </div>
           )}
 

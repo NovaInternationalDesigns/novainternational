@@ -3,39 +3,15 @@ import React, { createContext, useState, useEffect } from "react";
 
 export const UserContext = createContext();
 
-const getSavedToken = () => {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem("nova_jwt_token");
-};
-
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(getSavedToken);
   const [loading, setLoading] = useState(true);
-
-  const saveToken = (newToken) => {
-    setToken(newToken);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("nova_jwt_token", newToken);
-    }
-  };
-
-  const clearToken = () => {
-    setToken(null);
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem("nova_jwt_token");
-    }
-  };
 
   // Fetch current logged-in user from backend
   const fetchUser = async () => {
-    const storedToken = token || getSavedToken();
-    const headers = storedToken ? { Authorization: `Bearer ${storedToken}` } : {};
-
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
         credentials: "include", // important for cookies
-        headers,
       });
 
       if (res.ok) {
@@ -76,21 +52,14 @@ export const UserProvider = ({ children }) => {
       }
 
       const data = await res.json();
-      if (data.token) {
-        saveToken(data.token);
-      }
-      return { user: data.user || null, token: data.token || null };
+      return { user: data.user || null };
     } catch (err) {
       throw new Error(err.message || "Signup failed");
     }
   };
 
   // Sign in: fetch user from /me
-  const signIn = async (userData, tokenData) => {
-    if (tokenData) {
-      saveToken(tokenData);
-    }
-
+  const signIn = async (userData) => {
     if (userData) {
       setUser(userData);
       setLoading(false);
@@ -111,7 +80,6 @@ export const UserProvider = ({ children }) => {
       console.error("Logout error:", err);
     } finally {
       setUser(null);
-      clearToken();
       window.location.href = "/";
     }
   };
@@ -122,7 +90,7 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, token, signUp, signIn, signOut, loading }}>
+    <UserContext.Provider value={{ user, signUp, signIn, signOut, loading }}>
       {children}
     </UserContext.Provider>
   );
