@@ -149,15 +149,20 @@
 }
 
 .signout-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-weight: bold;
+  padding: 10px 15px;
+  font-size: 14px;
+  border-radius: 5px;
   cursor: pointer;
+  border: none;
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: bold;
+  transition: background-color 0.2s;
 }
 
 .signout-btn:hover {
-  color: #ff6b6b;
+  color: #ffffff;
+  background-color: #ff6b6b;
 }
 
 /* ---------------- Hamburger ---------------- */
@@ -263,6 +268,6 @@
 
   /* Cart */
   .cart-count {
-    padding: 14px;
+    margin: 30px;
   }
 }

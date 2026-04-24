@@ -1,7 +1,7 @@
 import React from "react";
 
 const SignOutButton = ({ onSignOut }) => {
-  return <button onClick={onSignOut}>Sign Out</button>;
+  return <button className="signout-btn" onClick={onSignOut}>Sign Out</button>;
 };
 
 export default SignOutButton;
