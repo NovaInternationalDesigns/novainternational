@@ -18,7 +18,7 @@ function PurchaseOrder() {
   
   // Allow access if user OR guest is logged in
   if (!user && !guest) {
-    alert("Please log in or proceed as guest");
+    // alert("Please log in or proceed as guest");
     navigate("/signin");
     return null;
   }

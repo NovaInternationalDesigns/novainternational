@@ -24,7 +24,7 @@ function ProductDetails() {
   const [validationError, setValidationError] = useState("");
   const [showPopup, setShowPopup] = useState(false);
 
-  // ✅ SAFE IMAGE HELPER
+  //  SAFE IMAGE HELPER
   const getSafeImage = (image_public_id) => {
     if (!image_public_id) return null;
     if (Array.isArray(image_public_id)) {
@@ -60,12 +60,12 @@ function ProductDetails() {
         if (!res.ok) throw new Error("Product not found");
 
         const data = await res.json();
-
-        console.log("✅ Product Fetched:", {
-          name: data.name,
-          images_public_id: data.images_public_id,
-          images_count: data.images_public_id?.length || 0
-        });
+        
+        // console.log(" Product Fetched:", {
+        //   name: data.name,
+        //   images_public_id: data.images_public_id,
+        //   images_count: data.images_public_id?.length || 0
+        // });
 
         const variants = data.variants || [];
         const colors =
@@ -271,7 +271,7 @@ function ProductDetails() {
 
   const handleAddToPO = async () => {
     if (!user && !guest) {
-      alert("Please log in or proceed as guest");
+      // alert("Please log in or proceed as guest");
       navigate("/signin");
       return;
     }
@@ -302,10 +302,13 @@ function ProductDetails() {
       const ownerId = user?._id || guest?._id;
       const endpoint = `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`;
 
+      const isProd = !window.location.hostname.includes('localhost') &&
+                    !window.location.hostname.includes('127.0.0.1');
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        credentials: isProd ? 'include' : 'omit',
         body: JSON.stringify({ items: poData }),
       });
 
@@ -351,8 +354,6 @@ function ProductDetails() {
         </div>
       </div>
 
-
-
       <div className="info-section">
         <h1>
           {(() => {
@@ -370,7 +371,7 @@ function ProductDetails() {
         </h1>
         <p className="style-no">Style No: {selectedVariant?.styleNo || product.styleNo}</p>
         <h2 className="price">USD {selectedVariant?.price ?? product.price}</h2>
-        <p className="category">{product.category}</p>
+        {/* <p className="category">{product.category}</p> */}
         <p className="description">{product.description || "N/A"}</p>
 
         {getVariantColors().length > 0 && (
@@ -456,8 +457,7 @@ function ProductDetails() {
             </div>
           </div>
         )}
-
-       
+   
         <div className="action-buttons">
           {!showAddedBar && (
             <button className="add-po-btn" onClick={handleAddToPO}>
@@ -476,7 +476,7 @@ function ProductDetails() {
 
         {showAddedBar && (
           <div className="action-buttons">
-            <button onClick={() => navigate("/purchase-order/form")}>
+            <button onClick={() => navigate("/checkout")}>
               View Purchase Order
             </button>
             <button onClick={() => navigate("/")}>Continue Shopping</button>
