@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+/* =========================
+   SUMMARY / RIGHT PANEL
+========================= */
+
 .summary-row {
   display: flex;
   justify-content: space-between;
@@ -16,8 +20,8 @@
 .checkout-summary-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 0;
+  gap: 12px;
+  padding: 10px 0;
   border-bottom: 1px solid #ececec;
 }
 
@@ -35,27 +39,22 @@
   min-width: 0;
 }
 
-.checkout-summary-name,
-.checkout-summary-meta,
-.checkout-summary-line-total {
-  margin: 0;
-}
-
 .checkout-summary-name {
   font-size: 14px;
   font-weight: 600;
+  margin: 0;
 }
 
 .checkout-summary-meta {
   font-size: 12px;
   color: #666;
-  margin-top: 2px;
 }
 
 .checkout-summary-line-total {
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
+  margin-left: auto;
 }
 
 .checkout-summary-actions {
@@ -98,12 +97,20 @@
   font-size: 14px;
 }
 
+/* =========================
+   TOTAL SECTION
+========================= */
+
 .grand-total {
   font-size: 18px;
   font-weight: bold;
   margin-top: 15px;
   text-align: right;
 }
+
+/* =========================
+   FORM INPUTS
+========================= */
 
 .input-row {
   display: flex;
@@ -122,7 +129,9 @@
   margin-top: 10px;
 }
 
-.po-left textarea {
+/* Inputs */
+.po-left input,
+.po-left select {
   width: 100%;
   padding: 10px;
   margin-top: 5px;
@@ -130,29 +139,16 @@
   border: 1px solid #bbb;
   border-radius: 6px;
   font-size: 16px;
-  resize: vertical;
+  background: #fff;
 }
 
-.po-left textarea:focus {
-  border-color: #000000;
+.po-left input:focus,
+.po-left select:focus {
+  border-color: #000;
   outline: none;
 }
 
-.po-left input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  border: 1px solid #bbb;
-  border-radius: 6px;
-  font-size: 16px;
-}
-
-.po-left input:focus {
-  border-color: #000000;
-  outline: none;
-}
-
+/* Textarea */
 .po-left textarea {
   width: 100%;
   padding: 10px;
@@ -167,21 +163,26 @@
 }
 
 .po-left textarea:focus {
-  border-color: #000000;
+  border-color: #000;
   outline: none;
 }
+
+/* =========================
+   BUTTONS
+========================= */
 
 .po-form-section button,
 .po-left button {
   width: auto;
   margin-right: 10px;
-  padding: 14px;
-  background: #000000;
-  color: white;
+  padding: 14px 18px;
+  background: #000;
+  color: #fff;
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   border-radius: 8px;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
 .po-form-section button:hover,
@@ -195,10 +196,25 @@
   cursor: not-allowed;
 }
 
-.po-form-error {
-  color: red;
-  margin-top: 10px;
+/* =========================
+   LAYOUT FIX
+========================= */
+
+.po-container {
+  display: flex;
+  gap: 25px;
+  align-items: flex-start;
 }
+
+.po-left,
+.po-right {
+  flex: 1;
+  min-width: 0;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media (max-width: 1024px) {
   .po-container {
@@ -208,5 +224,9 @@
   .po-left,
   .po-right {
     width: 100%;
+  }
+
+  .checkout-summary-line-total {
+    margin-left: 0;
   }
 }

@@ -401,7 +401,7 @@ export default function Checkout() {
           {error && <p style={{ color: "red" }}>{error}</p>}
 
           <button onClick={handlePayment} disabled={submitting}>
-            {submitting ? "Redirecting..." : "Pay with Stripe"}
+            {submitting ? "Redirecting..." : "Submit Purchase Order"}
           </button>
         </div>
 
