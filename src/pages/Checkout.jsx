@@ -1,262 +1,223 @@
-import React, { useEffect, useState, useContext, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import "./CSS/checkout.css";
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useMemo,
+} from "react";
+import { useNavigate } from "react-router-dom";
 
+import "./CSS/checkout.css";
 import { usePO } from "../context/PurchaseOrderContext.jsx";
 import { useGuest } from "../context/GuestContext.jsx";
 import { UserContext } from "../context/UserContext.jsx";
 
-const TAX_RATE = 0.11; // 11% tax rate
-const PROCESSING_FEE_RATE = 0.05; // 5% of subtotal
-// const SHIPPING_FLAT = 15;
-// const FREE_SHIPPING_THRESHOLD = 500;
+const TAX_RATE = 0.11;
+const PROCESSING_FEE_RATE = 0.05;
 
 const getQty = (item) => Number(item.qty ?? item.quantity ?? 0);
 const getPrice = (item) => Number(item.price ?? item.unitPrice ?? 0);
 
-const Checkout = () => {
-  const location = useLocation();
+const safeStringify = (obj) =>
+  JSON.stringify(obj, (_, value) =>
+    typeof value === "bigint" ? value.toString() : value
+  );
+
+export default function Checkout() {
   const navigate = useNavigate();
 
   const { guest } = useGuest();
   const { user, loading } = useContext(UserContext);
-  const { purchaseOrderId, poItems, removeFromPO, updatePOItemQty } = usePO();
+  const {
+    poItems,
+    clearPO,
+    removeFromPO,
+    updatePOItemQty,
+    updatePOItemSize,
+  } = usePO();
 
-  const { items = [], form = {} } = location.state || {};
-  const normalizeOrderItems = (source) =>
-    (source || []).map((item) => ({
-      ...item,
-      qty: item.quantity ?? item.qty ?? 0,
-      _draftKey:
-        item._draftKey ||
-        {
-          productId: item.productId || item.styleNo,
-          color: item.color ?? null,
-          size: item.size ?? null,
-        },
-    }));
+  const [orderData, setOrderData] = useState([]);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const [orderData, setOrderData] = useState(() =>
-    normalizeOrderItems(poItems?.length ? poItems : items)
-  );
+  const [minQtyByProduct, setMinQtyByProduct] = useState({});
+  const [sizeOptionsByProduct, setSizeOptionsByProduct] = useState({});
 
+  // ---------------- AUTH ----------------
+  useEffect(() => {
+    if (!loading) {
+      if (!user && !guest) navigate("/signin");
+      if (!poItems.length) navigate("/");
+    }
+  }, [user, guest, loading, poItems]);
+
+  // ---------------- LOAD DATA ----------------
+  useEffect(() => {
+    setOrderData(
+      (poItems || []).map((item) => ({
+        ...item,
+        qty: item.quantity ?? item.qty ?? 0,
+      }))
+    );
+  }, [poItems]);
+
+  // ---------------- FETCH PRODUCT DATA ----------------
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const ids = [...new Set((poItems || []).map(i => i.productId))];
+
+        const entries = await Promise.all(
+          ids.map(async (productId) => {
+            const res = await fetch(
+              `${import.meta.env.VITE_API_URL}/api/products/lookup/${productId}`
+            );
+
+            const product = res.ok ? await res.json() : null;
+
+            const sizes =
+              product?.variants?.length > 0
+                ? [...new Set(product.variants.map(v => v.size).filter(Boolean))]
+                : [];
+
+            return [
+              productId,
+              product?.minQty ?? 1,
+              sizes
+            ];
+          })
+        );
+
+        const minQtyMap = {};
+        const sizeMap = {};
+
+        entries.forEach(([id, minQty, sizes]) => {
+          minQtyMap[id] = minQty;
+          sizeMap[id] = sizes;
+        });
+
+        setMinQtyByProduct(minQtyMap);
+        setSizeOptionsByProduct(sizeMap);
+
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (poItems?.length) fetchData();
+  }, [poItems]);
+
+  // ---------------- ITEM CHANGE ----------------
+  const handleItemChange = async (index, field, value) => {
+    const updated = [...orderData];
+    const item = updated[index];
+    const oldValue = item[field];
+
+    item[field] = value;
+    setOrderData([...updated]);
+
+    try {
+      if (field === "size") {
+        await updatePOItemSize({
+          productId: item.productId,
+          color: item.color,
+          size: oldValue,
+          newSize: value,
+        });
+      }
+
+      if (field === "qty") {
+        const minQty = minQtyByProduct[item.productId] || 1;
+        const newQty = Number(value) || 0;
+
+        if (newQty < minQty) {
+          setError(`Minimum quantity is ${minQty}`);
+          updated[index][field] = oldValue;
+          setOrderData([...updated]);
+          return;
+        }
+
+        await updatePOItemQty({
+          productId: item.productId,
+          color: item.color,
+          size: item.size,
+          qty: newQty,
+        });
+
+        setError("");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Update failed");
+    }
+  };
+
+  // ---------------- REMOVE ----------------
+  const handleRemove = async (index) => {
+    const item = orderData[index];
+
+    await removeFromPO({
+      productId: item.productId,
+      color: item.color,
+      size: item.size,
+    });
+
+    setOrderData((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // ---------------- SHIPPING ----------------
   const [shippingInfo, setShippingInfo] = useState({
     email: "",
     firstName: "",
     lastName: "",
-    company: "",
+    phone: "",
     address: "",
     city: "",
-    state: "",
     zip: "",
     country: "",
-    phone: "",
   });
 
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!loading) {
-      if (!user && !guest) navigate("/checkout-guest");
-      if (!items.length && !poItems.length) navigate("/");
-    }
-  }, [user, guest, loading, navigate, items, poItems]);
-
-  useEffect(() => {
-    const source = poItems?.length ? poItems : items;
-    if (source.length) {
-      setOrderData(normalizeOrderItems(source));
-    }
-  }, [poItems, items]);
+  const validateShipping = () => {
+    if (!shippingInfo.firstName.trim()) return "First Name is required";
+    if (!shippingInfo.lastName.trim()) return "Last Name is required";
+    if (!shippingInfo.email.trim()) return "Email is required";
+    if (!shippingInfo.phone.trim()) return "Phone is required";
+    if (!shippingInfo.address.trim()) return "Address is required";
+    if (!shippingInfo.city.trim()) return "City is required";
+    if (!shippingInfo.zip.trim()) return "ZIP is required";
+    if (!shippingInfo.country.trim()) return "Country is required";
+    return null;
+  };
 
   useEffect(() => {
     setShippingInfo((prev) => ({
       ...prev,
-      email: prev.email || form?.email || user?.email || guest?.email || "",
+      email: user?.email || guest?.email || "",
+      firstName: user?.name?.split(" ")[0] || "",
+      lastName: user?.name?.split(" ")[1] || "",
     }));
-  }, [form, user, guest]);
+  }, [user, guest]);
 
-  // ------------------------
-  // CALCULATIONS
-  // ------------------------
+  // ---------------- CALC ----------------
   const subtotal = useMemo(
-    () => orderData.reduce((acc, item) => acc + getQty(item) * getPrice(item), 0),
+    () => orderData.reduce((acc, i) => acc + getQty(i) * getPrice(i), 0),
     [orderData]
   );
 
-  // const shippingCost = subtotal <= 0 ? 0 : subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT;
-  // const estimatedTax = subtotal <= 0 ? 0 : (subtotal + shippingCost) * TAX_RATE;
-  // const total = subtotal + shippingCost + estimatedTax;
+  const tax = subtotal * TAX_RATE;
+  const processingFee = subtotal * PROCESSING_FEE_RATE;
+  const total = subtotal + tax + processingFee;
 
-  const shippingCost = 0;
-  const estimatedTax = subtotal <= 0 ? 0 : subtotal * TAX_RATE;
-  const processingFee = subtotal <= 0 ? 0 : subtotal * PROCESSING_FEE_RATE;
-  const total = subtotal + estimatedTax + processingFee;
+  // ---------------- STRIPE PAYMENT ----------------
+  const handlePayment = async () => {
+  setError("");
 
-  // ------------------------
-  // VALIDATION
-  // ------------------------
-  const validateFields = () => {
-    const errors = {};
+  const validationError = validateShipping();
+  if (validationError) {
+    setError(validationError);
+    return;
+  }
 
-    if (!shippingInfo.email.trim()) {
-      errors.email = "Email is required.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shippingInfo.email.trim())) {
-      errors.email = "Please enter a valid email address.";
-    }
-
-    if (!shippingInfo.firstName.trim()) {
-      errors.firstName = "First name is required.";
-    } else if (!/^[a-zA-Z\s'-]{2,30}$/.test(shippingInfo.firstName)) {
-      errors.firstName = "First name must be 2–30 letters only.";
-    }
-
-    if (shippingInfo.lastName && !/^[a-zA-Z\s'-]{2,30}$/.test(shippingInfo.lastName)) {
-      errors.lastName = "Last name must be 2–30 letters only.";
-    }
-
-    if (!shippingInfo.address.trim()) {
-      errors.address = "Address is required.";
-    } else if (shippingInfo.address.length < 5) {
-      errors.address = "Address is too short.";
-    }
-
-    if (!shippingInfo.city.trim()) {
-      errors.city = "City is required.";
-    }
-
-    if (shippingInfo.state && shippingInfo.state.length < 2) {
-      errors.state = "State must be at least 2 characters.";
-    }
-
-    if (!shippingInfo.zip.trim()) {
-      errors.zip = "ZIP code is required.";
-    } else if (!/^[a-zA-Z0-9\s-]{3,10}$/.test(shippingInfo.zip)) {
-      errors.zip = "Invalid ZIP code format.";
-    }
-
-    if (!shippingInfo.country.trim()) {
-      errors.country = "Country is required.";
-    }
-
-    if (shippingInfo.phone && !/^[0-9+\-\s()]{7,20}$/.test(shippingInfo.phone)) {
-      errors.phone = "Invalid phone number.";
-    }
-
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setShippingInfo((prev) => ({ ...prev, [name]: value }));
-    setFieldErrors((prev) => ({ ...prev, [name]: "" }));
-  };
-
-  const handleQtyChange = async (index, value) => {
-    const nextQty = Math.max(1, Number(value) || 1);
-    const targetItem = orderData[index];
-    if (!targetItem) return;
-
-    // Prefer the original draft key (set in PurchaseOrderForm) so the server
-    // UPDATE matches the stored productId/color/size even if the user edited
-    // those fields in the form before proceeding to checkout.
-    const updateKey = targetItem._draftKey ?? {
-      productId: targetItem.productId || targetItem.styleNo,
-      color: targetItem.color || null,
-      size: targetItem.size || null,
-    };
-
-    const previousQty = getQty(targetItem);
-
-    setOrderData((prev) =>
-      prev.map((item, i) =>
-        i === index
-          ? {
-              ...item,
-              qty: nextQty,
-              quantity: nextQty,
-            }
-          : item
-      )
-    );
-
-    try {
-      const updatedItems = await updatePOItemQty({
-        ...updateKey,
-        qty: nextQty,
-      });
-
-      if (Array.isArray(updatedItems)) {
-        setOrderData(
-          updatedItems.map((item) => ({
-            ...item,
-            qty: item.quantity ?? item.qty ?? 0,
-          }))
-        );
-      }
-
-      setError("");
-    } catch (err) {
-      setOrderData((prev) =>
-        prev.map((item, i) =>
-          i === index
-            ? {
-                ...item,
-                qty: previousQty,
-                quantity: previousQty,
-              }
-            : item
-        )
-      );
-      setError(err.message || "Failed to update quantity");
-    }
-  };
-
-  const handleRemoveItem = async (index) => {
-    const targetItem = orderData[index];
-    if (!targetItem) return;
-
-    // Prefer the original draft key (set in PurchaseOrderForm) so the server
-    // DELETE matches the stored productId/color/size even if the user edited
-    // those fields in the form before proceeding to checkout.
-    const deleteKey = targetItem._draftKey ?? {
-      productId: targetItem.productId || targetItem.styleNo,
-      color: targetItem.color || null,
-      size: targetItem.size || null,
-    };
-
-    const previousItems = orderData;
-    setOrderData((prev) => prev.filter((_, i) => i !== index));
-
-    try {
-      const updatedItems = await removeFromPO(deleteKey);
-
-      if (Array.isArray(updatedItems)) {
-        setOrderData(
-          updatedItems.map((item) => ({
-            ...item,
-            qty: item.quantity ?? item.qty ?? 0,
-          }))
-        );
-      }
-
-      setError("");
-    } catch (err) {
-      setOrderData(previousItems);
-      setError(err.message || "Failed to remove item");
-    }
-  };
-
-  // ------------------------
-  // CHECKOUT
-  // ------------------------
-  const handleStripeCheckout = async () => {
-    setError("");
-
-    if (!validateFields()) return;
+  setSubmitting(true);
 
   try {
     const payload = {
@@ -270,269 +231,181 @@ const Checkout = () => {
       ownerType: user ? "User" : "Guest",
     };
 
-    try {
-      const sessionRes = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            items: orderData,
-            purchaseOrderId,
-            shippingCost,
-            estimatedTax,
-            Processing_Fee: processingFee,
-            subtotal,
-            totalAmount: total,
-            shippingInfo,
-            form: {
-              ...form,
-              email: shippingInfo.email,
-            },
-            ownerType: guest ? "Guest" : "User",
-            ownerId: guest?._id || user?._id,
-            guestSessionId: guest?.sessionId || null,
-          }),
-        }
-      );
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/payment/create-checkout-session`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: safeStringify(payload),
+      }
+    );
 
-      const sessionData = await sessionRes.json();
-      if (!sessionRes.ok)
-        throw new Error(sessionData.error || "Stripe session creation failed");
+    const data = await res.json();
 
-      window.location.assign(sessionData.url);
-    } catch (err) {
-      setError(err.message || "Checkout failed");
-      setSubmitting(false);
+    if (!res.ok) {
+      throw new Error(data.error || "Stripe session creation failed");
     }
-  };
+
+    if (!data.url) {
+      throw new Error("Stripe URL not returned from backend");
+    }
+
+    // IMPORTANT: redirect first
+    window.location.href = data.url;
+
+  } catch (err) {
+    setError(err.message);
+    setSubmitting(false);
+  }
+};
 
   if (loading) return null;
-  if (!user && !guest) return null;
+
+  const countries = ["United States","Canada","United Kingdom","Australia","India"];
 
   return (
-    <div className="purchase-order-form">
-      <h2>Checkout</h2>
+    <div className="checkout-page">
+
+      <div className="business-log-purchase">
+        <img src="/images/logo.png" alt="Company Logo" />
+      </div>
+
+      <table className="po-table">
+        <thead>
+          <tr>
+            <th>Style No</th>
+            <th>Description</th>
+            <th>Size</th>
+            <th>Color</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {orderData.map((item, index) => (
+            <tr key={index}>
+              <td><input value={item.styleNo || "N/A"} readOnly /></td>
+              <td><input value={item.description || item.name} readOnly /></td>
+
+              <td>
+                <input
+                  value={item.size || "N/A"}
+                  onChange={(e) =>
+                    handleItemChange(index, "size", e.target.value)
+                  }
+                />
+              </td>
+
+              <td><input value={item.color || "N/A"} readOnly /></td>
+
+              <td>
+                <input
+                  type="number"
+                  value={getQty(item)}
+                  onChange={(e) =>
+                    handleItemChange(index, "qty", e.target.value)
+                  }
+                />
+              </td>
+
+              <td><input value={getPrice(item)} readOnly /></td>
+
+              <td>{(getQty(item) * getPrice(item)).toFixed(2)}</td>
+
+              <td>
+                <button onClick={() => handleRemove(index)}>X</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       <div className="po-container">
-        <div className="po-left po-form-section">
-          <h3>Shipping Details</h3>
 
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
+        <div className="po-left">
+          <h3>Shipping Information</h3>
+
+          <input placeholder="First Name"
+            value={shippingInfo.firstName}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, firstName: e.target.value })} />
+
+          <input placeholder="Last Name"
+            value={shippingInfo.lastName}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, lastName: e.target.value })} />
+
+          <input placeholder="Email"
             value={shippingInfo.email}
-            onChange={handleInputChange}
-          />
-          {fieldErrors.email && (
-            <p className="field-error">{fieldErrors.email}</p>
-          )}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, email: e.target.value })} />
 
-          <div className="input-row">
-            <div>
-              <input
-                name="firstName"
-                placeholder="First Name"
-                value={shippingInfo.firstName}
-                onChange={handleInputChange}
-              />
-              {fieldErrors.firstName && (
-                <p className="field-error">{fieldErrors.firstName}</p>
-              )}
-            </div>
-
-            <div>
-              <input
-                name="lastName"
-                placeholder="Last Name"
-                value={shippingInfo.lastName}
-                onChange={handleInputChange}
-              />
-              {fieldErrors.lastName && (
-                <p className="field-error">{fieldErrors.lastName}</p>
-              )}
-            </div>
-          </div>
-
-          <input
-            name="company"
-            placeholder="Company"
-            value={shippingInfo.company}
-            onChange={handleInputChange}
-          />
-
-          <textarea
-            name="address"
-            placeholder="Address"
-            value={shippingInfo.address}
-            onChange={handleInputChange}
-          />
-          {fieldErrors.address && (
-            <p className="field-error">{fieldErrors.address}</p>
-          )}
-
-          <div className="input-row">
-            <div>
-              <input
-                name="city"
-                placeholder="City"
-                value={shippingInfo.city}
-                onChange={handleInputChange}
-              />
-              {fieldErrors.city && (
-                <p className="field-error">{fieldErrors.city}</p>
-              )}
-            </div>
-
-            <div>
-              <input
-                name="state"
-                placeholder="State"
-                value={shippingInfo.state}
-                onChange={handleInputChange}
-              />
-              {fieldErrors.state && (
-                <p className="field-error">{fieldErrors.state}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="input-row">
-            <div>
-              <input
-                name="zip"
-                placeholder="ZIP Code"
-                value={shippingInfo.zip}
-                onChange={handleInputChange}
-              />
-              {fieldErrors.zip && (
-                <p className="field-error">{fieldErrors.zip}</p>
-              )}
-            </div>
-
-            <div>
-              <input
-                name="country"
-                placeholder="Country"
-                value={shippingInfo.country}
-                onChange={handleInputChange}
-              />
-              {fieldErrors.country && (
-                <p className="field-error">{fieldErrors.country}</p>
-              )}
-            </div>
-          </div>
-
-          <input
-            name="phone"
-            placeholder="Phone"
+          <input placeholder="Phone"
             value={shippingInfo.phone}
-            onChange={handleInputChange}
-          />
-          {fieldErrors.phone && (
-            <p className="field-error">{fieldErrors.phone}</p>
-          )}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, phone: e.target.value })} />
+
+          <input placeholder="Address"
+            value={shippingInfo.address}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, address: e.target.value })} />
+
+          <input placeholder="City"
+            value={shippingInfo.city}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, city: e.target.value })} />
+
+          <input placeholder="ZIP"
+            value={shippingInfo.zip}
+            onChange={(e) => setShippingInfo({ ...shippingInfo, zip: e.target.value })} />
+
+          <select
+            value={shippingInfo.country}
+            onChange={(e) =>
+              setShippingInfo({ ...shippingInfo, country: e.target.value })
+            }
+          >
+            <option value="">Select Country</option>
+            {countries.map(c => <option key={c}>{c}</option>)}
+          </select>
         </div>
 
-        <div className="po-right po-form-section">
-          <h3>Purchase Order Summary</h3>
+        <div className="po-right">
+          <h3>Summary</h3>
 
-          {!orderData.length && (
-            <p className="checkout-empty-summary">No items in checkout summary.</p>
-          )}
+          {orderData.map((item, index) => (
+            <div key={index}>
+              
+              {/* ✅ ADDED IMAGE ONLY */}
+              <img
+                src={item.image || item.images?.[0] || "/images/placeholder.png"}
+                alt={item.name || "Product"}
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  objectFit: "cover",
+                  borderRadius: "5px",
+                  marginBottom: "5px",
+                  border: "1px solid #ccc",
+                }}
+              />
 
-          <div className="checkout-summary-items">
-            {orderData.map((item, idx) => {
-              const qty = getQty(item);
-              const imageSrc =
-                item.image ||
-                item.imageUrl ||
-                item.thumbnail ||
-                item.images_public_id?.[0] ||
-                "/images/no-image.png";
-              const productName = item.name || item.description || "Product";
+              <p>{item.name}</p>
+              <p>{getQty(item)} x {getPrice(item)}</p>
+            </div>
+          ))}
 
-              return (
-                <div className="checkout-summary-item" key={`${item.productId || item.styleNo || productName || "item"}-${idx}`}>
-                  <img
-                    src={imageSrc}
-                    alt={productName}
-                    className="checkout-summary-thumb"
-                  />
+          <p>Subtotal: ${subtotal.toFixed(2)}</p>
+          <p>Tax: ${tax.toFixed(2)}</p>
+          <p>Fee: ${processingFee.toFixed(2)}</p>
 
-                  <div className="checkout-summary-details">
-                    <p className="checkout-summary-name">{productName}</p>
-                    <div className="checkout-summary-actions">
-                      <label className="checkout-qty-wrap">
-                        <span className="checkout-summary-meta">Qty</span>
-                        <input
-                          id={`checkout-qty-${idx}`}
-                          name={`checkoutQty-${idx}`}
-                          type="number"
-                          min="1"
-                          value={qty}
-                          onChange={(e) => handleQtyChange(idx, e.target.value)}
-                          className="checkout-qty-input"
-                        />
-                      </label>
+          <h3>Total: ${total.toFixed(2)}</h3>
 
-                      <button
-                        type="button"
-                        className="checkout-remove-btn"
-                        onClick={() => handleRemoveItem(idx)}>X</button>
-                    </div>
-                  </div>
+          {error && <p style={{ color: "red" }}>{error}</p>}
 
-                  <p className="checkout-summary-line-total">
-                    ${(qty * getPrice(item)).toFixed(2)}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="summary-row">
-            <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
-          </div>
-
-          {/* <div className="summary-row">
-            <span>Shipping</span>
-            <span>${shippingCost.toFixed(2)}</span>
-          </div> */}
-
-          <div className="summary-row">
-            <span>Estimated Tax</span>
-            <span>${estimatedTax.toFixed(2)}</span>
-          </div>
-
-          <div className="summary-row">
-          <span>Processing Fee</span>
-          <span>${processingFee.toFixed(2)}</span>
-          </div>
-
-          <hr />
-
-          <div className="grand-total">
-            <strong>Total: ${total.toFixed(2)}</strong>
-          </div>
-
-          {error && <p className="po-form-error">{error}</p>}
-
-          <button
-            type="button"
-            onClick={handleStripeCheckout}
-            disabled={submitting || !orderData.length}
-          >
-            {submitting ? "Redirecting..." : "Confirm Purchase Order"}
+          <button onClick={handlePayment} disabled={submitting}>
+            {submitting ? "Redirecting..." : "Pay with Stripe"}
           </button>
         </div>
 
       </div>
     </div>
   );
-};
-
-export default Checkout;
+}
