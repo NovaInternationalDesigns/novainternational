@@ -11,7 +11,7 @@ const TOP_LINKS = [
   { title: "About Us", path: "/about" },
   { title: "Gift Cards", path: "#" },
   { title: "Sign In", path: "/signin" },
-  { title: "Contact Us", path: "/contact" },
+  // { title: "Contact Us", path: "/contact" },
   { title: "Careers", path: "/careers" },
 ];
 

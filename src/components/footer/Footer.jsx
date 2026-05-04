@@ -8,31 +8,22 @@ const Footer = () => {
       <div className="footer-container">
 
         <div className="footer-col">
-          <h4>Customer Service</h4>
+          <h4>Customer Support</h4>
           <ul>
-            {/* <li><a href="CookiePolicy">Cookie Policy</a></li> */}
-            <li><a href="/PrivacyNotice">Privacy Notice</a></li>
-            <li><a href="/LegalNotice">Legal Notice</a></li>
-            <li><a href="/TermsConditions">Terms & Conditions</a></li>
-          </ul>
-        </div>
-
-        <div className="footer-col">
-          <h4>My Account</h4>
-          <ul>
-            <li><a href="/signin">Sign In</a></li>         
-            <li><a href="#">Gift Cards</a></li>
-           
-          </ul>
-        </div>
-
-        <div className="footer-col">
-          <h4>Company</h4>
-          <ul>
-            <li><a href="/about">About Us</a></li>
-            <li><a href="/careers">Careers</a></li>
             <li><a href="/contact">Contact Us</a></li>
           </ul>
+        </div>
+
+        <div className="footer-col">
+          <h4><a href="/PrivacyNotice">Privacy Notice</a></h4>
+        </div>
+
+        <div className="footer-col">
+          <h4><a href="/LegalNotice">Legal Notice</a></h4>
+        </div>
+
+        <div className="footer-col">
+           <h4><a href="/TermsConditions">Terms & Conditions</a></h4>
         </div>
       </div>
 

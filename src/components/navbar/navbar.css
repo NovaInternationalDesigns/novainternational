@@ -183,6 +183,8 @@
   .top-nav .container {
     flex-direction: column;
     padding: 10px 16px;
+    display: none;
+
   }
 
   .top-nav ul {

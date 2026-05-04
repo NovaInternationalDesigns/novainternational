@@ -19,8 +19,8 @@
   max-width: 1200px;
   margin: auto;
   display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 80px;
+  grid-template-columns: repeat(4,1fr);
+  gap: 60px;
   margin-bottom: 20px;
 }
 
@@ -74,6 +74,7 @@
   .footer-container {
     grid-template-columns: 1fr;
     text-align: center;
+    gap: 0px;
   }
 
   .footer-bottom {
