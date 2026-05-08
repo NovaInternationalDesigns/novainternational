@@ -10,12 +10,15 @@ import "./CSS/checkout.css";
 import { usePO } from "../context/PurchaseOrderContext.jsx";
 import { useGuest } from "../context/GuestContext.jsx";
 import { UserContext } from "../context/UserContext.jsx";
+import { getImageUrl } from "../utils/getImageUrl.js";
 
 const TAX_RATE = 0.11;
 const PROCESSING_FEE_RATE = 0.05;
 
 const getQty = (item) => Number(item.qty ?? item.quantity ?? 0);
 const getPrice = (item) => Number(item.price ?? item.unitPrice ?? 0);
+const getRowKey = (item) =>
+  item._id || `${item.productId || ""}-${item.color || ""}-${item.size || ""}`;
 
 const safeStringify = (obj) =>
   JSON.stringify(obj, (_, value) =>
@@ -34,6 +37,7 @@ export default function Checkout() {
     updatePOItemQty,
     updatePOItemSize,
     updatePOItemColor,
+    refreshPO,
   } = usePO();
 
   const [orderData, setOrderData] = useState([]);
@@ -43,6 +47,7 @@ export default function Checkout() {
   const [minQtyByProduct, setMinQtyByProduct] = useState({});
   const [sizeOptionsByProduct, setSizeOptionsByProduct] = useState({});
   const [colorOptionsByProduct, setColorOptionsByProduct] = useState({});
+  const [productLookupByKey, setProductLookupByKey] = useState({});
 
   // ---------------- AUTH ----------------
   useEffect(() => {
@@ -86,11 +91,18 @@ export default function Checkout() {
                 ? [...new Set(product.variants.map(v => v.color).filter(Boolean))]
                 : [];
 
+            const variantKeys =
+              product?.variants?.length > 0
+                ? product.variants.map((variant) => variant.productId).filter(Boolean)
+                : [];
+
             return [
               productId,
               product?.minQty ?? 1,
               sizes,
-              colors
+              colors,
+              product,
+              variantKeys,
             ];
           })
         );
@@ -98,17 +110,25 @@ export default function Checkout() {
         const minQtyMap = {};
         const sizeMap = {};
         const colorMap = {};
+        const productMap = {};
 
-        entries.forEach(([id, minQty, sizes, colors]) => {
-          minQtyMap[id] = minQty;
-          sizeMap[id] = sizes;
-          colorMap[id] = colors;
+        entries.forEach(([id, minQty, sizes, colors, product, variantKeys]) => {
+          const addLookupKey = (key) => {
+            if (!key) return;
+            minQtyMap[key] = minQty;
+            sizeMap[key] = sizes;
+            colorMap[key] = colors;
+            if (product) productMap[key] = product;
+          };
+
+          addLookupKey(id);
+          variantKeys.forEach(addLookupKey);
         });
 
         setColorOptionsByProduct(colorMap);
-
         setMinQtyByProduct(minQtyMap);
         setSizeOptionsByProduct(sizeMap);
+        setProductLookupByKey(productMap);
 
       } catch (err) {
         console.error(err);
@@ -119,72 +139,142 @@ export default function Checkout() {
   }, [poItems]);
 
   // ---------------- ITEM CHANGE ----------------
-      const handleItemChange = async (index, field, value) => {
-      const updated = [...orderData];
-      const item = updated[index];
-      const oldValue = item[field];
-
-      item[field] = value;
-      setOrderData([...updated]);
-
-    // ---------------- SIZE UPDATE ----------------
+  const handleItemChange = async (index, field, value) => {
     try {
-      if (field === "size") {
-        await updatePOItemSize({
-          productId: item.productId,
-          color: item.color,
-          size: oldValue,
-          newSize: value,
-        });
-      }
+      const item = orderData[index];
 
       if (field === "color") {
-        await updatePOItemColor({
-          productId: item.productId,
-          color: oldValue,
-          size: item.size,
-          newColor: value,
-        });
-      }
+        const product = productLookupByKey[item.productId] || null;
+        const variants = Array.isArray(product?.variants) ? product.variants : [];
 
-      // ---------------- QTY UPDATE ----------------
-      if (field === "qty") {
-        const minQty = minQtyByProduct[item.productId] || 1;
-        const newQty = Number(value) || 0;
+        const variant =
+          variants.find(
+            (v) =>
+              (v?.color || null) === (value || null) &&
+              (item.size ? (v?.size || null) === (item.size || null) : true)
+          ) || variants.find((v) => (v?.color || null) === (value || null));
 
-        if (newQty < minQty) {
-          setError(`Minimum quantity is ${minQty}`);
-          updated[index][field] = oldValue;
-          setOrderData([...updated]);
-          return;
-        }
+        const resolvedSize = variant?.size ?? item.size;
+        const resolvedStyleNo = variant?.styleNo || product?.styleNo || item.styleNo || "";
+        const resolvedName = String(product?.name || item.name || "").trim();
+        const resolvedDescription = String(
+          variant?.description || product?.description || item.description || item.name || ""
+        ).trim();
+        const resolvedPrice = Number.isFinite(Number(variant?.price))
+          ? Number(variant.price)
+          : Number.isFinite(Number(product?.price))
+          ? Number(product.price)
+          : item.price;
+        const resolvedImage =
+          variant?.images_public_id || variant?.image ||
+          product?.images_public_id?.[0] || item.image || null;
 
-        await updatePOItemQty({
+        const updatedItems = await updatePOItemColor({
           productId: item.productId,
           color: item.color,
           size: item.size,
-          qty: newQty,
+          newColor: value,
+          newSize: resolvedSize !== item.size ? resolvedSize : undefined,
+          newProductId: product?._id ? String(product._id) : undefined,
+          newStyleNo: resolvedStyleNo,
+          newPrice: resolvedPrice,
+          newName: resolvedName,
+          newDescription: resolvedDescription,
+          newImage: resolvedImage,
         });
 
-        setError("");
+        const refreshed = await refreshPO();
+        const refreshedItems = Array.isArray(refreshed) && refreshed.length > 0 ? refreshed : updatedItems;
+
+        if (refreshedItems && refreshedItems.length) {
+          setOrderData(
+            refreshedItems.map((itm) => ({
+              ...itm,
+              qty: itm.quantity ?? itm.qty ?? 0,
+            }))
+          );
+        }
+
+      } else if (field === "size") {
+        const updatedItems = await updatePOItemSize({
+          productId: item.productId,
+          color: item.color,
+          size: item.size,
+          newSize: value,
+        });
+
+        const refreshed = await refreshPO();
+        const refreshedItems = Array.isArray(refreshed) && refreshed.length > 0 ? refreshed : updatedItems;
+
+        if (refreshedItems && refreshedItems.length) {
+          setOrderData(
+            refreshedItems.map((itm) => ({
+              ...itm,
+              qty: itm.quantity ?? itm.qty ?? 0,
+            }))
+          );
+        } else {
+          setOrderData((prev) =>
+            prev.map((itm, i) =>
+              i === index ? { ...itm, size: value } : itm
+            )
+          );
+        }
+
+      } else if (field === "qty") {
+        const updatedItems = await updatePOItemQty({
+          productId: item.productId,
+          color: item.color,
+          size: item.size,
+          qty: Number(value),
+        });
+
+        const refreshed = await refreshPO();
+        const refreshedItems = Array.isArray(refreshed) && refreshed.length > 0 ? refreshed : updatedItems;
+
+        if (refreshedItems && refreshedItems.length) {
+          setOrderData(
+            refreshedItems.map((itm) => ({
+              ...itm,
+              qty: itm.quantity ?? itm.qty ?? 0,
+            }))
+          );
+        } else {
+          setOrderData((prev) =>
+            prev.map((itm, i) =>
+              i === index ? { ...itm, qty: Number(value) } : itm
+            )
+          );
+        }
       }
-    } catch (err) {
-      console.error(err);
-      setError("Update failed");
-    }
-  };
+
+    setError("");
+  } catch (err) {
+    console.error("Failed to update PO item:", err);
+    setError("Failed to update item");
+  }
+};
 
   // ---------------- REMOVE ----------------
   const handleRemove = async (index) => {
     const item = orderData[index];
 
-    await removeFromPO({
+    const updatedItems = await removeFromPO({
       productId: item.productId,
       color: item.color,
       size: item.size,
     });
 
-    setOrderData((prev) => prev.filter((_, i) => i !== index));
+    if (updatedItems) {
+      setOrderData(
+        updatedItems.map((itm) => ({
+          ...itm,
+          qty: itm.quantity ?? itm.qty ?? 0,
+        }))
+      );
+    } else {
+      setOrderData((prev) => prev.filter((_, i) => i !== index));
+    }
   };
 
   // ---------------- SHIPPING ----------------
@@ -343,72 +433,66 @@ export default function Checkout() {
         </thead>
 
         <tbody>
-          {orderData.map((item, index) => (
-            <tr key={index}>
-              <td><input value={item.styleNo || "N/A"} readOnly /></td>
-              <td><input value={item.description || item.name} readOnly /></td>
-
-              <td>
-                {sizeOptionsByProduct[item.productId]?.length > 0 ? (
-                  <select
-                    value={item.size || ""}
+          {orderData.map((item, index) => {
+            return (
+              <tr key={getRowKey(item)}>
+                <td><input value={item.styleNo || "N/A"} readOnly /></td>
+                <td><input value={item.description || item.name} readOnly /></td>
+                <td>
+                  {sizeOptionsByProduct[item.productId]?.length > 0 ? (
+                    <select
+                      value={item.size || ""}
+                      onChange={(e) =>
+                        handleItemChange(index, "size", e.target.value)
+                      }
+                    >
+                      <option value="">Select Size</option>
+                      {sizeOptionsByProduct[item.productId].map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input value={item.size || "N/A"} readOnly />
+                  )}
+                </td>
+                <td>
+                  {colorOptionsByProduct[item.productId]?.length > 0 ? (
+                    <select
+                      value={item.color || ""}
+                      onChange={(e) =>
+                        handleItemChange(index, "color", e.target.value)
+                      }
+                    >
+                      <option value="">Select Color</option>
+                      {colorOptionsByProduct[item.productId].map((color) => (
+                        <option key={color} value={color}>
+                          {color}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input value={item.color || "N/A"} readOnly />
+                  )}
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={getQty(item)}
                     onChange={(e) =>
-                      handleItemChange(index, "size", e.target.value)
+                      handleItemChange(index, "qty", e.target.value)
                     }
-                  >
-                    <option value="">Select Size</option>
-
-                    {sizeOptionsByProduct[item.productId].map((size) => (
-                      <option key={size} value={size}>
-                        {size}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input value={item.size || "N/A"} readOnly />
-                )}
-              </td>
-
-              <td>
-                {colorOptionsByProduct[item.productId]?.length > 0 ? (
-                  <select
-                    value={item.color || ""}
-                    onChange={(e) =>
-                      handleItemChange(index, "color", e.target.value)
-                    }
-                  >
-                    <option value="">Select Color</option>
-
-                    {colorOptionsByProduct[item.productId].map((color) => (
-                      <option key={color} value={color}>
-                        {color}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input value={item.color || "N/A"} readOnly />
-                )}
-              </td>
-
-              <td>
-                <input
-                  type="number"
-                  value={getQty(item)}
-                  onChange={(e) =>
-                    handleItemChange(index, "qty", e.target.value)
-                  }
-                />
-              </td>
-
-              <td><input value={getPrice(item)} readOnly /></td>
-
-              <td>{(getQty(item) * getPrice(item)).toFixed(2)}</td>
-
-              <td>
-                <button onClick={() => handleRemove(index)}>X</button>
-              </td>
-            </tr>
-          ))}
+                  />
+                </td>
+                <td><input value={getPrice(item)} readOnly /></td>
+                <td>{(getQty(item) * getPrice(item)).toFixed(2)}</td>
+                <td>
+                  <button onClick={() => handleRemove(index)}>X</button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
@@ -494,26 +578,26 @@ export default function Checkout() {
           <h3>Summary</h3>
 
           {orderData.map((item, index) => (
-            <div key={index}>
-              
-              {/* ✅ ADDED IMAGE ONLY */}
+          <div key={index}>
               <img
-                src={item.image || item.images?.[0] || "/images/placeholder.png"}
+                src={getImageUrl(item.image)}
                 alt={item.name || "Product"}
                 style={{
                   width: "100px",
                   height: "100px",
-                  objectFit: "contain",
+                  objectFit: "cover",
                   borderRadius: "5px",
                   marginBottom: "5px",
                   border: "1px solid #ccc",
                 }}
               />
-
-              <p>{item.name}</p>
-              <p>{getQty(item)} x {getPrice(item)}</p>
-            </div>
-          ))}
+            <p>Color: {item.color}</p>
+            <p>Size: {item.size || "N/A"}</p>
+            <p>Qty: {getQty(item)}</p>
+            <p>Price: ${getPrice(item)}</p>
+            <p>Total: ${(getQty(item) * getPrice(item)).toFixed(2)}</p>
+          </div>
+        ))}
 
           <p>Subtotal: ${subtotal.toFixed(2)}</p>
           <p>Tax: ${tax.toFixed(2)}</p>

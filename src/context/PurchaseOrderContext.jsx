@@ -45,8 +45,8 @@ export const PurchaseOrderProvider = ({ children }) => {
       _id: i._id,
       productId: i.productId,
       styleNo: i.styleNo || "",
-      name: i.name,
-      description: i.description || "",
+      name: i.name || i.description || "",
+      description: i.description || i.name || "",
       price: i.price,
       quantity: i.qty ?? i.quantity ?? 0,
       color: i.color || null,
@@ -230,6 +230,29 @@ export const PurchaseOrderProvider = ({ children }) => {
     }
   };
 
+  const refreshPO = async () => {
+    const { ownerType, ownerId } = getOwner();
+    if (!ownerType || !ownerId) return null;
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}`,
+        {
+          credentials: "include",
+        }
+      );
+      if (!res.ok) return null;
+
+      const data = await res.json();
+      const items = mapDraftItems(data.items || []);
+      setPoItems(items);
+      return items;
+    } catch (err) {
+      console.error("Failed to refresh PO draft:", err);
+      return null;
+    }
+  };
+
   const updatePOItemQty = async ({
     productId,
     color = null,
@@ -395,9 +418,12 @@ export const PurchaseOrderProvider = ({ children }) => {
     color = null,
     size = null,
     newColor = null,
+    newSize,
     newProductId,
     newStyleNo,
     newPrice,
+    newName,
+    newDescription,
     newImage,
   }) => {
     if (!productId) throw new Error("productId is required");
@@ -424,9 +450,12 @@ export const PurchaseOrderProvider = ({ children }) => {
           color,
           size,
           newColor,
+          newSize,
           newProductId,
           newStyleNo,
           newPrice,
+          newName,
+          newDescription,
           newImage,
         }),
       });
@@ -465,6 +494,7 @@ export const PurchaseOrderProvider = ({ children }) => {
       updatePOItemQty,
       updatePOItemSize,
       updatePOItemColor,
+      refreshPO,
       clearPO,
     }),
     [poItems, purchaseOrderId]
