@@ -38,7 +38,7 @@
 /* ---------- Flex container for left and right form sections ---------- */
 .po-container {
   display: flex;
-  gap: 30px;
+  gap: 100px;
   margin-top: 30px;
 }
 

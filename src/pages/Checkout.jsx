@@ -33,6 +33,7 @@ export default function Checkout() {
     removeFromPO,
     updatePOItemQty,
     updatePOItemSize,
+    updatePOItemColor,
   } = usePO();
 
   const [orderData, setOrderData] = useState([]);
@@ -41,6 +42,7 @@ export default function Checkout() {
 
   const [minQtyByProduct, setMinQtyByProduct] = useState({});
   const [sizeOptionsByProduct, setSizeOptionsByProduct] = useState({});
+  const [colorOptionsByProduct, setColorOptionsByProduct] = useState({});
 
   // ---------------- AUTH ----------------
   useEffect(() => {
@@ -79,21 +81,31 @@ export default function Checkout() {
                 ? [...new Set(product.variants.map(v => v.size).filter(Boolean))]
                 : [];
 
+            const colors =
+              product?.variants?.length > 0
+                ? [...new Set(product.variants.map(v => v.color).filter(Boolean))]
+                : [];
+
             return [
               productId,
               product?.minQty ?? 1,
-              sizes
+              sizes,
+              colors
             ];
           })
         );
 
         const minQtyMap = {};
         const sizeMap = {};
+        const colorMap = {};
 
-        entries.forEach(([id, minQty, sizes]) => {
+        entries.forEach(([id, minQty, sizes, colors]) => {
           minQtyMap[id] = minQty;
           sizeMap[id] = sizes;
+          colorMap[id] = colors;
         });
+
+        setColorOptionsByProduct(colorMap);
 
         setMinQtyByProduct(minQtyMap);
         setSizeOptionsByProduct(sizeMap);
@@ -107,14 +119,15 @@ export default function Checkout() {
   }, [poItems]);
 
   // ---------------- ITEM CHANGE ----------------
-  const handleItemChange = async (index, field, value) => {
-    const updated = [...orderData];
-    const item = updated[index];
-    const oldValue = item[field];
+      const handleItemChange = async (index, field, value) => {
+      const updated = [...orderData];
+      const item = updated[index];
+      const oldValue = item[field];
 
-    item[field] = value;
-    setOrderData([...updated]);
+      item[field] = value;
+      setOrderData([...updated]);
 
+    // ---------------- SIZE UPDATE ----------------
     try {
       if (field === "size") {
         await updatePOItemSize({
@@ -125,6 +138,16 @@ export default function Checkout() {
         });
       }
 
+      if (field === "color") {
+        await updatePOItemColor({
+          productId: item.productId,
+          color: oldValue,
+          size: item.size,
+          newColor: value,
+        });
+      }
+
+      // ---------------- QTY UPDATE ----------------
       if (field === "qty") {
         const minQty = minQtyByProduct[item.productId] || 1;
         const newQty = Number(value) || 0;
@@ -326,15 +349,46 @@ export default function Checkout() {
               <td><input value={item.description || item.name} readOnly /></td>
 
               <td>
-                <input
-                  value={item.size || "N/A"}
-                  onChange={(e) =>
-                    handleItemChange(index, "size", e.target.value)
-                  }
-                />
+                {sizeOptionsByProduct[item.productId]?.length > 0 ? (
+                  <select
+                    value={item.size || ""}
+                    onChange={(e) =>
+                      handleItemChange(index, "size", e.target.value)
+                    }
+                  >
+                    <option value="">Select Size</option>
+
+                    {sizeOptionsByProduct[item.productId].map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input value={item.size || "N/A"} readOnly />
+                )}
               </td>
 
-              <td><input value={item.color || "N/A"} readOnly /></td>
+              <td>
+                {colorOptionsByProduct[item.productId]?.length > 0 ? (
+                  <select
+                    value={item.color || ""}
+                    onChange={(e) =>
+                      handleItemChange(index, "color", e.target.value)
+                    }
+                  >
+                    <option value="">Select Color</option>
+
+                    {colorOptionsByProduct[item.productId].map((color) => (
+                      <option key={color} value={color}>
+                        {color}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input value={item.color || "N/A"} readOnly />
+                )}
+              </td>
 
               <td>
                 <input
@@ -363,43 +417,77 @@ export default function Checkout() {
         <div className="po-left">
           <h3>Shipping Information</h3>
 
-          <input placeholder="First Name"
-            value={shippingInfo.firstName}
-            onChange={(e) => setShippingInfo({ ...shippingInfo, firstName: e.target.value })} />
+          <div className="form-grid">
+            <label>Name:</label>
+            <input
+              value={shippingInfo.firstName}
+              onChange={(e) =>
+                setShippingInfo({ ...shippingInfo, firstName: e.target.value })
+              }
+            />
 
-          <input placeholder="Last Name"
-            value={shippingInfo.lastName}
-            onChange={(e) => setShippingInfo({ ...shippingInfo, lastName: e.target.value })} />
+            <label>Last Name:</label>
+            <input
+              value={shippingInfo.lastName}
+              onChange={(e) =>
+                setShippingInfo({ ...shippingInfo, lastName: e.target.value })
+              }
+            />
 
-          <input placeholder="Email"
-            value={shippingInfo.email}
-            onChange={(e) => setShippingInfo({ ...shippingInfo, email: e.target.value })} />
+            <label>Email:</label>
+            <input
+              value={shippingInfo.email}
+              onChange={(e) =>
+                setShippingInfo({ ...shippingInfo, email: e.target.value })
+              }
+            />
 
-          <input placeholder="Phone"
-            value={shippingInfo.phone}
-            onChange={(e) => setShippingInfo({ ...shippingInfo, phone: e.target.value })} />
+            <label>Phone:</label>
+            <input
+              value={shippingInfo.phone}
+              onChange={(e) =>
+                setShippingInfo({ ...shippingInfo, phone: e.target.value })
+              }
+            />
 
-          <input placeholder="Address"
-            value={shippingInfo.address}
-            onChange={(e) => setShippingInfo({ ...shippingInfo, address: e.target.value })} />
+            <label>Address:</label>
+            <input
+              value={shippingInfo.address}
+              onChange={(e) =>
+                setShippingInfo({ ...shippingInfo, address: e.target.value })
+              }
+            />
 
-          <input placeholder="City"
-            value={shippingInfo.city}
-            onChange={(e) => setShippingInfo({ ...shippingInfo, city: e.target.value })} />
+            <label>City:</label>
+            <input
+              value={shippingInfo.city}
+              onChange={(e) =>
+                setShippingInfo({ ...shippingInfo, city: e.target.value })
+              }
+            />
 
-          <input placeholder="ZIP"
-            value={shippingInfo.zip}
-            onChange={(e) => setShippingInfo({ ...shippingInfo, zip: e.target.value })} />
+            <label>ZIP:</label>
+            <input
+              value={shippingInfo.zip}
+              onChange={(e) =>
+                setShippingInfo({ ...shippingInfo, zip: e.target.value })
+              }
+            />
 
-          <select className="checkout-country-select"
-            value={shippingInfo.country}
-            onChange={(e) =>
-              setShippingInfo({ ...shippingInfo, country: e.target.value })
-            }
-          >
-            <option value="">Select Country</option>
-            {countries.map(c => <option key={c}>{c}</option>)}
-          </select>
+            <label>Country:</label>
+            <select
+              className="checkout-country-select"
+              value={shippingInfo.country}
+              onChange={(e) =>
+                setShippingInfo({ ...shippingInfo, country: e.target.value })
+              }
+            >
+              <option value="">Select Country</option>
+              {countries.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="po-right">
@@ -415,7 +503,7 @@ export default function Checkout() {
                 style={{
                   width: "100px",
                   height: "100px",
-                  objectFit: "cover",
+                  objectFit: "contain",
                   borderRadius: "5px",
                   marginBottom: "5px",
                   border: "1px solid #ccc",

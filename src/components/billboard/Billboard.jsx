@@ -46,8 +46,19 @@ const Billboard = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
   };
 
-  const goNext = () => setIndex((prev) => prev + 1);
-  const goPrev = () => setIndex((prev) => prev - 1);
+  const goNext = () => {
+    setIndex((prev) => {
+      if (prev >= extendedSlides.length - 1) return prev;
+      return prev + 1;
+    });
+  };
+
+  const goPrev = () => {
+    setIndex((prev) => {
+      if (prev <= 0) return prev;
+      return prev - 1;
+    });
+  };
 
   // Pause all videos safely
   const pauseAllVideos = () => {
@@ -66,21 +77,27 @@ const Billboard = () => {
 
     const currentSlide = extendedSlides[index];
 
+    if (!currentSlide) return;
+
     if (currentSlide.type === "image") {
-      timeoutRef.current = setTimeout(goNext, delay);
+      timeoutRef.current = setTimeout(() => goNext(), delay);
     } else if (currentSlide.type === "video") {
       const video = videoRefs.current[index];
       if (video) {
         video.currentTime = 0;
         // Safely handle play promise
-        video.play().catch((err) => {
-          // Ignore AbortError (expected if paused immediately)
-          if (err.name !== "AbortError") console.error(err);
+        video.play()
+        .then(() => {
+          // video started successfully
+        })
+        .catch(() => {
+          // autoplay blocked → fallback to image-like behavior
+          timeoutRef.current = setTimeout(() => goNext(), delay);
         });
-      }
-    }
+            }
+          }
 
-    return () => resetTimeout();
+    return resetTimeout;
   }, [index]);
 
   // Handle seamless loop

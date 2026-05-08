@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+} from "react";
 import { UserContext } from "./UserContext";
 import { useGuest } from "./GuestContext";
 
@@ -7,11 +13,36 @@ const POContext = createContext();
 export const PurchaseOrderProvider = ({ children }) => {
   const [poItems, setPoItems] = useState([]);
   const [purchaseOrderId, setPurchaseOrderId] = useState(null);
+
   const { user } = useContext(UserContext);
   const { guest } = useGuest();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const getOwner = () => {
+    if (user && user._id) {
+      return {
+        ownerType: "User",
+        ownerId: user._id,
+      };
+    }
+
+    if (guest && guest._id) {
+      return {
+        ownerType: "Guest",
+        ownerId: guest._id,
+      };
+    }
+
+    return {
+      ownerType: null,
+      ownerId: null,
+    };
+  };
+
   const mapDraftItems = (source) =>
     (source || []).map((i) => ({
+      _id: i._id,
       productId: i.productId,
       styleNo: i.styleNo || "",
       name: i.name,
@@ -25,30 +56,34 @@ export const PurchaseOrderProvider = ({ children }) => {
 
   // Load draft items from server for logged-in users and guests.
   useEffect(() => {
-    const load = async () => {
-      let ownerType, ownerId;
+    let mounted = true;
 
-      // If user is logged in
-      if (user && user._id) {
-        ownerType = "User";
-        ownerId = user._id;
-      } else if (guest && guest._id) {
-        // If guest is logged in
-        ownerType = "Guest";
-        ownerId = guest._id;
-      }
+    const load = async () => {
+      const { ownerType, ownerId } = getOwner();
 
       // Load from server if we have owner info
       if (ownerType && ownerId) {
         try {
-          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}`, {
-            credentials: "include",
-          });
+          const res = await fetch(
+            `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}`,
+            {
+              credentials: "include",
+            }
+          );
+
           if (res.ok) {
             const data = await res.json();
-            if (data.purchaseOrderId) setPurchaseOrderId(data.purchaseOrderId);
+
+            if (!mounted) return;
+
+            if (data.purchaseOrderId) {
+              setPurchaseOrderId(data.purchaseOrderId);
+            }
+
             const items = mapDraftItems(data.items);
+
             setPoItems(items);
+
             return;
           }
         } catch (err) {
@@ -60,11 +95,58 @@ export const PurchaseOrderProvider = ({ children }) => {
     };
 
     load();
+
+    return () => {
+      mounted = false;
+    };
   }, [user, guest]);
 
   // Do not persist PO items in localStorage; server-side drafts are used when available.
 
-  const addToPO = (item) => {
+  const addToPO = async (item) => {
+    const { ownerType, ownerId } = getOwner();
+
+    const endpoint =
+      ownerType && ownerId
+        ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
+        : null;
+
+    // If backend exists, save there first
+    if (endpoint) {
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ items: [item] }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+
+          throw new Error(
+            err.error || err.message || "Failed to add item to PO"
+          );
+        }
+
+        const data = await res.json();
+
+        console.log("PO Response:", data);
+
+        const items = mapDraftItems(data.po?.items || data.po);
+
+        setPoItems(items);
+
+        return items;
+      } catch (err) {
+        console.error("Error adding item to server PO:", err);
+        throw err;
+      }
+    }
+
+    // Local fallback
     setPoItems((prev) => {
       // match by productId + color + size to keep combinations distinct
       const existing = prev.find(
@@ -79,7 +161,10 @@ export const PurchaseOrderProvider = ({ children }) => {
           p.productId === item.productId &&
           (p.color || null) === (item.color || null) &&
           (p.size || null) === (item.size || null)
-            ? { ...p, quantity: (p.quantity || 0) + (item.quantity || 0) }
+            ? {
+                ...p,
+                quantity: (p.quantity || 0) + (item.quantity || 0),
+              }
             : p
         );
       }
@@ -92,19 +177,12 @@ export const PurchaseOrderProvider = ({ children }) => {
     // Accept either a productId string or an object { productId, color, size }
     if (!productId) throw new Error("productId is required");
 
-    // Determine ownerType and ownerId
-    let ownerType, ownerId;
-    if (user && user._id) {
-      ownerType = "User";
-      ownerId = user._id;
-    } else if (guest && guest._id) {
-      ownerType = "Guest";
-      ownerId = guest._id;
-    }
+    const { ownerType, ownerId } = getOwner();
 
-    const endpoint = ownerType && ownerId
-      ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
-      : null;
+    const endpoint =
+      ownerType && ownerId
+        ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
+        : null;
 
     if (!endpoint) {
       throw new Error("Session not ready. Please wait a moment and try again.");
@@ -113,12 +191,16 @@ export const PurchaseOrderProvider = ({ children }) => {
     // If user or guest is logged in, request backend to remove
     try {
       let body = null;
-      if (typeof productId === "string") body = { productId };
-      else body = {
-        productId: productId.productId,
-        color: productId.color,
-        size: productId.size,
-      };
+
+      if (typeof productId === "string") {
+        body = { productId };
+      } else {
+        body = {
+          productId: productId.productId,
+          color: productId.color,
+          size: productId.size,
+        };
+      }
 
       const res = await fetch(endpoint, {
         method: "DELETE",
@@ -129,13 +211,18 @@ export const PurchaseOrderProvider = ({ children }) => {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
+
         throw new Error(err.error || err.message || "Failed to remove item");
       }
 
       const data = await res.json();
+
       console.log("PO Response:", data);
+
       const items = mapDraftItems(data.po?.items || data.po);
+
       setPoItems(items);
+
       return items;
     } catch (err) {
       console.error("Error removing item from server PO:", err);
@@ -143,41 +230,52 @@ export const PurchaseOrderProvider = ({ children }) => {
     }
   };
 
-  const updatePOItemQty = async ({ productId, color = null, size = null, qty }) => {
+  const updatePOItemQty = async ({
+    productId,
+    color = null,
+    size = null,
+    qty,
+  }) => {
     if (!productId) throw new Error("productId is required");
 
     const numericQty = Math.max(1, Number(qty) || 1);
 
-    let ownerType, ownerId;
-    if (user && user._id) {
-      ownerType = "User";
-      ownerId = user._id;
-    } else if (guest && guest._id) {
-      ownerType = "Guest";
-      ownerId = guest._id;
-    }
+    const { ownerType, ownerId } = getOwner();
 
-    const endpoint = ownerType && ownerId
-      ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
-      : null;
+    const endpoint =
+      ownerType && ownerId
+        ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
+        : null;
 
     if (endpoint) {
       const res = await fetch(endpoint, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ productId, color, size, qty: numericQty }),
+        body: JSON.stringify({
+          productId,
+          color,
+          size,
+          qty: numericQty,
+        }),
       });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || err.message || "Failed to update item quantity");
+
+        throw new Error(
+          err.error || err.message || "Failed to update item quantity"
+        );
       }
 
       const data = await res.json();
+
       console.log("PO Response:", data);
+
       const items = mapDraftItems(data.po?.items || data.po);
+
       setPoItems(items);
+
       return items;
     }
 
@@ -195,19 +293,12 @@ export const PurchaseOrderProvider = ({ children }) => {
   };
 
   const clearPO = async () => {
-    // Determine ownerType and ownerId
-    let ownerType, ownerId;
-    if (user && user._id) {
-      ownerType = "User";
-      ownerId = user._id;
-    } else if (guest && guest._id) {
-      ownerType = "Guest";
-      ownerId = guest._id;
-    }
+    const { ownerType, ownerId } = getOwner();
 
-    const endpoint = ownerType && ownerId
-      ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
-      : null;
+    const endpoint =
+      ownerType && ownerId
+        ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
+        : null;
 
     if (endpoint) {
       try {
@@ -220,10 +311,12 @@ export const PurchaseOrderProvider = ({ children }) => {
 
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
+
           throw new Error(err.error || err.message || "Failed to clear PO");
         }
 
         setPoItems([]);
+
         return;
       } catch (err) {
         console.error("Error clearing server PO:", err);
@@ -246,18 +339,12 @@ export const PurchaseOrderProvider = ({ children }) => {
   }) => {
     if (!productId) throw new Error("productId is required");
 
-    let ownerType, ownerId;
-    if (user && user._id) {
-      ownerType = "User";
-      ownerId = user._id;
-    } else if (guest && guest._id) {
-      ownerType = "Guest";
-      ownerId = guest._id;
-    }
+    const { ownerType, ownerId } = getOwner();
 
-    const endpoint = ownerType && ownerId
-      ? `${import.meta.env.VITE_API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items/size`
-      : null;
+    const endpoint =
+      ownerType && ownerId
+        ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items/size`
+        : null;
 
     if (!endpoint) {
       throw new Error("Session not ready. Please wait a moment and try again.");
@@ -282,13 +369,20 @@ export const PurchaseOrderProvider = ({ children }) => {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || err.message || "Failed to update item size");
+
+        throw new Error(
+          err.error || err.message || "Failed to update item size"
+        );
       }
 
       const data = await res.json();
+
       console.log("PO Response:", data);
+
       const items = mapDraftItems(data.po?.items || data.po);
+
       setPoItems(items);
+
       return items;
     } catch (err) {
       console.error("Error updating item size in server PO:", err);
@@ -296,8 +390,88 @@ export const PurchaseOrderProvider = ({ children }) => {
     }
   };
 
+  const updatePOItemColor = async ({
+    productId,
+    color = null,
+    size = null,
+    newColor = null,
+    newProductId,
+    newStyleNo,
+    newPrice,
+    newImage,
+  }) => {
+    if (!productId) throw new Error("productId is required");
+
+    const { ownerType, ownerId } = getOwner();
+
+    const endpoint =
+      ownerType && ownerId
+        ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
+        : null;
+
+    if (!endpoint) {
+      throw new Error("Session not ready. Please wait a moment and try again.");
+    }
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+
+        body: JSON.stringify({
+          productId,
+          color,
+          size,
+          newColor,
+          newProductId,
+          newStyleNo,
+          newPrice,
+          newImage,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+
+        throw new Error(
+          err.error || err.message || "Failed to update item color"
+        );
+      }
+
+      const data = await res.json();
+
+      console.log("PO Response:", data);
+
+      const items = mapDraftItems(data.po?.items || data.po);
+
+      setPoItems(items);
+
+      return items;
+    } catch (err) {
+      console.error("Error updating item color in server PO:", err);
+
+      throw err;
+    }
+  };
+
+  const value = useMemo(
+    () => ({
+      poItems,
+      purchaseOrderId,
+      setPurchaseOrderId,
+      addToPO,
+      removeFromPO,
+      updatePOItemQty,
+      updatePOItemSize,
+      updatePOItemColor,
+      clearPO,
+    }),
+    [poItems, purchaseOrderId]
+  );
+
   return (
-    <POContext.Provider value={{ poItems, purchaseOrderId, setPurchaseOrderId, addToPO, removeFromPO, updatePOItemQty, updatePOItemSize, clearPO }}>
+    <POContext.Provider value={value}>
       {children}
     </POContext.Provider>
   );
