@@ -26,6 +26,22 @@ if (typeof window !== "undefined") {
   });
 }
 
+// ===============================
+// GLOBAL FETCH SAFETY WRAPPER
+// ===============================
+if (typeof window !== "undefined") {
+  const originalFetch = window.fetch;
+
+  window.fetch = async (...args) => {
+    try {
+      return await originalFetch(...args);
+    } catch (err) {
+      console.error("Fetch error caught globally:", err);
+      throw err;
+    }
+  };
+}
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
