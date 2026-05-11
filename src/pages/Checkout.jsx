@@ -143,7 +143,7 @@ export default function Checkout() {
     try {
       const item = orderData[index];
 
-      if (field === "color") {
+        if (field === "color") {
         const product = productLookupByKey[item.productId] || null;
         const variants = Array.isArray(product?.variants) ? product.variants : [];
 
@@ -155,7 +155,7 @@ export default function Checkout() {
           ) || variants.find((v) => (v?.color || null) === (value || null));
 
         const resolvedSize = variant?.size ?? item.size;
-        const resolvedStyleNo = variant?.styleNo || product?.styleNo || item.styleNo || "";
+        const resolvedStyleNo = variant?.styleNo ?? product?.styleNo ?? ""; // always take the variant's styleNo
         const resolvedName = String(product?.name || item.name || "").trim();
         const resolvedDescription = String(
           variant?.description || product?.description || item.description || item.name || ""
@@ -169,33 +169,42 @@ export default function Checkout() {
           variant?.images_public_id || variant?.image ||
           product?.images_public_id?.[0] || item.image || null;
 
-        const updatedItems = await updatePOItemColor({
+        await updatePOItemColor({
           productId: item.productId,
           color: item.color,
           size: item.size,
           newColor: value,
           newSize: resolvedSize !== item.size ? resolvedSize : undefined,
           newProductId: product?._id ? String(product._id) : undefined,
-          newStyleNo: resolvedStyleNo,
+          newStyleNo: resolvedStyleNo, // pass the correct styleNo
           newPrice: resolvedPrice,
           newName: resolvedName,
           newDescription: resolvedDescription,
           newImage: resolvedImage,
         });
 
-        const refreshed = await refreshPO();
-        const refreshedItems = Array.isArray(refreshed) && refreshed.length > 0 ? refreshed : updatedItems;
+        // Update orderData directly in state to reflect changes immediately
+        setOrderData((prev) =>
+          prev.map((itm, i) =>
+            i === index
+              ? {
+                  ...itm,
+                  color: value,
+                  size: resolvedSize,
+                  styleNo: resolvedStyleNo, // <-- this ensures table shows the correct styleNo
+                  price: resolvedPrice,
+                  name: resolvedName,
+                  description: resolvedDescription,
+                  image: resolvedImage,
+                }
+              : itm
+          )
+        );
 
-        if (refreshedItems && refreshedItems.length) {
-          setOrderData(
-            refreshedItems.map((itm) => ({
-              ...itm,
-              qty: itm.quantity ?? itm.qty ?? 0,
-            }))
-          );
-        }
+        setError("");
+      }
 
-      } else if (field === "size") {
+      else if (field === "size") {
         const updatedItems = await updatePOItemSize({
           productId: item.productId,
           color: item.color,
@@ -221,35 +230,44 @@ export default function Checkout() {
           );
         }
 
-      } else if (field === "qty") {
-        const updatedItems = await updatePOItemQty({
-          productId: item.productId,
-          color: item.color,
-          size: item.size,
-          qty: Number(value),
-        });
+      } 
 
-        const refreshed = await refreshPO();
-        const refreshedItems = Array.isArray(refreshed) && refreshed.length > 0 ? refreshed : updatedItems;
+      else if (field === "qty") {
+  const minQty = minQtyByProduct[item.productId] ?? 1; // dynamic minQty from DB
+  if (Number(value) < minQty) {
+    setError(`Minimum quantity for this product is ${minQty}`);
+    return;
+  }
 
-        if (refreshedItems && refreshedItems.length) {
-          setOrderData(
-            refreshedItems.map((itm) => ({
-              ...itm,
-              qty: itm.quantity ?? itm.qty ?? 0,
-            }))
-          );
-        } else {
-          setOrderData((prev) =>
-            prev.map((itm, i) =>
-              i === index ? { ...itm, qty: Number(value) } : itm
-            )
-          );
-        }
-      }
+  const updatedItems = await updatePOItemQty({
+    productId: item.productId,
+    color: item.color,
+    size: item.size,
+    qty: Number(value),
+  });
 
-    setError("");
-  } catch (err) {
+  const refreshed = await refreshPO();
+  const refreshedItems = Array.isArray(refreshed) && refreshed.length > 0 ? refreshed : updatedItems;
+
+  if (refreshedItems && refreshedItems.length) {
+    setOrderData(
+      refreshedItems.map((itm) => ({
+        ...itm,
+        qty: itm.quantity ?? itm.qty ?? 0,
+      }))
+    );
+  } else {
+    setOrderData((prev) =>
+      prev.map((itm, i) =>
+        i === index ? { ...itm, qty: Number(value) } : itm
+      )
+    );
+  }
+
+  setError("");
+}
+    }
+    catch (err) {
     console.error("Failed to update PO item:", err);
     setError("Failed to update item");
   }
@@ -476,13 +494,20 @@ export default function Checkout() {
                     <input value={item.color || "N/A"} readOnly />
                   )}
                 </td>
-                <td>
+               <td>
                   <input
                     type="number"
+                    min={minQtyByProduct[item.productId] ?? 1} // dynamic minQty
                     value={getQty(item)}
-                    onChange={(e) =>
-                      handleItemChange(index, "qty", e.target.value)
-                    }
+                    onChange={(e) => {
+                      const newQty = Number(e.target.value);
+                      const minQty = minQtyByProduct[item.productId] ?? 1; // backend minQty
+                      if (newQty < minQty) {
+                        setError(`Minimum quantity for this product is ${minQty}`);
+                        return;
+                      }
+                      handleItemChange(index, "qty", newQty);
+                    }}
                   />
                 </td>
                 <td><input value={getPrice(item)} readOnly /></td>

@@ -40,7 +40,7 @@
 }
 
 .po-table select {
-  width: 100%;
+  width: auto;
   padding: 10px;
   margin-top: 5px;
   margin-bottom: 15px;
@@ -125,6 +125,10 @@
   .po-table td {
     padding: 8px;
     font-size: 0.9rem;
+  }
+
+  .po-table select{
+    width: 100%;
   }
 
   .po-actions {
