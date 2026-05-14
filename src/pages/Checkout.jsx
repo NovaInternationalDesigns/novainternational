@@ -51,11 +51,17 @@ export default function Checkout() {
 
   // ---------------- AUTH ----------------
   useEffect(() => {
-    if (!loading) {
-      if (!user && !guest) navigate("/signin");
-      if (!poItems.length) navigate("/");
+    if (loading) return;
+
+    if (!user && !guest) {
+      navigate("/signin");
+      return;
     }
-  }, [user, guest, loading, poItems]);
+
+    if (!poItems || poItems.length === 0) {
+      navigate("/");
+    }
+  }, [user, guest, loading, poItems, navigate]);
 
   // ---------------- LOAD DATA ----------------
   useEffect(() => {
@@ -374,7 +380,7 @@ export default function Checkout() {
 
   // ---------------- STRIPE PAYMENT ----------------
   const handlePayment = async () => {
-  setError("");
+  if (submitting) return;
 
   const validationError = validateShipping();
   if (validationError) {
@@ -402,7 +408,7 @@ export default function Checkout() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: safeStringify(payload),
+        body: JSON.stringify(payload),
       }
     );
 
@@ -420,9 +426,9 @@ export default function Checkout() {
     window.location.href = data.url;
 
   } catch (err) {
-    setError(err.message);
-    setSubmitting(false);
-  }
+  setError(err.message);
+  setSubmitting(false);
+}
 };
 
   if (loading) return null;
@@ -600,22 +606,23 @@ export default function Checkout() {
         </div>
 
         <div className="po-right">
-          <h3>Summary</h3>
+        <h3>Summary</h3>
 
-          {orderData.map((item, index) => (
-          <div key={index}>
-              <img
-                src={getImageUrl(item.image)}
-                alt={item.name || "Product"}
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  objectFit: "cover",
-                  borderRadius: "5px",
-                  marginBottom: "5px",
-                  border: "1px solid #ccc",
-                }}
-              />
+        {orderData.map((item, index) => (
+          <div key={getRowKey(item)} className="summary-item">
+            <img
+              src={getImageUrl(item.image)}
+              alt={item.name || "Product"}
+              style={{
+                width: "100px",
+                height: "100px",
+                objectFit: "cover",
+                borderRadius: "5px",
+                marginBottom: "5px",
+                border: "1px solid #ccc",
+              }}
+            />
+
             <p>Color: {item.color}</p>
             <p>Size: {item.size || "N/A"}</p>
             <p>Qty: {getQty(item)}</p>
@@ -624,18 +631,22 @@ export default function Checkout() {
           </div>
         ))}
 
-          <p>Subtotal: ${subtotal.toFixed(2)}</p>
-          <p>Tax: ${tax.toFixed(2)}</p>
-          <p>Fee: ${processingFee.toFixed(2)}</p>
+        <p>Subtotal: ${subtotal.toFixed(2)}</p>
+        <p>Tax: ${tax.toFixed(2)}</p>
+        <p>Fee: ${processingFee.toFixed(2)}</p>
 
-          <h3>Total: ${total.toFixed(2)}</h3>
+        <h3>Total: ${total.toFixed(2)}</h3>
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
-          <button className="checkout-submit-btn" onClick={handlePayment} disabled={submitting}>
-            {submitting ? "Redirecting..." : "Submit Purchase Order"}
-          </button>
-        </div>
+        <button
+          className="checkout-submit-btn"
+          onClick={handlePayment}
+          disabled={submitting}
+        >
+          {submitting ? "Redirecting..." : "Submit Purchase Order"}
+        </button>
+      </div>
 
       </div>
     </div>
