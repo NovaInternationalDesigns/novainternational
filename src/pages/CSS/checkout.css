@@ -24,6 +24,13 @@
   font-size: 15px;
 }
 
+.summary-item{
+  border:solid 1px #e0e0e0;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
 .checkout-summary-items {
   margin-bottom: 14px;
 }

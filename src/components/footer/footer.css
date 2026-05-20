@@ -1,10 +1,11 @@
 .footer {
-  background: #111;
-  color: #fff;
+  background: #ffffff;
+  color: #000000;
   padding: 20px;
   display: flex;             /* enables left/right alignment */
   justify-content: space-between;
   align-items: center;
+  border-top: 1px solid #e3e3e3;
 }
 
 .social-icons img {
@@ -38,13 +39,13 @@
 }
 
 .footer-col a {
-  color: #ccc;
+  color: #000000;
   text-decoration: none;
   font-size: 14px;
 }
 
 .footer-col a:hover {
-  color: #fff;
+  color: #000000;
 }
 
 /* bottom footer (your flex layout) */

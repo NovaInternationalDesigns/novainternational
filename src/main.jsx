@@ -34,7 +34,17 @@ if (typeof window !== "undefined") {
 
   window.fetch = async (...args) => {
     try {
-      return await originalFetch(...args);
+      const response = await originalFetch(...args);
+      
+      // Suppress 401 errors in console - they're expected for unauthenticated requests
+      if (response.status === 401) {
+        return response;
+      }
+      
+      if (!response.ok) {
+        console.error(`HTTP ${response.status}:`, response.url);
+      }
+      return response;
     } catch (err) {
       console.error("Fetch error caught globally:", err);
       throw err;

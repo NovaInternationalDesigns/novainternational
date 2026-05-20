@@ -3,7 +3,9 @@
 }
 
 .logo{
-    width: 250px;
+    width: 240px;
+    height: 118px;
+    padding-top: 2px;
 }
 
 body {
