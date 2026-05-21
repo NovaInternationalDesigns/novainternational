@@ -9,7 +9,7 @@ export const UserProvider = ({ children }) => {
   const didFetch = useRef(false);
 
   const fetchUser = async () => {
-    if (didFetch.current) return;   //  HARD STOP
+    if (didFetch.current) return;   // HARD STOP
 
     didFetch.current = true;        // set immediately to prevent spam
 
