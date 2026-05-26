@@ -40,8 +40,9 @@ if (typeof window !== "undefined") {
       if (response.status === 401) {
         return response;
       }
-      
-      if (!response.ok) {
+
+      // Suppress noisy 404 logs for expected-not-found resources (e.g. already-deleted drafts).
+      if (!response.ok && response.status !== 404) {
         console.error(`HTTP ${response.status}:`, response.url);
       }
       return response;

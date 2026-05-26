@@ -4,6 +4,7 @@ import {
   useEffect,
   useState,
   useMemo,
+  useRef,
 } from "react";
 import { UserContext } from "./UserContext";
 import { useGuest } from "./GuestContext";
@@ -18,6 +19,8 @@ export const PurchaseOrderProvider = ({ children }) => {
   const { guest } = useGuest();
 
   const API_URL = import.meta.env.VITE_API_URL;
+  // Prevent concurrent/in-flight clear operations
+  const clearingRef = useRef(false);
 
   const getOwner = () => {
     if (user && user._id) {
@@ -316,6 +319,12 @@ export const PurchaseOrderProvider = ({ children }) => {
   };
 
   const clearPO = async () => {
+  // Prevent duplicate/infinite clear requests
+  if (clearingRef.current) return;
+
+  clearingRef.current = true;
+
+  try {
     const { ownerType, ownerId } = getOwner();
 
     const endpoint =
@@ -323,32 +332,43 @@ export const PurchaseOrderProvider = ({ children }) => {
         ? `${API_URL}/api/purchaseOrderDraft/${ownerType}/${ownerId}/items`
         : null;
 
-    if (endpoint) {
-      try {
-        const res = await fetch(endpoint, {
-          method: "DELETE",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        });
-
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-
-          throw new Error(err.error || err.message || "Failed to clear PO");
-        }
-
-        setPoItems([]);
-
-        return;
-      } catch (err) {
-        console.error("Error clearing server PO:", err);
-        // fall through to local clear
-      }
+    // If no backend session exists, just clear local state
+    if (!endpoint) {
+      setPoItems([]);
+      return;
     }
 
+    const res = await fetch(endpoint, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    // Treat 404 as already cleared
+    if (res.ok || res.status === 404) {
+      setPoItems([]);
+      return;
+    }
+
+    const err = await res.json().catch(() => ({}));
+
+    throw new Error(
+      err.error ||
+        err.message ||
+        `Failed to clear PO (status ${res.status})`
+    );
+  } catch (err) {
+    console.error("Error clearing server PO:", err);
+
+    // Always clear local state anyway
     setPoItems([]);
-  };
+  } finally {
+    clearingRef.current = false;
+  }
+};
 
   const updatePOItemSize = async ({
     productId,

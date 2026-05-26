@@ -1,5 +1,5 @@
 // src/pages/OrderConfirmation.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { usePO } from "../context/PurchaseOrderContext";
 import "./CSS/orderConfirmation.css";
@@ -14,8 +14,12 @@ export default function OrderConfirmation() {
   
   const { clearPO } = usePO();
   const navigate = useNavigate();
+  const hasClearedRef = useRef(false);
 
   useEffect(() => {
+    // Prevent double execution (React StrictMode/dev) — only run the effect once per mount/sessionId
+    if (hasClearedRef.current) return;
+    hasClearedRef.current = true;
     if (!sessionId) {
       setError("No session ID found in the URL.");
       setLoading(false);
@@ -76,7 +80,8 @@ export default function OrderConfirmation() {
     };
 
     fetchOrder();
-  }, [sessionId, import.meta.env.VITE_API_URL, clearPO]);
+  // Only depend on sessionId to avoid retriggers from changing function refs or env wrappers
+  }, [sessionId]);
 
   useEffect(() => {
     if (loading || error || !order) return undefined;
