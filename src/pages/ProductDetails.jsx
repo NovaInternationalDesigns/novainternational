@@ -308,7 +308,7 @@ function ProductDetails() {
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: isProd ? 'include' : 'omit',
+        credentials: 'include',
         body: JSON.stringify({ items: poData }),
       });
 
