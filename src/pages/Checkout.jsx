@@ -628,7 +628,7 @@ export default function Checkout() {
             <p>Size: {item.size || "N/A"}</p>
             <p>Qty: {getQty(item)}</p>
             <p>Price: ${getPrice(item)}</p>
-            <p>Total: ${(getQty(item) * getPrice(item)).toFixed(2)}</p>
+            {/* <p>Total: ${(getQty(item) * getPrice(item)).toFixed(2)}</p> */}
           </div>
         ))}
 
