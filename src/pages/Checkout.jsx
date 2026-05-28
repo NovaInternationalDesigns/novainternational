@@ -396,6 +396,7 @@ export default function Checkout() {
       shippingInfo,
       subtotal,
       estimatedTax: tax,
+      processingFee,
       totalAmount: total,
       form: { email: shippingInfo.email },
       ownerId: String(user?._id || guest?._id),
