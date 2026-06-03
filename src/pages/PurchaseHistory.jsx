@@ -22,7 +22,9 @@ export default function PurchaseHistory() {
         setLoading(true);
         // Determine which endpoint to use
         const endpoint = user
-          ? `${import.meta.env.VITE_API_URL}/api/orders/my-orders`
+          ? user.role === "admin"
+            ? `${import.meta.env.VITE_API_URL}/api/orders/all`
+            : `${import.meta.env.VITE_API_URL}/api/orders/my-orders`
           : `${import.meta.env.VITE_API_URL}/api/orders/guest/${guest._id}?sessionId=${encodeURIComponent(
               guest.sessionId || ""
             )}`;
@@ -59,10 +61,12 @@ export default function PurchaseHistory() {
 
   return (
     <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
-      <h2>Your Purchase History</h2>
+      <h2>{user?.role === "admin" ? "All Orders" : "Your Purchase History"}</h2>
       <p>
         {user
-          ? `Welcome, ${user.name}!`
+          ? user.role === "admin"
+            ? `Welcome, ${user.name}! Showing all orders across users and guests.`
+            : `Welcome, ${user.name}!`
           : guest
           ? `Welcome, ${guest.name}!`
           : "Guest"}
@@ -127,6 +131,8 @@ export default function PurchaseHistory() {
                 <h4 style={{ marginBottom: "0.5rem" }}>Shipping Address</h4>
                 <p style={{ margin: "0", fontSize: "0.95rem" }}>
                   {order.shippingInfo.name}
+                  <br />
+                  {order.shippingInfo.phone }
                   <br />
                   {order.shippingInfo.address}
                   <br />
