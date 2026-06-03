@@ -23,7 +23,7 @@ export default function PurchaseHistory() {
         // Determine which endpoint to use
         const endpoint = user
           ? user.role === "admin"
-            ? `${import.meta.env.VITE_API_URL}/api/orders/all`
+            ? `${import.meta.env.VITE_API_URL}/api/orders`
             : `${import.meta.env.VITE_API_URL}/api/orders/my-orders`
           : `${import.meta.env.VITE_API_URL}/api/orders/guest/${guest._id}?sessionId=${encodeURIComponent(
               guest.sessionId || ""
