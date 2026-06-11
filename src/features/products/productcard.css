@@ -94,14 +94,9 @@
   font-size: 14px;
   border-radius: 5px;
   cursor: pointer;
-  border: none;
-  background-color: #000;
-  color: #fff;
+  border-radius: 5px;
+  color: #000000;
   transition: background-color 0.2s;
-}
-
-.add-po-btn:hover {
-  background-color: #333;
 }
 
 .buy-now-btn {

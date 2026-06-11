@@ -246,22 +246,14 @@
 
 .checkout-submit-btn {
   width: 60%;
-  padding: 14px 16px;
-  background: #000;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
+  padding: 12px 25px;
+  color: #000000;
+  border-radius: 5px;
   font-size: 16px;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-.checkout-submit-btn:hover {
-  background: #111;
-  transform: translateY(-1px);
-}
 
 .checkout-country-select {
   width: 100%;
