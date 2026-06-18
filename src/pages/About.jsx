@@ -41,13 +41,13 @@ const About = () => {
       </div>
 
       <div className="team-member">
-        <img src="images/Shila-photo.jpeg" alt="Shila Pattewar" className="team-photo" />
+        <img src="images/Shila-photo.jpeg" alt="Shila" className="team-photo" />
         <div className="team-info">
-          <p><strong>Name:</strong> Shila Pattewar</p>
+          <p><strong>Name:</strong> Shila</p>
           <p><strong>Designation:</strong> Software Developer</p>
           <p><strong>Experience:</strong> Extensive experience in software development and contributed to various projects at Nova International Designs Corporation</p>
           <p>
-            <a href="https://www.linkedin.com/in/shila-front-end-developer/" target="_blank" >
+            <a href="https://www.linkedin.com/" target="_blank" >
               LinkedIn Account
             </a>
           </p>
