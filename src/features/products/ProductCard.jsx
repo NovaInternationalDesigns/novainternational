@@ -95,7 +95,7 @@ function ProductCard({ product }) {
       </h3>
 
       <h4>Style No: {product.styleNo}</h4>
-      <p className="price">USD {product.price}</p>
+      <p className="price">MRP {product.price} USD</p>
     </div>
   );
 }

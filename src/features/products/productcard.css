@@ -93,8 +93,8 @@
   padding: 10px 15px;
   font-size: 14px;
   border-radius: 5px;
+  border: 1px solid #ccc;
   cursor: pointer;
-  border-radius: 5px;
   color: #000000;
   transition: background-color 0.2s;
 }

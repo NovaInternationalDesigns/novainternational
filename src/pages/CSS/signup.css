@@ -37,14 +37,22 @@
   cursor: pointer;
 }
 
-.signup-button:disabled {
+#signup-name, #signup-email, #signup-password, #signup-confirm-password {
+  width: 100%;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+/* .signup-button:disabled {
   background-color: #555;
   cursor: not-allowed;
 }
 
 .signup-button:hover:not(:disabled) {
   background-color: #333;
-}
+} */
 
 .signup-error {
   color: red;
