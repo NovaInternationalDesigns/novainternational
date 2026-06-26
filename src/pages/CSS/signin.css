@@ -31,10 +31,6 @@
   cursor: pointer;
 }
 
-.signin-button:hover {
-  background: #333;
-}
-
 .signin-error {
   color: red;
   margin-top: 10px;
