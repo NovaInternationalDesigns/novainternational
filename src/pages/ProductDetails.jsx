@@ -370,7 +370,7 @@ function ProductDetails() {
           })()}
         </h1>
         <p className="style-no">Style No: {selectedVariant?.styleNo || product.styleNo}</p>
-        <h2 className="price">USD {selectedVariant?.price ?? product.price}</h2>
+        <h2 className="price">MRP {selectedVariant?.price ?? product.price} USD</h2>
         {/* <p className="category">{product.category}</p> */}
         <p className="description">{product.description || "N/A"}</p>
 

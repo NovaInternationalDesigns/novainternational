@@ -22,8 +22,8 @@
 }
 
 .price {
-  font-size: 28px;
-  color: #b12704;
+  font-size: 16px;
+  color: #e63946;
   font-weight: bold;
   margin: 10px 0;
 }
@@ -34,7 +34,7 @@
 }
 
 .style-no {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   color: #333;
 }
@@ -87,19 +87,15 @@
 }
 
 .order-combinations > button {
-  background-color: #000;
-  color: #fff;
-  border: none;
+  color: #000000;
+  border: 1px solid #ccc;
   padding: 8px 16px;
   margin-top: 10px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 5px;
   transition: all 0.2s ease-in-out;
 }
 
-.order-combinations > button:hover {
-  background-color: #333;
-}
 
 .min-qty-note {
   font-size: 0.9rem;
